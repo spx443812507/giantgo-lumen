@@ -16,7 +16,8 @@ $app->get('/', function () use ($app) {
 });
 
 $app->get('users/{id}', 'UserController@get');
+$app->get('users/me', 'UserController@me');
 $app->get('users', 'UserController@getList');
 
-$app->get('passports', 'PassportController@signIn');
+$app->patch('passports', 'PassportController@signIn');
 $app->post('passports', 'PassportController@signUp');

@@ -1,17 +1,18 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Auth\Authorizable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
+class User extends BaseModel implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, Authorizable;
+    use Authenticatable, Authorizable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -19,7 +20,7 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
      * @var array
      */
     protected $fillable = [
-        'name', 'email',
+        'name', 'email', 'password'
     ];
 
     /**
@@ -28,8 +29,20 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
      * @var array
      */
     protected $hidden = [
-        'password',
+        'password', 'remember_token'
     ];
+
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = ['last_login'];
+
+    public function setPasswordAttribute($password)
+    {
+        $this->attributes['password'] = Hash::make($password);
+    }
 
     public function getJWTIdentifier()
     {

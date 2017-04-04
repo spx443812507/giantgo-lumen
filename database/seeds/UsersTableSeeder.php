@@ -17,19 +17,12 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(App\User::class)->create([
+        factory(App\Models\User::class)->create([
+            'name' => 'siler',
             'email' => 'spx@foxmail.com',
-            'password' => app('hash')->make('123123')
-        ]);
-
-        factory(App\User::class)->create([
-            'email' => 'user2@example.com',
-            'password' => app('hash')->make('1234')
-        ]);
-
-        factory(App\User::class)->create([
-            'email' => 'user3@example.com',
-            'password' => app('hash')->make('1234')
+            'mobile' => '15930181489',
+            'password' => app('hash')->make('123123'),
+            'last_login' => new DateTime()
         ]);
     }
 }
