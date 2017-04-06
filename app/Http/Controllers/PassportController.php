@@ -28,6 +28,8 @@ class PassportController extends Controller
         $this->validate($request, [
             'email' => 'required|email|max:255',
             'password' => 'required',
+        ], [
+            'required' => '请填写:attribute'
         ]);
 
         try {
@@ -64,7 +66,7 @@ class PassportController extends Controller
         try {
             $user = User::create($userInfo);
         } catch (Exception $exception) {
-            return response()->json(['error' => 'User already exists.'], 500);
+            return response()->json(['error' => 'user_already_exists'], 500);
         }
 
         $token = $this->jwt->fromUser($user);

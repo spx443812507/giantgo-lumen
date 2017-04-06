@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Exceptions;
 
@@ -20,6 +21,7 @@ class UserController extends Controller
     public function __construct(JWTAuth $jwt)
     {
         $this->jwt = $jwt;
+        $this->middleware('auth');
     }
 
     public function me()
