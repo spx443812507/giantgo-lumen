@@ -8,5 +8,6 @@
 
 return [
     'user_not_exists' => '用户不存在',
-    'user_already_exists' => '用户已存在'
+    'user_already_exists' => '用户已存在',
+    'unauthorized' => '未授权的用户'
 ];

@@ -8,5 +8,6 @@
 
 return [
     'user_not_exists' => 'The user is not exists',
-    'user_already_exists' => 'The user is already exists'
+    'user_already_exists' => 'The user is already exists',
+    'unauthorized' => 'The user is unauthorized'
 ];

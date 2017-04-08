@@ -21,13 +21,15 @@ class Localization
 
         if (!$response->isSuccessful()) {
 
-            $error = $response->getData();
+            $content = $response->getContent();
 
-            if (property_exists($error, 'error')) {
-                $response->setData([
-                    'error' => $error->error,
-                    'message' => trans('response.' . $error->error)
-                ]);
+            $content = json_decode($content);
+
+            if (property_exists($content, 'error')) {
+                $response->setContent(json_encode([
+                    'error' => $content->error,
+                    'message' => trans('response.' . $content->error)
+                ]));
             }
         }
 
