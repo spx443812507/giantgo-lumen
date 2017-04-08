@@ -10,7 +10,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends BaseModel implements JWTSubject, AuthenticatableContract, AuthorizableContract
+class User extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable, SoftDeletes;
 
@@ -20,7 +20,7 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password'
+        'name', 'email', 'password', 'mobile'
     ];
 
     /**
@@ -38,6 +38,11 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
      * @var array
      */
     protected $dates = ['last_login'];
+
+    protected $casts = [
+        'verified_email' => 'boolean',
+        'verified_mobile' => 'boolean'
+    ];
 
     public function setPasswordAttribute($password)
     {

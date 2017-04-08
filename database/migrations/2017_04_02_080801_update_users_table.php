@@ -14,7 +14,7 @@ class UpdateUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('mobile');
+            $table->string('mobile')->unique();
             $table->boolean('verified_email');
             $table->boolean('verified_mobile');
             $table->dateTime('last_login')->nullable();;

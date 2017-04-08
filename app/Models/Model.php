@@ -9,9 +9,9 @@
 namespace App\Models;
 
 use DateTimeInterface;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model as BaseModel;
 
-class BaseModel extends Model
+class Model extends BaseModel
 {
     protected function serializeDate(DateTimeInterface $date)
     {
