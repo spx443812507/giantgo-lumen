@@ -10,14 +10,21 @@
 | and give it the Closure to call when that URI is requested.
 |
 */
+$prefix = env('API_PREFIX');
 
-$app->get('/', function () use ($app) {
-    return phpinfo();
+$app->group(['prefix' => $prefix], function () use ($app) {
+    $app->get('/', function () use ($app) {
+        return phpinfo();
+    });
+
+    $app->group(['prefix' => 'passports'], function () use ($app) {
+        $app->patch('/', 'PassportController@signIn');
+        $app->post('/', 'PassportController@signUp');
+    });
+
+    $app->group(['middleware' => 'auth'], function () use ($app) {
+        $app->get('users/{id}', 'UserController@get');
+        $app->get('users/me', 'UserController@me');
+        $app->get('users', 'UserController@getList');
+    });
 });
-
-$app->get('users/{id}', 'UserController@get');
-$app->get('users/me', 'UserController@me');
-$app->get('users', 'UserController@getList');
-
-$app->patch('passports', 'PassportController@signIn');
-$app->post('passports', 'PassportController@signUp');

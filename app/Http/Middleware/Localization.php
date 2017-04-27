@@ -15,11 +15,18 @@ class Localization
      */
     public function handle($request, Closure $next)
     {
+        $acceptLanguage = $request->header('accept-language');
+
+        if ($acceptLanguage) {
+            $language = substr(current(explode(',', $acceptLanguage)), 0, 2);
+            app('translator')->setLocale($language);
+        }
         app('translator')->setLocale('zh');
 
         $response = $next($request);
 
-        if (!$response->isSuccessful()) {
+        //escape parameters error
+        if (!$response->isSuccessful() && $response->getStatusCode() !== 422) {
 
             $content = $response->getContent();
 

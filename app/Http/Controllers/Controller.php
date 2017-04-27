@@ -25,9 +25,8 @@ class Controller extends BaseController
             }
 
             $result[$input] = $error;
-
         }
 
-        return ['errors' => $result, 'message' => 'validation_failed'];
+        return ['error' => $result, 'message' => 'validation_failed'];
     }
 }
