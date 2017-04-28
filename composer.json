@@ -13,7 +13,8 @@
     "laravel/lumen-framework": "5.4.*",
     "vlucas/phpdotenv": "~2.2",
     "tymon/jwt-auth": "1.0.0-beta.1",
-    "nesbot/carbon": "^1.0"
+    "nesbot/carbon": "^1.0",
+    "zizaco/entrust": "5.2.x-dev"
   },
   "require-dev": {
     "fzaninotto/faker": "~1.4",

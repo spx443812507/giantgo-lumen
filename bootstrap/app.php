@@ -60,11 +60,14 @@ $app->singleton(
 */
 
 $app->middleware([
-    'localization' => App\Http\Middleware\Localization::class
+    'localization' => App\Http\Middleware\Localization::class,
 ]);
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
+    'role' => \Zizaco\Entrust\Middleware\EntrustRole::class,
+    'permission' => \Zizaco\Entrust\Middleware\EntrustPermission::class,
+    'ability' => \Zizaco\Entrust\Middleware\EntrustAbility::class,
 ]);
 
 /*
@@ -81,6 +84,7 @@ $app->routeMiddleware([
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
+$app->register(Zizaco\Entrust\EntrustServiceProvider::class);
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes

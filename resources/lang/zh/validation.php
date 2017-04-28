@@ -94,5 +94,8 @@ return [
         'password' => '密码',
         'content' => '内容',
         'identity' => '手机号/用户名',
+        'name' => '名称',
+        'display_name' => '显示名称',
+        'description' => '描述'
     ],
 ];

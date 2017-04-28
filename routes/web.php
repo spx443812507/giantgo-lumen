@@ -22,6 +22,10 @@ $app->group(['prefix' => $prefix], function () use ($app) {
         $app->post('/', 'PassportController@signUp');
     });
 
+    $app->group(['prefix' => 'roles'], function () use ($app) {
+        $app->post('/', 'RoleController@create');
+    });
+
     $app->group(['prefix' => 'admins', 'middleware' => 'auth'], function () use ($app) {
         $app->get('users/me', 'UserController@me');
     });

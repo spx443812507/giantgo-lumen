@@ -9,10 +9,11 @@ use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Zizaco\Entrust\Traits\EntrustUserTrait;
 
 class User extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, Authorizable, SoftDeletes;
+    use Authenticatable, Authorizable, EntrustUserTrait, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
