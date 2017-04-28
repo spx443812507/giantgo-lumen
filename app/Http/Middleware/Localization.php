@@ -20,8 +20,9 @@ class Localization
         if ($acceptLanguage) {
             $language = substr(current(explode(',', $acceptLanguage)), 0, 2);
             app('translator')->setLocale($language);
+        } else {
+            app('translator')->setLocale('zh');
         }
-        app('translator')->setLocale('zh');
 
         $response = $next($request);
 
@@ -32,7 +33,7 @@ class Localization
 
             $content = json_decode($content);
 
-            if (property_exists($content, 'error')) {
+            if (isset($content) && property_exists($content, 'error')) {
                 $response->setContent(json_encode([
                     'error' => $content->error,
                     'message' => trans('response.' . $content->error)

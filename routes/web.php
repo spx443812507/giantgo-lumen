@@ -12,18 +12,21 @@
 */
 $prefix = env('API_PREFIX');
 
-$app->group(['prefix' => $prefix], function () use ($app) {
-    $app->get('/', function () use ($app) {
-        return phpinfo();
-    });
+$app->get($prefix . '/', function () use ($app) {
+    return phpinfo();
+});
 
+$app->group(['prefix' => $prefix], function () use ($app) {
     $app->group(['prefix' => 'passports'], function () use ($app) {
         $app->patch('/', 'PassportController@signIn');
         $app->post('/', 'PassportController@signUp');
     });
 
+    $app->group(['prefix' => 'admins', 'middleware' => 'auth'], function () use ($app) {
+        $app->get('users/me', 'UserController@me');
+    });
+
     $app->group(['middleware' => 'auth'], function () use ($app) {
-        $app->get('users/{id}', 'UserController@get');
         $app->get('users/me', 'UserController@me');
         $app->get('users', 'UserController@getList');
     });
