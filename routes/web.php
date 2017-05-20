@@ -22,16 +22,23 @@ $app->group(['prefix' => $prefix], function () use ($app) {
         $app->post('/', 'PassportController@signUp');
     });
 
-    $app->group(['prefix' => 'roles'], function () use ($app) {
-        $app->post('/', 'RoleController@create');
-    });
-
-    $app->group(['prefix' => 'admins', 'middleware' => 'auth'], function () use ($app) {
-        $app->get('users/me', 'UserController@me');
-    });
-
     $app->group(['middleware' => 'auth'], function () use ($app) {
         $app->get('users/me', 'UserController@me');
-        $app->get('users', 'UserController@getList');
+
+        $app->group(['middleware' => 'role:admin'], function () use ($app) {
+            $app->get('users', 'UserController@getList');
+
+            $app->group(['prefix' => 'roles'], function () use ($app) {
+                $app->post('/', 'RoleController@create');
+            });
+        });
+
+        $app->group(['middleware' => 'role:owner'], function () use ($app) {
+
+        });
+
+        $app->group(['middleware' => 'role:customer'], function () use ($app) {
+
+        });
     });
 });

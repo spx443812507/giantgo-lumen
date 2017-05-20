@@ -11,4 +11,7 @@ return [
     'user_already_exists' => 'The user is already exists',
     'unauthorized' => 'The user is unauthorized',
     'create_role_error' => 'Create role error',
+    'role_error' => 'Your role is error',
+    'permission_error' => 'The permission  is error',
+    'ability_error' => 'Insufficient of permission'
 ];

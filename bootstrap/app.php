@@ -65,9 +65,9 @@ $app->middleware([
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
-    'role' => \Zizaco\Entrust\Middleware\EntrustRole::class,
-    'permission' => \Zizaco\Entrust\Middleware\EntrustPermission::class,
-    'ability' => \Zizaco\Entrust\Middleware\EntrustAbility::class,
+    'role' => App\Http\Middleware\Role::class,
+    'permission' => App\Http\Middleware\Permission::class,
+    'ability' => App\Http\Middleware\Ability::class,
 ]);
 
 /*

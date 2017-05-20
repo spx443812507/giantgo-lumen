@@ -13,7 +13,12 @@ use Zizaco\Entrust\Traits\EntrustUserTrait;
 
 class User extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, Authorizable, EntrustUserTrait, SoftDeletes;
+    use Authenticatable, Authorizable, SoftDeletes, EntrustUserTrait {
+        SoftDeletes::restore insteadof EntrustUserTrait;
+        EntrustUserTrait::restore insteadof SoftDeletes;
+        Authorizable::can insteadof EntrustUserTrait;
+        EntrustUserTrait::can as hasPermission;
+    }
 
     /**
      * The attributes that are mass assignable.

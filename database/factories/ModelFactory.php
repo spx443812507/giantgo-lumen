@@ -17,3 +17,11 @@ $factory->define(App\Models\User::class, function (Faker\Generator $faker) {
         'email' => $faker->unique()->email
     ];
 });
+
+$factory->define(App\Models\Role::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->unique()->name,
+        'display_name' => $faker->name,
+        'description' => $faker->title
+    ];
+});

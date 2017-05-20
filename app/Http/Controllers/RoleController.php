@@ -45,8 +45,14 @@ class RoleController extends Controller
         return response()->json($role, 200);
     }
 
-    public function get()
+    public function get(Request $request)
     {
+        $this->validate($request, [
+            'name' => 'required|unique:roles',
+            'display_name' => 'required',
+            'description' => 'required'
+        ]);
+
         return response()->json();
     }
 }
