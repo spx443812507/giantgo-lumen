@@ -23,22 +23,11 @@ $app->group(['prefix' => $prefix], function () use ($app) {
     });
 
     $app->group(['middleware' => 'auth'], function () use ($app) {
-        $app->get('users/me', 'UserController@me');
+        $app->get('/users/me', 'UserController@me');
+        $app->get('/users', ['as' => 'users.get', 'uses' => 'UserController@getList', 'middleware' => 'role:admin']);
 
-        $app->group(['middleware' => 'role:admin'], function () use ($app) {
-            $app->get('users', 'UserController@getList');
+        $app->post('/roles', ['as' => 'roles.create', 'uses' => 'RoleController@create', 'middleware' => 'permission:role-create']);
 
-            $app->group(['prefix' => 'roles'], function () use ($app) {
-                $app->post('/', 'RoleController@create');
-            });
-        });
-
-        $app->group(['middleware' => 'role:owner'], function () use ($app) {
-
-        });
-
-        $app->group(['middleware' => 'role:customer'], function () use ($app) {
-
-        });
+        $app->post('/products', ['as' => 'products.create', 'uses' => 'ProductController@create', 'middleware' => 'permission:product-create']);
     });
 });

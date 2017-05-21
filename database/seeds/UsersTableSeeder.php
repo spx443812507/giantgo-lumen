@@ -25,7 +25,7 @@ class UsersTableSeeder extends Seeder
             'last_login' => new DateTime()
         ]);
 
-        $role = factory(App\Models\Role::class)->create([
+        $admin = factory(App\Models\Role::class)->create([
             'name' => 'admin',
             'display_name' => '系统管理员',
             'description' => '系统管理员，拥有整个系统最大权限',
@@ -43,6 +43,6 @@ class UsersTableSeeder extends Seeder
             'description' => '消费者',
         ]);
 
-        $user->attachRole($role);
+        $user->attachRole($admin);
     }
 }

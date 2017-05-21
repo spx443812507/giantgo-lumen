@@ -25,3 +25,19 @@ $factory->define(App\Models\Role::class, function (Faker\Generator $faker) {
         'description' => $faker->title
     ];
 });
+
+$factory->define(App\Models\Permission::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->unique()->name,
+        'display_name' => $faker->name,
+        'description' => $faker->title
+    ];
+});
+
+$factory->define(App\Models\Product::class, function (Faker\Generator $faker) {
+    return [
+        'title' => $faker->unique()->name,
+        'description' => $faker->name,
+        'price' => $faker->title
+    ];
+});

@@ -7,6 +7,7 @@
  */
 
 return [
+    'create_error' => 'The creation is error',
     'user_not_exists' => 'The user is not exists',
     'user_already_exists' => 'The user is already exists',
     'unauthorized' => 'The user is unauthorized',

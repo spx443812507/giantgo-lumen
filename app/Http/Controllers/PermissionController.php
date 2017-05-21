@@ -6,7 +6,7 @@
  * Time: 下午2:23
  */
 
-namespace app\Http\Controllers;
+namespace App\Http\Controllers;
 
 
 class PermissionController extends Controller

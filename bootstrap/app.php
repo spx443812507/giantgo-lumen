@@ -27,6 +27,7 @@ $app->withFacades();
 
 $app->withEloquent();
 
+$app->configure('entrust');
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings

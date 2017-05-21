@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Hash;
-use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -13,12 +12,7 @@ use Zizaco\Entrust\Traits\EntrustUserTrait;
 
 class User extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, Authorizable, SoftDeletes, EntrustUserTrait {
-        SoftDeletes::restore insteadof EntrustUserTrait;
-        EntrustUserTrait::restore insteadof SoftDeletes;
-        Authorizable::can insteadof EntrustUserTrait;
-        EntrustUserTrait::can as hasPermission;
-    }
+    use Authenticatable, SoftDeletes, EntrustUserTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -63,5 +57,10 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function products()
+    {
+        return $this->hasMany('App\Models\Product');
     }
 }
