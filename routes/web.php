@@ -30,4 +30,6 @@ $app->group(['prefix' => $prefix], function () use ($app) {
 
         $app->post('/products', ['as' => 'products.create', 'uses' => 'ProductController@create', 'middleware' => 'permission:product-create']);
     });
+
+    $app->get('/products/export', ['as' => 'products.export', 'uses' => 'ProductController@export']);
 });

@@ -9,7 +9,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Exception;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Tymon\JWTAuth\JWTAuth;
 
 class ProductController extends Controller
@@ -40,5 +42,18 @@ class ProductController extends Controller
         }
 
         return response()->json($product, 201);
+    }
+
+    public function export()
+    {
+        Excel::create('Laravel Excel', function ($excel) {
+
+            $excel->sheet('Excel sheet', function ($sheet) {
+
+                $sheet->setOrientation('landscape');
+
+            });
+
+        })->export('xls');
     }
 }
