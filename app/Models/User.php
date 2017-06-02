@@ -56,7 +56,7 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
 
     public function getJWTCustomClaims()
     {
-        return [];
+        return ['email' => $this->attributes['email']];
     }
 
     public function products()
