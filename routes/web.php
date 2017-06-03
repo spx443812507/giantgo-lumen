@@ -32,4 +32,9 @@ $app->group(['prefix' => $prefix], function () use ($app) {
     });
 
     $app->get('/products/export', ['as' => 'products.export', 'uses' => 'ProductController@export']);
+
+    $app->group(['prefix' => 'oauth'], function () use ($app) {
+        $app->get('/wechat/login', 'OAuthController@weChatLogin');
+        $app->get('/wechat/callback', 'OAuthController@weChatCallback');
+    });
 });
