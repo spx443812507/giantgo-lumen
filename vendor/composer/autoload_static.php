@@ -114,6 +114,7 @@ class ComposerStaticInit5a2eca509d1c4b17bd17b937e46e67bc
         ),
         'F' => 
         array (
+            'Firebase\\JWT\\' => 13,
             'FastRoute\\' => 10,
             'Faker\\' => 6,
         ),
@@ -362,6 +363,10 @@ class ComposerStaticInit5a2eca509d1c4b17bd17b937e46e67bc
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
+        'Firebase\\JWT\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
+        ),
         'FastRoute\\' => 
         array (
             0 => __DIR__ . '/..' . '/nikic/fast-route/src',
@@ -442,6 +447,7 @@ class ComposerStaticInit5a2eca509d1c4b17bd17b937e46e67bc
 
     public static $classMap = array (
         'CreateEavTable' => __DIR__ . '/../..' . '/database/migrations/2017_06_01_133724_create_eav_table.php',
+        'CreateOauthuserTable' => __DIR__ . '/../..' . '/database/migrations/2017_06_04_032417_create_oauthuser_table.php',
         'CreateProductsTable' => __DIR__ . '/../..' . '/database/migrations/2017_05_21_013443_create_products_table.php',
         'CreateUsersTable' => __DIR__ . '/../..' . '/database/migrations/2017_03_31_094309_create_users_table.php',
         'DatabaseSeeder' => __DIR__ . '/../..' . '/database/seeds/DatabaseSeeder.php',

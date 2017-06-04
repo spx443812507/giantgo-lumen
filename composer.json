@@ -20,7 +20,8 @@
     "guzzlehttp/guzzle": "~6.0",
     "tymon/jwt-auth": "1.0.0-beta.3",
     "zizaco/entrust": "5.2.x-dev",
-    "overtrue/laravel-wechat": "~3.0"
+    "overtrue/laravel-wechat": "~3.0",
+    "firebase/php-jwt": "^4.0"
   },
   "require-dev": {
     "fzaninotto/faker": "~1.4",

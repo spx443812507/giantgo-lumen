@@ -14,5 +14,8 @@ return [
     'create_role_error' => 'Create role error',
     'role_error' => 'Your role is error',
     'permission_error' => 'The permission  is error',
-    'ability_error' => 'Insufficient of permission'
+    'ability_error' => 'Insufficient of permission',
+    'token_expired' => 'The token is expired',
+    'token_invalid' => 'The token is invalid',
+    'token_absent' => 'The token is absent',
 ];

@@ -8,9 +8,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OAuthUser;
 use App\Models\User;
 use Exception;
+use Firebase\JWT\ExpiredException;
+use Firebase\JWT\SignatureInvalidException;
 use Illuminate\Http\Request;
+use Firebase\JWT\JWT;
 use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Exceptions;
 
@@ -21,6 +25,23 @@ class PassportController extends Controller
     public function __construct(JWTAuth $jwt)
     {
         $this->jwt = $jwt;
+    }
+
+    private function bindOAuthUser($user, $token)
+    {
+        try {
+            $payload = JWT::decode($token, env('JWT_SECRET'), array('HS256'));
+        } catch (ExpiredException $e) {
+            return response()->json(['error' => 'token_expired'], 500);
+        } catch (SignatureInvalidException $e) {
+            return response()->json(['error' => 'token_invalid'], 500);
+        }
+
+        $oAuthUser = OAuthUser::find($payload->sub)->first();
+
+        if (!empty($oAuthUser)) {
+            $user->oAuthUsers()->save($oAuthUser);
+        }
     }
 
     public function signIn(Request $request)
@@ -48,6 +69,10 @@ class PassportController extends Controller
 
         $user->save();
 
+        if (!empty($request->input('verify'))) {
+            $this->bindOAuthUser($user, $request->input('verify'));
+        }
+
         return response()->json(compact('token'));
     }
 
@@ -66,6 +91,10 @@ class PassportController extends Controller
             $user = User::create($userInfo);
         } catch (Exception $exception) {
             return response()->json(['error' => 'user_already_exists'], 500);
+        }
+
+        if (!empty($request->input('verify'))) {
+            $this->bindOAuthUser($user, $request->input('verify'));
         }
 
         $token = $this->jwt->fromUser($user);
