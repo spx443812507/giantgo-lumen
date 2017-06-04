@@ -56,13 +56,7 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
 
     public function getJWTCustomClaims()
     {
-        $claims = ['provider' => 'giantgo'];
-
-        if (!empty($this->attributes['email'])) {
-            $claims['email'] = $this->attributes['email'];
-        }
-
-        return $claims;
+        return ['provider' => 'giantgo'];
     }
 
     public function products()
@@ -70,8 +64,8 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
         return $this->hasMany('App\Models\Product');
     }
 
-    public function oAuthUsers()
+    public function socialAccounts()
     {
-        return $this->hasMany('App\Models\OAuthUser');
+        return $this->hasMany('App\Models\SocialAccount');
     }
 }

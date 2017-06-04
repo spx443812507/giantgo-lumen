@@ -8,7 +8,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OAuthUser;
+use App\Models\SocialAccount;
 use App\Models\User;
 use Exception;
 use Firebase\JWT\ExpiredException;
@@ -27,7 +27,7 @@ class PassportController extends Controller
         $this->jwt = $jwt;
     }
 
-    private function bindOAuthUser($user, $token)
+    private function bindSocialAccount($user, $token)
     {
         try {
             $payload = JWT::decode($token, env('JWT_SECRET'), array('HS256'));
@@ -37,7 +37,7 @@ class PassportController extends Controller
             return response()->json(['error' => 'token_invalid'], 500);
         }
 
-        $oAuthUser = OAuthUser::find($payload->sub)->first();
+        $oAuthUser = SocialAccount::find($payload->sub)->first();
 
         if (!empty($oAuthUser)) {
             $user->oAuthUsers()->save($oAuthUser);
@@ -70,7 +70,7 @@ class PassportController extends Controller
         $user->save();
 
         if (!empty($request->input('verify'))) {
-            $this->bindOAuthUser($user, $request->input('verify'));
+            $this->bindSocialAccount($user, $request->input('verify'));
         }
 
         return response()->json(compact('token'));
@@ -94,7 +94,7 @@ class PassportController extends Controller
         }
 
         if (!empty($request->input('verify'))) {
-            $this->bindOAuthUser($user, $request->input('verify'));
+            $this->bindSocialAccount($user, $request->input('verify'));
         }
 
         $token = $this->jwt->fromUser($user);

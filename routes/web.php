@@ -16,7 +16,7 @@ $app->get($prefix . '/', function () use ($app) {
     return phpinfo();
 });
 
-$app->group(['prefix' => $prefix], function () use ($app) {
+$app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app) {
     $app->group(['prefix' => 'passports'], function () use ($app) {
         $app->patch('/', 'PassportController@signIn');
         $app->post('/', 'PassportController@signUp');
@@ -37,4 +37,6 @@ $app->group(['prefix' => $prefix], function () use ($app) {
         $app->get('/applications/{appId}/wechat/login', 'OAuthController@weChatLogin');
         $app->get('/applications/{appId}/wechat/callback', 'OAuthController@weChatCallback');
     });
+
+    $app->get('/socials/me', 'SocialAccountController@me');
 });

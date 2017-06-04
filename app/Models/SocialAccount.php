@@ -11,7 +11,7 @@ namespace App\Models;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class OAuthUser extends Model implements JWTSubject
+class SocialAccount extends Model implements JWTSubject
 {
     /**
      * The attributes that are mass assignable.
@@ -19,10 +19,10 @@ class OAuthUser extends Model implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'open_id', 'name', 'nickname', 'email', 'avatar', 'provider'
+        'provider_id', 'name', 'nickname', 'email', 'avatar', 'provider'
     ];
 
-    protected $table = 'oauth_user';
+    protected $table = 'social_accounts';
 
     protected $dates = ['last_auth'];
 

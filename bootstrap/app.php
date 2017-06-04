@@ -69,6 +69,7 @@ $app->routeMiddleware([
     'role' => App\Http\Middleware\Role::class,
     'permission' => App\Http\Middleware\Permission::class,
     'ability' => App\Http\Middleware\Ability::class,
+    'cors' => App\Http\Middleware\Cors::class
 ]);
 
 /*

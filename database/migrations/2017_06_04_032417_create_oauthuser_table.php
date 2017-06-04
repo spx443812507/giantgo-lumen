@@ -13,10 +13,10 @@ class CreateOauthuserTable extends Migration
      */
     public function up()
     {
-        Schema::create('oauth_user', function (Blueprint $table) {
+        Schema::create('social_accounts', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->nullable();
-            $table->string('open_id');
+            $table->string('provider_id');
             $table->string('name')->nullable();
             $table->string('nickname')->nullable();
             $table->string('email')->nullable();
@@ -35,6 +35,6 @@ class CreateOauthuserTable extends Migration
      */
     public function down()
     {
-        Schema::drop('oauth_user');
+        Schema::drop('social_accounts');
     }
 }
