@@ -9,32 +9,49 @@
 namespace App\Http\Controllers\OAuth;
 
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Overtrue\Socialite\AuthorizeFailedException;
 use Overtrue\Socialite\SocialiteManager as Socialite;
 use Tymon\JWTAuth\JWTAuth;
 
-class QQController extends Controller
+class QQController extends AbstractController
 {
-    protected $jwt;
-
     protected $qq;
 
     public function __construct(JWTAuth $jwt)
     {
-        $this->jwt = $jwt;
+        parent::__construct($jwt);
+
         $this->qq = (new Socialite(['qq' => config('qq')]))->driver('qq');
     }
 
-    public function qqLogin(Request $request, $appId)
+    public function login(Request $request)
     {
-//        $this->qq->setConfig();
+        $appId = $request->input('app_id');
+
         return $this->qq->stateless(false)->redirect();
     }
 
-    public function qqCallback(Request $request, $appId)
+    public function callback(Request $request)
     {
-        $this->qq->setConfig();
-        $this->qq->stateless(false)->redirect();
+        $returnUrl = $request->input('return_url');
+
+        try {
+            $user = $this->qq->stateless(false)->user();
+        } catch (AuthorizeFailedException $e) {
+            $url = $this->buildReturnUrl($returnUrl, ['error' => '授权失败']);
+
+            return redirect()->to($url);
+        }
+
+        $token = $this->generateToken($user, 'qq');
+
+        if (empty($returnUrl)) {
+            return response()->json($token);
+        } else {
+            $url = $this->buildReturnUrl($returnUrl, $token);
+
+            return redirect()->to($url);
+        }
     }
 }

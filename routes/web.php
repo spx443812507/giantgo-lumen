@@ -37,8 +37,8 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
 });
 
 $app->group(['prefix' => 'oauth', 'namespace' => 'OAuth'], function () use ($app) {
-    $app->get('/wechat/login', 'WeChatController@weChatLogin');
-    $app->get('/wechat/callback', 'WeChatController@weChatCallback');
-    $app->get('/qq/login', 'QQController@qqLogin');
-    $app->get('/qq/callback', 'QQController@qqCallback');
+    $app->get('/wechat/login', 'WeChatController@login');
+    $app->get('/wechat/callback', 'WeChatController@callback');
+    $app->get('/qq/login', 'QQController@login');
+    $app->get('/qq/callback', 'QQController@callback');
 });
