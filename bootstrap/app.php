@@ -28,6 +28,8 @@ $app->withFacades();
 $app->withEloquent();
 
 $app->configure('entrust');
+$app->configure('wechat');
+$app->configure('qq');
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -89,7 +91,6 @@ $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Zizaco\Entrust\EntrustServiceProvider::class);
 $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
-$app->register(Overtrue\LaravelWechat\ServiceProvider::class);
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes

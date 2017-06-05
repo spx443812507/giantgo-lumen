@@ -33,10 +33,12 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
 
     $app->get('/products/export', ['as' => 'products.export', 'uses' => 'ProductController@export']);
 
-    $app->group(['prefix' => 'oauth'], function () use ($app) {
-        $app->get('/applications/{appId}/wechat/login', 'OAuthController@weChatLogin');
-        $app->get('/applications/{appId}/wechat/callback', 'OAuthController@weChatCallback');
-    });
-
     $app->get('/socials/me', 'SocialAccountController@me');
+});
+
+$app->group(['prefix' => 'oauth', 'namespace' => 'OAuth'], function () use ($app) {
+    $app->get('/wechat/login', 'WeChatController@weChatLogin');
+    $app->get('/wechat/callback', 'WeChatController@weChatCallback');
+    $app->get('/qq/login', 'QQController@qqLogin');
+    $app->get('/qq/callback', 'QQController@qqCallback');
 });
