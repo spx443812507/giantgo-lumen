@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateOauthuserTable extends Migration
+class CreateApplicationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,12 @@ class CreateOauthuserTable extends Migration
      */
     public function up()
     {
-        Schema::create('social_accounts', function (Blueprint $table) {
+        Schema::create('applications', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id')->nullable();
-            $table->string('provider_id');
-            $table->string('name')->nullable();
-            $table->string('nickname')->nullable();
-            $table->string('email')->nullable();
-            $table->string('avatar')->nullable();
+            $table->string('client_id');
+            $table->string('client_secret');
+            $table->string('redirect');
             $table->string('provider');
-            $table->dateTime('last_auth')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -35,6 +31,6 @@ class CreateOauthuserTable extends Migration
      */
     public function down()
     {
-        Schema::drop('social_accounts');
+        Schema::drop('applications');
     }
 }

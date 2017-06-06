@@ -41,3 +41,12 @@ $factory->define(App\Models\Product::class, function (Faker\Generator $faker) {
         'price' => $faker->title
     ];
 });
+
+$factory->define(App\Models\Application::class, function (Faker\Generator $faker) {
+    return [
+        'client_id' => $faker->unique()->name,
+        'client_secret' => $faker->name,
+        'redirect' => $faker->title,
+        'provider' => $faker->title
+    ];
+});

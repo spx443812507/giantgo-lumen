@@ -29,7 +29,7 @@ $app->withEloquent();
 
 $app->configure('entrust');
 $app->configure('wechat');
-$app->configure('qq');
+$app->configure('oauth');
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
