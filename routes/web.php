@@ -36,5 +36,11 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
     $app->get('/socials/me', 'SocialAccountController@me');
 });
 
-$app->get('oauth/{provider}/login', 'OAuthController@login');
-$app->get('oauth/{provider}/callback', 'OAuthController@callback');
+$app->get('/oauth/{provider}/login', 'OAuthController@login');
+$app->get('/oauth/{provider}/callback', 'OAuthController@callback');
+
+$app->get('/oauth/wechat/open/login', 'PlatformController@login');
+$app->get('/oauth/wechat/open/callback', 'PlatformController@callback');
+$app->get('/oauth/wechat/open/auth', 'PlatformController@auth');
+$app->get('/oauth/wechat/open/response', 'PlatformController@response');
+

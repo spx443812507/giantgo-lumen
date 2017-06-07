@@ -85,6 +85,10 @@ class OAuthController extends Controller
                 'provider' => $provider
             ]);
         } else {
+            $socialAccount['name'] = $user->getName();
+            $socialAccount['nickname'] = $user->getNickname();
+            $socialAccount['avatar'] = $user->getAvatar();
+            $socialAccount['email'] = $user->getEmail();
             $socialAccount['last_auth'] = new \DateTime();
             $socialAccount->save();
         }

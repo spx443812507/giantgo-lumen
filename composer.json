@@ -22,7 +22,8 @@
     "zizaco/entrust": "5.2.x-dev",
     "overtrue/wechat": "~3.1",
     "firebase/php-jwt": "^4.0",
-    "jakeasmith/http_build_url": "^1"
+    "jakeasmith/http_build_url": "^1",
+    "overtrue/laravel-wechat": "~3.0"
   },
   "require-dev": {
     "fzaninotto/faker": "~1.4",
