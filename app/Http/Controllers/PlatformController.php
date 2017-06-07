@@ -63,9 +63,11 @@ class PlatformController extends Controller
     {
         $code = $request->input('code');
 
+        $appId = $request->input('appid');
+
         $http = new Http();
 
-        $result = $http->get('http://dev', compact('code'));
+        $result = $http->get('http://devswcb.smarket.net.cn/', ['code' => $code, 'appId' => $appId]);
 
         return response()->json($result, 200);
     }
