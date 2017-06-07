@@ -24,16 +24,16 @@ return [
     /**
      * 开放平台第三方平台配置信息
      */
-//    'open_platform' => [
-//        'app_id' => env('WECHAT_OPEN_PLATFORM_APPID', 'component-app-id'),       //ComponentAppID
-//        'secret' => env('WECHAT_OPEN_PLATFORM_SECRET', 'component-app-secret'),//ComponentAppSecret
-//        'token' => env('WECHAT_OPEN_PLATFORM_TOKEN', 'component-token'),          // Token
-//        'aes_key' => env('WECHAT_OPEN_PLATFORM_AES_KEY', ''),                    // EncodingAESKey
-//        /**
-//         * 事件推送URL
-//         */
-//        'serve_url' => env('WECHAT_OPEN_PLATFORM_SERVE_URL', 'serve'),
-//    ],
+    'open_platform' => [
+        'app_id' => env('WECHAT_OPEN_PLATFORM_APPID', 'component-app-id'),       //ComponentAppID
+        'secret' => env('WECHAT_OPEN_PLATFORM_SECRET', 'component-app-secret'),//ComponentAppSecret
+        'token' => env('WECHAT_OPEN_PLATFORM_TOKEN', 'component-token'),          // Token
+        'aes_key' => env('WECHAT_OPEN_PLATFORM_AES_KEY', ''),                    // EncodingAESKey
+        /**
+         * 事件推送URL
+         */
+        'serve_url' => env('WECHAT_OPEN_PLATFORM_SERVE_URL', 'serve'),
+    ],
 
     /*
      * 日志配置

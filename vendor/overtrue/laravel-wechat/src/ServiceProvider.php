@@ -28,7 +28,7 @@ class ServiceProvider extends LaravelServiceProvider
         $this->setupConfig();
 
         if ($this->isEnableOpenPlatform()) {
-            $this->app->register(RouteServiceProvider::class);
+//            $this->app->register(RouteServiceProvider::class);
         }
     }
 
