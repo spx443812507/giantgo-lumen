@@ -61,7 +61,7 @@ class OAuthController extends Controller
             $this->config = new Config([$application['provider'] => [
                 'client_id' => $application['client_id'],
                 'client_secret' => $application['client_secret'],
-                'redirect' => $application['redirect'] . '?app_id=' . $appId . '&return_url=' . urlencode($returnUrl)
+                'redirect' => $this->buildReturnUrl($application['redirect'], ['app_id' => $appId, 'return_url' => $returnUrl])
             ]]);
         }
 
@@ -145,7 +145,7 @@ class OAuthController extends Controller
         try {
             $user = $this->socialite->with($provider)->stateless(false)->user();
         } catch (AuthorizeFailedException $e) {
-            $url = $this->buildReturnUrl($returnUrl, ['error' => '授权失败']);
+            $url = $this->buildReturnUrl($returnUrl, ['error' => '授权失败，请重试']);
 
             return redirect()->to($url);
         }

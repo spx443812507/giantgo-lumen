@@ -8,17 +8,16 @@
 
 namespace App\Http\Controllers;
 
-use EasyWeChat\Core\Http;
 use EasyWeChat\Foundation\Application;
 use EasyWeChat\OpenPlatform\Guard;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Overtrue\LaravelWechat\CacheBridge;
+use Overtrue\Socialite\User;
 use Tymon\JWTAuth\JWTAuth;
 
-class PlatformController extends Controller
+class PlatformController extends OAuthController
 {
-    protected $jwt;
-
     protected $weChat;
 
     protected $config;
@@ -33,7 +32,8 @@ class PlatformController extends Controller
 
     public function __construct(JWTAuth $jwt, Application $app)
     {
-        $this->jwt = $jwt;
+        parent::__construct($jwt);
+
         $this->weChat = $app;
         $this->config = config('wechat');
         $this->scope = env('WECHAT_OAUTH_SCOPES');
@@ -42,16 +42,17 @@ class PlatformController extends Controller
         $this->cache = new CacheBridge();
     }
 
-    public function login(Request $request)
+    public function login(Request $request, $provider = 'wechat_open')
     {
-
         $appId = $request->input('app_id');
 
         $scope = $request->input('scope');
 
+        $returnUrl = $request->input('return_url');
+
         $authUrl = [
             'appid' => $appId,
-            'redirect_uri' => $this->redirectUri,
+            'redirect_uri' => $this->buildReturnUrl($this->redirectUri, ['return_url' => $returnUrl]),
             'response_type' => 'code',
             'scope' => $scope ?: $this->scope,
             'component_appid' => $this->componentId
@@ -62,17 +63,59 @@ class PlatformController extends Controller
         return redirect('https://open.weixin.qq.com/connect/oauth2/authorize' . '?' . $query . '#wechat_redirect');
     }
 
-    public function callback(Request $request)
+    public function callback(Request $request, $provider = 'wechat_open')
     {
         $code = $request->input('code');
 
         $appId = $request->input('appid');
 
-        $http = new Http();
+        $returnUrl = $request->input('return_url');
 
-        $result = $http->get('http://devswcb.smarket.net.cn/', ['code' => $code, 'appId' => $appId]);
+        $http = new Client();
 
-        return response()->json($result, 200);
+        $result = $http->request('post', 'http://devswcb.wechat.smarket.net.cn/index.php', ['json' =>
+            ["command" =>
+                ["size" => 0,
+                    "orn" => "02-0001-00000001",
+                    "dst" => "01-0401-00000001",
+                    "type" => "0x0002",
+                    "cmd" => 'contact.getInfoByCode',
+                    "sess" => '',
+                    "seq" => '0',
+                    "ver" => '1000',
+                    "body" => ['code' => $code, 'appId' => $appId]
+                ]
+            ]
+        ]);
+
+        $content = json_decode($result->getBody()->getContents());
+
+        if ($content->body->result == 0) {
+            $user = $content->body->content;
+
+            $user = new User([
+                'id' => $user->openid,
+                'name' => $user->nickname,
+                'nickname' => $user->nickname,
+                'avatar' => $user->headimgurl,
+                'email' => null,
+                'original' => $user->privilege,
+            ]);
+        } else {
+            $url = $this->buildReturnUrl($returnUrl, ['error' => '授权失败，请重试']);
+
+            return redirect()->to($url);
+        }
+
+        $token = $this->generateToken($user, $provider);
+
+        if (empty($returnUrl)) {
+            return response()->json($token);
+        } else {
+            $url = $this->buildReturnUrl($returnUrl, $token);
+
+            return redirect()->to($url);
+        }
     }
 
     /**
@@ -81,15 +124,10 @@ class PlatformController extends Controller
     public function auth()
     {
         $openPlatform = $this->weChat->open_platform;
-
-        $oauth = $openPlatform->oauth;
-
-        $response = $oauth->scopes(['snsapi_userinfo'])->redirect();
-
         // 直接跳转
-//        $response = $openPlatform->pre_auth->redirect('http://password.smarket.net.cn/oauth/wechat/open/response');
+        $response = $openPlatform->pre_auth->redirect('http://password.smarket.net.cn/oauth/wechat/open/response');
         // 获取跳转的 URL
-        return "";
+        return $response->getTargetUrl();
     }
 
     /**
