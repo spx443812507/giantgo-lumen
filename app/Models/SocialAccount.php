@@ -36,8 +36,8 @@ class SocialAccount extends Model implements JWTSubject
         return ['provider' => $this->attributes['provider']];
     }
 
-    public function user()
+    public function customer()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo('App\Models\Customer', 'entity_id');
     }
 }

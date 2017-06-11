@@ -1,18 +1,25 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: siler
+ * Date: 2017/6/11
+ * Time: 下午9:27
+ */
 
 namespace App\Models;
+
 
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Zizaco\Entrust\Traits\EntrustUserTrait;
 
-class User extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
+class Customer extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, SoftDeletes, EntrustUserTrait;
+    use Authenticatable, Authorizable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -20,7 +27,7 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password'
+        'name', 'email', 'password', 'mobile'
     ];
 
     /**
@@ -39,6 +46,11 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
      */
     protected $dates = ['last_login'];
 
+    protected $casts = [
+        'verified_email' => 'boolean',
+        'verified_mobile' => 'boolean'
+    ];
+
     public function setPasswordAttribute($password)
     {
         $this->attributes['password'] = Hash::make($password);
@@ -54,8 +66,8 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
         return ['provider' => 'giantgo'];
     }
 
-    public function products()
+    public function socialAccounts()
     {
-        return $this->hasMany('App\Models\Product');
+        return $this->hasMany('App\Models\SocialAccount', 'customer_id', 'entity_id');
     }
 }

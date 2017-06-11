@@ -81,8 +81,7 @@ class PassportController extends Controller
         $this->validate($request, [
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required',
-            'name' => 'required|max:255',
-            'mobile' => 'required|unique:users'
+            'name' => 'required|max:255'
         ]);
 
         $userInfo = $request->only('email', 'password', 'name', 'mobile');

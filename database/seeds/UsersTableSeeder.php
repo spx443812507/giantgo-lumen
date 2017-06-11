@@ -20,7 +20,6 @@ class UsersTableSeeder extends Seeder
         $user = factory(App\Models\User::class)->create([
             'name' => 'siler',
             'email' => 'admin@admin.com',
-            'mobile' => '15930181489',
             'password' => 'admin',
             'last_login' => new DateTime()
         ]);
