@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\EAV\Traits\EntityTrait;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Hash;
@@ -12,7 +13,7 @@ use Zizaco\Entrust\Traits\EntrustUserTrait;
 
 class User extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, SoftDeletes, EntrustUserTrait;
+    use Authenticatable, SoftDeletes, EntrustUserTrait, EntityTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -20,7 +21,7 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password'
+        'email', 'mobile', 'password', 'is_active'
     ];
 
     /**
@@ -38,6 +39,12 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
      * @var array
      */
     protected $dates = ['last_login'];
+
+    protected $casts = [
+        'verified_email' => 'boolean',
+        'verified_mobile' => 'boolean',
+        'is_active' => 'boolean'
+    ];
 
     public function setPasswordAttribute($password)
     {
@@ -57,5 +64,10 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
     public function products()
     {
         return $this->hasMany('App\Models\Product');
+    }
+
+    public function socialAccounts()
+    {
+        return $this->hasMany('App\Models\SocialAccount');
     }
 }

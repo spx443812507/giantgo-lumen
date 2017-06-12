@@ -8,10 +8,34 @@
 
 namespace app\Models\EAV;
 
+use app\Models\EAV\Contracts\AttributeInterface;
+use Sidus\EAVModelBundle\Exception\MissingAttributeException;
+
 interface EntityInterface
 {
     /**
      * @return string
      */
     public function getCode();
+
+    /**
+     * @return AttributeInterface[]
+     */
+    public function getAttributes();
+
+    /**
+     * @param string $code
+     *
+     * @throws MissingAttributeException
+     *
+     * @return AttributeInterface
+     */
+    public function getAttribute($code);
+
+    /**
+     * @param string $code
+     *
+     * @return bool
+     */
+    public function hasAttribute($code);
 }

@@ -9,20 +9,12 @@
 namespace app\Models\EAV\Contracts;
 
 
+use app\Models\EAV\EntityInterface;
+
 interface AttributeInterface
 {
     /**
-     * @return string
-     */
-    public function getCode();
-
-    /**
-     * @return AttributeTypeInterface
-     */
-    public function getType();
-
-    /**
-     * @return AttributeTypeInterface
+     * @return EntityInterface
      */
     public function getEntity();
 
@@ -60,26 +52,6 @@ interface AttributeInterface
     public function addOption($code, $value);
 
     /**
-     * @return boolean
-     */
-    public function isRequired();
-
-    /**
-     * @param boolean $value
-     */
-    public function setRequired($value);
-
-    /**
-     * @return boolean
-     */
-    public function isUnique();
-
-    /**
-     * @param boolean $value
-     */
-    public function setUnique($value);
-
-    /**
      * @return array
      */
     public function getValidationRules();
@@ -93,9 +65,4 @@ interface AttributeInterface
      * @param array $validationRules
      */
     public function setValidationRules(array $validationRules);
-
-    /**
-     * @return mixed
-     */
-    public function getDefault();
 }

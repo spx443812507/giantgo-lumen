@@ -14,10 +14,10 @@ class EntitiesTableSeeder extends Seeder
     {
         DB::table('eav_entity_type')->insert([
             'entity_type_id' => 1,
-            'entity_type_code' => 'customer',
-            'entity_model' => 'customer',
+            'entity_type_code' => 'user',
+            'entity_model' => 'App\Models\User',
             'attribute_model' => '',
-            'entity_table' => 'customer_entity',
+            'entity_table' => 'users',
             'created_at' => new \DateTime(),
             'updated_at' => new \DateTime()
         ]);

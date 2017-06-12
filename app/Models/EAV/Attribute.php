@@ -11,20 +11,32 @@ namespace pp\Models\EAV;
 
 use app\Models\EAV\Contracts\AttributeInterface;
 use app\Models\EAV\EntityInterface;
+use Illuminate\Database\Eloquent\Model;
 
-class Attribute implements AttributeInterface
+class Attribute extends Model implements AttributeInterface
 {
-    /** @var string */
-    protected $code;
+    /**
+     * Fillable attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'attribute_code', 'attribute_model',
+        'backend_model', 'backend_type', 'backend_table',
+        'frontend_model', 'frontend_input', 'frontend_label', 'frontend_class',
+        'is_required', 'is_user_defined', 'is_unique', 'default_value', 'note'
+    ];
 
-    /** @var string */
-    protected $label;
+    protected $table = 'eav_attribute';
+
+    protected $casts = [
+        'is_required' => 'boolean',
+        'is_user_defined' => 'boolean',
+        'is_unique' => 'boolean'
+    ];
 
     /** @var EntityInterface */
     protected $entity;
-
-    /** @var AttributeType */
-    protected $type;
 
     /** @var string */
     protected $group;
@@ -32,42 +44,16 @@ class Attribute implements AttributeInterface
     /** @var array */
     protected $options = [];
 
-    /** @var bool */
-    protected $required = false;
-
-    /** @var bool */
-    protected $unique = false;
-
     /** @var array */
     protected $validationRules = [];
 
-    /** @var mixed */
-    protected $default;
-
     /**
-     * @param string $code
-     * @param array $configuration
-     *
+     * Attribute constructor.
+     * @param array $attributes
      */
-    public function __construct($code)
+    public function __construct(array $attributes = [])
     {
-        $this->code = $code;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    /**
-     * @return AttributeType
-     */
-    public function getType()
-    {
-        return $this->type;
+        parent::__construct($attributes);
     }
 
     /**
@@ -127,38 +113,6 @@ class Attribute implements AttributeInterface
     }
 
     /**
-     * @return boolean
-     */
-    public function isRequired()
-    {
-        return $this->required;
-    }
-
-    /**
-     * @param boolean $required
-     */
-    public function setRequired($required)
-    {
-        $this->required = $required;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isUnique()
-    {
-        return $this->unique;
-    }
-
-    /**
-     * @param boolean $unique
-     */
-    public function setUnique($unique)
-    {
-        $this->unique = $unique;
-    }
-
-    /**
      * @return array
      */
     public function getValidationRules()
@@ -196,45 +150,5 @@ class Attribute implements AttributeInterface
     public function setGroup($group)
     {
         $this->group = $group;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLabel()
-    {
-        return $this->label;
-    }
-
-    /**
-     * @param string $label
-     *
-     * @return Attribute
-     */
-    public function setLabel($label)
-    {
-        $this->label = $label;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDefault()
-    {
-        return $this->default;
-    }
-
-    /**
-     * @param mixed $default
-     *
-     * @return Attribute
-     */
-    public function setDefault($default)
-    {
-        $this->default = $default;
-
-        return $this;
     }
 }

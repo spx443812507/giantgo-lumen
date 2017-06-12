@@ -21,6 +21,6 @@ trait EntityTrait
 
     public function attributes()
     {
-        return $this->hasMany('App\Models\Attribute', 'eav_attributes');
+        return $this->belongsToMany('App\Models\Attribute', 'eav_entity_attribute', 'id', 'attribute_id');
     }
 }

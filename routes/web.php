@@ -24,13 +24,12 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
 
     $app->group(['middleware' => 'auth'], function () use ($app) {
         $app->get('/users/me', 'UserController@me');
+
         $app->get('/users', ['as' => 'users.get', 'uses' => 'UserController@getList', 'middleware' => 'role:admin']);
 
         $app->post('/roles', ['as' => 'roles.create', 'uses' => 'RoleController@create', 'middleware' => 'permission:role-create']);
 
         $app->post('/products', ['as' => 'products.create', 'uses' => 'ProductController@create', 'middleware' => 'permission:product-create']);
-
-        $app->get('/customers', ['as' => 'customers.list', 'uses' => 'CustomerController@getList']);
     });
 
     $app->get('/products/export', ['as' => 'products.export', 'uses' => 'ProductController@export']);
