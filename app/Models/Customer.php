@@ -9,6 +9,7 @@
 namespace App\Models;
 
 
+use App\Models\EAV\Traits\EntityTrait;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Hash;
@@ -19,7 +20,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Customer extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, Authorizable, SoftDeletes;
+    use Authenticatable, Authorizable, SoftDeletes, EntityTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -50,6 +51,8 @@ class Customer extends Model implements JWTSubject, AuthenticatableContract, Aut
         'verified_email' => 'boolean',
         'verified_mobile' => 'boolean'
     ];
+
+    protected $table = 'customer_entity';
 
     public function setPasswordAttribute($password)
     {

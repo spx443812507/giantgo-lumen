@@ -23,8 +23,15 @@
     "overtrue/wechat": "~3.1",
     "firebase/php-jwt": "^4.0",
     "jakeasmith/http_build_url": "^1",
-    "overtrue/laravel-wechat": "~3.0"
+    "overtrue/laravel-wechat": "~3.0",
+    "cartalyst/attributes": "^2.0"
   },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://packages.cartalyst.com"
+    }
+  ],
   "require-dev": {
     "fzaninotto/faker": "~1.4",
     "phpunit/phpunit": "~5.0",

@@ -29,6 +29,8 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->post('/roles', ['as' => 'roles.create', 'uses' => 'RoleController@create', 'middleware' => 'permission:role-create']);
 
         $app->post('/products', ['as' => 'products.create', 'uses' => 'ProductController@create', 'middleware' => 'permission:product-create']);
+
+        $app->get('/customers', ['as' => 'customers.list', 'uses' => 'CustomerController@getList']);
     });
 
     $app->get('/products/export', ['as' => 'products.export', 'uses' => 'ProductController@export']);
