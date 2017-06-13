@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EAV\Attribute;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\JWTAuth;
@@ -49,5 +50,39 @@ class UserController extends Controller
     public function getList(Request $request)
     {
         return response()->json(User::all());
+    }
+
+    public function getAttributes(Request $request)
+    {
+        $user = new User();
+
+        $attributes = $user->getEntityAttributes();
+
+        return response()->json(compact('attributes'));
+    }
+
+    public function addAttributes(Request $request)
+    {
+        $attributes = $request->input('attributes');
+
+        for ($index = 0; $index < count($attributes); $index++) {
+            Attribute::create([
+                'entity_type_id' => User::$entityTypeId,
+                'attribute_code' => 'name',
+                'attribute_model' => '',
+                'backend_model' => '',
+                'backend_type' => 'varchar',
+                'backend_table' => '',
+                'frontend_model' => '',
+                'frontend_input' => 'text',
+                'frontend_label' => '姓名',
+                'frontend_class' => '',
+                'is_required' => true,
+                'is_user_defined' => false,
+                'is_unique' => false,
+                'default' => '张三',
+                'description' => '该字段记录用户姓名',
+            ]);
+        }
     }
 }

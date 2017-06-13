@@ -9,19 +9,12 @@
 namespace App\Models\EAV;
 
 
+use App\Models\EAV\Traits\Attributable;
 use App\Models\Model;
 
 abstract class Entity extends Model
 {
-    protected $entityTypeId;
+    use Attributable;
 
-    public function getEntityTypeId()
-    {
-        return $this->entityTypeId;
-    }
-
-    public function setEntityTypeId()
-    {
-        return $this->entityTypeId;
-    }
+    abstract public function getEntityTypeId();
 }

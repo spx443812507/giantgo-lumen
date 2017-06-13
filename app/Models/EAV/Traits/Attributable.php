@@ -8,15 +8,19 @@
 
 namespace App\Models\EAV\Traits;
 
+use App\Models\EAV\Scopes\EagerLoadScope;
+use Closure;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use SuperClosure\Serializer;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection as BaseCollection;
 
 use App\Models\EAV\Supports\RelationBuilder;
+use App\Models\EAV\Supports\ValueCollection;
 use App\Models\EAV\Value;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 use App\Models\EAV\Attribute;
-use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Support\Str;
 
 trait Attributable
 {
@@ -56,7 +60,7 @@ trait Attributable
         $entityTypeIds = DB::table('entity_type')->whereIn('entity_model', $models)->get()->pluck('id');
         $attributes = DB::table('entity_attribute')->whereIn('entity_type_id', $entityTypeIds)->get()->pluck('attribute_id');
         static::$entityAttributes = Attribute::whereIn('id', $attributes)->get()->keyBy('attribute_code');
-//        static::addGlobalScope(new EagerLoadScope());
+        static::addGlobalScope(new EagerLoadScope());
 //        static::saved(EntityWasSaved::class . '@handle');
 //        static::deleted(EntityWasDeleted::class . '@handle');
     }

@@ -34,6 +34,16 @@ class Attribute extends Model implements AttributeInterface
         'is_unique' => 'boolean'
     ];
 
+    protected $inputMappings = [
+        'text' => 'varchar',
+        'textarea' => 'text',
+        'swith' => 'boolean',
+        'radio' => 'integer',
+        'checkbox' => 'integer',
+        'number' => 'integer',
+        'datetime' => 'datetime'
+    ];
+
     /** @var EntityInterface */
     protected $entity;
 
@@ -56,6 +66,11 @@ class Attribute extends Model implements AttributeInterface
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
+    }
+
+    public function setFrontendInputAttribute($input)
+    {
+        $this->attributes['backend_type'] = $this->inputMappings[$input];
     }
 
     /**

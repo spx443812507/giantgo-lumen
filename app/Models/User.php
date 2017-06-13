@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Models\EAV\Entity;
-use App\Models\EAV\Traits\Attributable;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Hash;
@@ -14,15 +13,9 @@ use Zizaco\Entrust\Traits\EntrustUserTrait;
 
 class User extends Entity implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, SoftDeletes, EntrustUserTrait, Attributable;
+    use Authenticatable, SoftDeletes, EntrustUserTrait;
 
-    /**
-     * eav entity type id
-     *
-     * @var int
-     */
-    protected $entityTypeId = 1;
-
+    public static $entityTypeId = 1;
     /**
      * The attributes that are mass assignable.
      *
@@ -67,6 +60,11 @@ class User extends Entity implements JWTSubject, AuthenticatableContract, Author
     public function getJWTCustomClaims()
     {
         return ['provider' => 'giantgo'];
+    }
+
+    public function getEntityTypeId()
+    {
+        return self::$entityTypeId;
     }
 
     public function products()
