@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\EAV\Traits\EntityTrait;
+use App\Models\EAV\Entity;
+use App\Models\EAV\Traits\Attributable;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Hash;
@@ -11,9 +12,16 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Zizaco\Entrust\Traits\EntrustUserTrait;
 
-class User extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
+class User extends Entity implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, SoftDeletes, EntrustUserTrait, EntityTrait;
+    use Authenticatable, SoftDeletes, EntrustUserTrait, Attributable;
+
+    /**
+     * eav entity type id
+     *
+     * @var int
+     */
+    protected $entityTypeId = 1;
 
     /**
      * The attributes that are mass assignable.

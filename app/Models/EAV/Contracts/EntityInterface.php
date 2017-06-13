@@ -6,7 +6,7 @@
  * Time: 下午3:58
  */
 
-namespace app\Models\EAV;
+namespace App\Models\EAV;
 
 use app\Models\EAV\Contracts\AttributeInterface;
 use Sidus\EAVModelBundle\Exception\MissingAttributeException;

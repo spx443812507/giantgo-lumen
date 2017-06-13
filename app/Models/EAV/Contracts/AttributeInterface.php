@@ -6,10 +6,10 @@
  * Time: 下午5:06
  */
 
-namespace app\Models\EAV\Contracts;
+namespace App\Models\EAV\Contracts;
 
 
-use app\Models\EAV\EntityInterface;
+use App\Models\EAV\EntityInterface;
 
 interface AttributeInterface
 {

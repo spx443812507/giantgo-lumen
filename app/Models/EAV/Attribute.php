@@ -6,11 +6,10 @@
  * Time: 下午5:06
  */
 
-namespace pp\Models\EAV;
+namespace App\Models\EAV;
 
 
-use app\Models\EAV\Contracts\AttributeInterface;
-use app\Models\EAV\EntityInterface;
+use App\Models\EAV\Contracts\AttributeInterface;
 use Illuminate\Database\Eloquent\Model;
 
 class Attribute extends Model implements AttributeInterface
@@ -24,10 +23,10 @@ class Attribute extends Model implements AttributeInterface
         'attribute_code', 'attribute_model',
         'backend_model', 'backend_type', 'backend_table',
         'frontend_model', 'frontend_input', 'frontend_label', 'frontend_class',
-        'is_required', 'is_user_defined', 'is_unique', 'default_value', 'note'
+        'is_required', 'is_user_defined', 'is_unique', 'default', 'description'
     ];
 
-    protected $table = 'eav_attribute';
+    protected $table = 'attributes';
 
     protected $casts = [
         'is_required' => 'boolean',
@@ -46,6 +45,9 @@ class Attribute extends Model implements AttributeInterface
 
     /** @var array */
     protected $validationRules = [];
+
+    /** @var bool */
+    protected $collection;
 
     /**
      * Attribute constructor.
@@ -150,5 +152,25 @@ class Attribute extends Model implements AttributeInterface
     public function setGroup($group)
     {
         $this->group = $group;
+    }
+
+    /**
+     * When an attribute is multiple, it's also a collection
+     *
+     * @return boolean
+     */
+    public function isCollection()
+    {
+        return $this->collection;
+    }
+
+    /**
+     * Sometimes an attribute can be multiple but not a collection
+     *
+     * @param boolean $collection
+     */
+    public function setCollection($collection)
+    {
+        $this->collection = $collection;
     }
 }
