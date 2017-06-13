@@ -12,8 +12,8 @@ class EntitiesTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('eav_entity_type')->insert([
-            'entity_type_id' => 1,
+        DB::table('entity_type')->insert([
+            'id' => 1,
             'entity_type_code' => 'user',
             'entity_model' => 'App\Models\User',
             'attribute_model' => '',

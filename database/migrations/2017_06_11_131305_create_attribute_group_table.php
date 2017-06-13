@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateEavAttributeGroupTable extends Migration
+class CreateAttributeGroupTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class CreateEavAttributeGroupTable extends Migration
      */
     public function up()
     {
-        Schema::create('eav_attribute_group', function (Blueprint $table) {
-            $table->increments('attribute_group_id');
+        Schema::create('attribute_group', function (Blueprint $table) {
+            $table->increments('id');
             $table->integer('attribute_set_id');
             $table->string('attribute_group_name');
             $table->integer('sort_order');
@@ -32,6 +32,6 @@ class CreateEavAttributeGroupTable extends Migration
      */
     public function down()
     {
-        Schema::drop('eav_attribute_group');
+        Schema::drop('attribute_group');
     }
 }

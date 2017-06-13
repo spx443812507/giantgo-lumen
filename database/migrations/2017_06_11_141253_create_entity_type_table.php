@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateEavAttributeSetTable extends Migration
+class CreateEntityTypeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class CreateEavAttributeSetTable extends Migration
      */
     public function up()
     {
-        Schema::create('eav_attribute_set', function (Blueprint $table) {
-            $table->increments('attribute_set_id');
-            $table->integer('entity_type_id');
-            $table->string('attribute_set_name');
-            $table->integer('sort_order');
+        Schema::create('entity_type', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('entity_type_code');
+            $table->string('entity_model');
+            $table->string('attribute_model');
+            $table->string('entity_table');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -30,6 +31,6 @@ class CreateEavAttributeSetTable extends Migration
      */
     public function down()
     {
-        Schema::drop('eav_attribute_set');
+        Schema::drop('entity_type');
     }
 }
