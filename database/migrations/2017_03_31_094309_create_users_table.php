@@ -17,8 +17,8 @@ class CreateUsersTable extends Migration
             $table->increments('id');
             $table->integer('entity_type_id');
             $table->integer('attribute_set_id');
-            $table->string('email')->unique();
-            $table->string('mobile')->unique();
+            $table->string('email')->unique()->nullable();
+            $table->string('mobile')->unique()->nullable();
             $table->string('password');
             $table->boolean('verified_email');
             $table->boolean('verified_mobile');

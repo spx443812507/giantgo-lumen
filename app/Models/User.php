@@ -15,7 +15,6 @@ class User extends Entity implements JWTSubject, AuthenticatableContract, Author
 {
     use Authenticatable, SoftDeletes, EntrustUserTrait;
 
-    public static $entityTypeId = 1;
     /**
      * The attributes that are mass assignable.
      *
@@ -60,11 +59,6 @@ class User extends Entity implements JWTSubject, AuthenticatableContract, Author
     public function getJWTCustomClaims()
     {
         return ['provider' => 'giantgo'];
-    }
-
-    public function getEntityTypeId()
-    {
-        return self::$entityTypeId;
     }
 
     public function products()

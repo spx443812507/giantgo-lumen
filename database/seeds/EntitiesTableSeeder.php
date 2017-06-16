@@ -62,7 +62,6 @@ class EntitiesTableSeeder extends Seeder
         ];
 
         foreach ($attributes as $key => $value) {
-            App\Models\EAV\Attribute::create();
             factory(App\Models\EAV\Attribute::class)->create($value);
         }
     }

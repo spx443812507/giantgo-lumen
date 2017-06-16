@@ -48,7 +48,7 @@ class RelationBuilder
         // which will help us to simulate any relation as if it was made in the
         // original entity class definition using a function statement.
         return Closure::bind(function () use ($entity, $attribute, $method) {
-            $relation = $entity->$method($attribute->getAttribute('type'), 'entity_id', 'id');
+            $relation = $entity->$method($attribute->getAttribute('backend_type'), 'entity_id', 'id');
             // Since an attribute could be attached to multiple entities, then values could have
             // same entity ID, but for different entity types, so we need to add type where
             // clause to fetch only values related to the given entity ID + entity type.

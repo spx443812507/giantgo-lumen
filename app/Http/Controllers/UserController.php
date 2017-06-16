@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EAV\Attribute;
+use App\Models\EAV\Factories\EntityFactory;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\JWTAuth;
@@ -54,11 +55,11 @@ class UserController extends Controller
 
     public function getAttributes(Request $request)
     {
-        $user = new User();
+        $userClass = EntityFactory::getEntity(1);
 
-        $attributes = $user->getEntityAttributes();
+        $user = new $userClass();
 
-        return response()->json(compact('attributes'));
+        return response()->json($user->attributes());
     }
 
     public function addAttributes(Request $request)
@@ -67,7 +68,7 @@ class UserController extends Controller
 
         for ($index = 0; $index < count($attributes); $index++) {
             Attribute::create([
-                'entity_type_id' => User::$entityTypeId,
+                'entity_type_id' => 1,
                 'attribute_code' => 'name',
                 'attribute_model' => '',
                 'backend_model' => '',

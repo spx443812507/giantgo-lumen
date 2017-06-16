@@ -8,6 +8,8 @@
 
 namespace App\Models\EAV\Traits;
 
+use App\Events\EntityWasDeleted;
+use App\Events\EntityWasSaved;
 use App\Models\EAV\Scopes\EagerLoadScope;
 use Closure;
 use Illuminate\Support\Arr;
@@ -61,8 +63,8 @@ trait Attributable
         $attributes = DB::table('entity_attribute')->whereIn('entity_type_id', $entityTypeIds)->get()->pluck('attribute_id');
         static::$entityAttributes = Attribute::whereIn('id', $attributes)->get()->keyBy('attribute_code');
         static::addGlobalScope(new EagerLoadScope());
-//        static::saved(EntityWasSaved::class . '@handle');
-//        static::deleted(EntityWasDeleted::class . '@handle');
+        static::saved(EntityWasSaved::class . '@handle');
+        static::deleted(EntityWasDeleted::class . '@handle');
     }
 
     /**
@@ -321,11 +323,14 @@ trait Attributable
         if (is_null($current)) {
             return $this->setEntityAttributeValue($attribute, $value);
         }
+
         if ($value instanceof Value) {
-            $value = $value->getAttribute('content');
+            $value = $value->getAttribute('value');
         }
-        $current->setAttribute('entity_type', get_class($this));
-        return $current->setAttribute('content', $value);
+
+        $current->setAttribute('entity_type_id', $this->getEntityTypeId());
+
+        return $current->setAttribute('value', $value);
     }
 
     /**
@@ -338,15 +343,16 @@ trait Attributable
     protected function setEntityAttributeValue(Attribute $attribute, $value)
     {
         if (!is_null($value) && !$value instanceof Value) {
-            $model = $attribute->getAttribute('type');
+            $model = $attribute->getAttribute('backend_type');
+
             $instance = new $model();
             $instance->setAttribute('entity_id', $this->getKey());
-            $instance->setAttribute('entity_type', get_class($this));
+            $instance->setAttribute('entity_type_id', $this->getEntityTypeId());
             $instance->setAttribute($attribute->getForeignKey(), $attribute->getKey());
-            $instance->setAttribute('content', $value);
+            $instance->setAttribute('value', $value);
             $value = $instance;
         }
-        return $this->setRelation($attribute->getAttribute('slug'), $value);
+        return $this->setRelation($attribute->getAttribute('attribute_code'), $value);
     }
 
     /**
@@ -395,7 +401,7 @@ trait Attributable
     public function scopeHasAttribute(Builder $query, $key, $value)
     {
         return $query->whereHas($key, function (Builder $query) use ($value) {
-            $query->where('content', $value)->where('entity_type', get_class($this));
+            $query->where('value', $value)->where('entity_type_id', $this->getEntityTypeId());
         });
     }
 
