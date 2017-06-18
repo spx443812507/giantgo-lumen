@@ -9,6 +9,7 @@
 namespace App\Models\EAV;
 
 
+use App\Events\AttributeSaved;
 use App\Models\EAV\Contracts\AttributeInterface;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,10 +21,10 @@ class Attribute extends Model implements AttributeInterface
      * @var array
      */
     protected $fillable = [
-        'attribute_code', 'attribute_model',
+        'entity_type_id', 'attribute_code', 'attribute_model',
         'backend_model', 'backend_type', 'backend_table',
         'frontend_model', 'frontend_input', 'frontend_label', 'frontend_class',
-        'is_required', 'is_user_defined', 'is_unique', 'default', 'description'
+        'is_required', 'is_user_defined', 'is_unique', 'default_value', 'description'
     ];
 
     protected $table = 'attributes';
@@ -35,13 +36,34 @@ class Attribute extends Model implements AttributeInterface
     ];
 
     protected $inputMappings = [
-        'text' => 'varchar',
-        'textarea' => 'text',
-        'swith' => 'boolean',
-        'radio' => 'integer',
-        'checkbox' => 'integer',
-        'number' => 'integer',
-        'datetime' => 'datetime'
+        'text' => [
+            'backend_type' => 'varchar',
+            'is_collection' => false
+        ],
+        'textarea' => [
+            'backend_type' => 'text',
+            'is_collection' => false
+        ],
+        'swith' => [
+            'backend_type' => 'boolean',
+            'is_collection' => false
+        ],
+        'radio' => [
+            'backend_type' => 'integer',
+            'is_collection' => false
+        ],
+        'checkbox' => [
+            'backend_type' => 'integer',
+            'is_collection' => true
+        ],
+        'number' => [
+            'backend_type' => 'integer',
+            'is_collection' => false
+        ],
+        'datetime' => [
+            'backend_type' => 'datetime',
+            'is_collection' => false
+        ]
     ];
 
     /** @var EntityInterface */
@@ -56,9 +78,6 @@ class Attribute extends Model implements AttributeInterface
     /** @var array */
     protected $validationRules = [];
 
-    /** @var bool */
-    protected $collection;
-
     /**
      * Attribute constructor.
      * @param array $attributes
@@ -68,9 +87,20 @@ class Attribute extends Model implements AttributeInterface
         parent::__construct($attributes);
     }
 
+    /**
+     * Registering events.
+     */
+    public static function boot()
+    {
+        parent::boot();
+
+        static::saved(AttributeSaved::class . '@handle');
+    }
+
     public function setFrontendInputAttribute($input)
     {
-        $this->attributes['backend_type'] = $this->inputMappings[$input];
+        $this->attributes['backend_type'] = $this->inputMappings[$input]['backend_type'];
+        $this->attributes['is_collection'] = $this->inputMappings[$input]['is_collection'];
     }
 
     /**
@@ -176,16 +206,6 @@ class Attribute extends Model implements AttributeInterface
      */
     public function isCollection()
     {
-        return $this->collection;
-    }
-
-    /**
-     * Sometimes an attribute can be multiple but not a collection
-     *
-     * @param boolean $collection
-     */
-    public function setCollection($collection)
-    {
-        $this->collection = $collection;
+        return $this->getAttribute('is_collection');
     }
 }

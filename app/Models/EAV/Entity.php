@@ -8,9 +8,14 @@
 
 namespace App\Models\EAV;
 
+use App\Events\EntityDeleted;
+use App\Events\EntitySaved;
+use App\Models\EAV\Scopes\EagerLoadScope;
+use App\Models\Model;
 use App\Models\EAV\Supports\RelationBuilder;
 use App\Models\EAV\Supports\ValueCollection;
-use App\Models\Model;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -32,19 +37,19 @@ abstract class Entity extends Model
      *
      * @var \Illuminate\Support\Collection
      */
-    protected $trash;
+    protected $entityAttributeValueTrash;
     /**
      * The entity attribute relations.
      *
      * @var array
      */
-    protected $attributeRelations = [];
+    protected $entityAttributeRelations = [];
     /**
      * Determine if the entity attribute relations have been booted.
      *
      * @var bool
      */
-    protected $attributeRelationsBooted = false;
+    protected $entityAttributeRelationsBooted = false;
 
 
     public function getEntityTypeId()
@@ -68,11 +73,23 @@ abstract class Entity extends Model
 
             static::$entityAttributes = Attribute::whereIn('id', $attributeIds)->get()->keyBy('attribute_code');
 
-            if (!$this->attributeRelationsBooted) {
+            if (!$this->entityAttributeRelationsBooted) {
                 app(RelationBuilder::class)->build($this);
-                $this->attributeRelationsBooted = true;
+                $this->entityAttributeRelationsBooted = true;
             }
         }
+    }
+
+    /**
+     * Registering events.
+     */
+    public static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(new EagerLoadScope());
+        static::saved(EntitySaved::class . '@handle');
+        static::deleted(EntityDeleted::class . '@handle');
     }
 
     /**
@@ -98,7 +115,7 @@ abstract class Entity extends Model
     /**
      * {@inheritdoc}
      */
-    protected function fillAttributes(array $attributes)
+    protected function fillFromArray(array $attributes)
     {
         foreach (array_diff_key($attributes, array_flip($this->getFillable())) as $key => $value) {
             if ($this->isEntityAttribute($key)) {
@@ -116,7 +133,11 @@ abstract class Entity extends Model
      */
     public function setAttribute($key, $value)
     {
-        return $this->isEntityAttribute($key) ? $this->setEntityAttribute($key, $value) : parent::setAttribute($key, $value);
+        if ($this->entityAttributeRelationsBooted) {
+            return $this->isEntityAttribute($key) ? $this->setEntityAttribute($key, $value) : parent::setAttribute($key, $value);
+        } else {
+            return parent::setAttribute($key, $value);
+        }
     }
 
     /**
@@ -124,7 +145,58 @@ abstract class Entity extends Model
      */
     public function getAttribute($key)
     {
-        return $this->isEntityAttribute($key) ? $this->getEntityAttribute($key) : parent::getAttribute($key);
+        if ($this->entityAttributeRelationsBooted) {
+            return $this->isEntityAttribute($key) ? $this->getEntityAttribute($key) : parent::getAttribute($key);
+        } else {
+            return parent::getAttribute($key);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function relationsToArray()
+    {
+        $eavAttributes = [];
+        $attributes = parent::relationsToArray();
+        $relations = array_keys($this->getEntityAttributeRelations());
+        foreach ($relations as $relation) {
+            if (array_key_exists($relation, $attributes)) {
+                $eavAttributes[$relation] = $this->getAttribute($relation) instanceof BaseCollection
+                    ? $this->getAttribute($relation)->toArray() : $this->getAttribute($relation);
+                // By unsetting the relation from the attributes array we will make
+                // sure we do not provide a duplicity when adding the namespace.
+                // Otherwise it would keep the relation as a key in the root.
+                unset($attributes[$relation]);
+            }
+        }
+        if (is_null($namespace = $this->getEntityAttributesNamespace())) {
+            $attributes = array_merge($attributes, $eavAttributes);
+        } else {
+            Arr::set($attributes, $namespace, $eavAttributes);
+        }
+        return $attributes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRelation($key, $value)
+    {
+        if ($value instanceof ValueCollection) {
+            $value->link($this, $this->getEntityAttributes()->get($key));
+        }
+        return parent::setRelation($key, $value);
+    }
+
+    /**
+     * Get the entity attribute relations.
+     *
+     * @return array
+     */
+    public function getEntityAttributeRelations()
+    {
+        return $this->entityAttributeRelations;
     }
 
     /**
@@ -137,7 +209,7 @@ abstract class Entity extends Model
      */
     public function setEntityAttributeRelation($relation, $value)
     {
-        $this->attributeRelations[$relation] = $value;
+        $this->entityAttributeRelations[$relation] = $value;
         return $this;
     }
 
@@ -150,7 +222,17 @@ abstract class Entity extends Model
      */
     public function isEntityAttributeRelation($key)
     {
-        return isset($this->attributeRelations[$key]);
+        return isset($this->entityAttributeRelations[$key]);
+    }
+
+    /**
+     * Get the entity attributes namespace if exists.
+     *
+     * @return string|null
+     */
+    public function getEntityAttributesNamespace()
+    {
+        return property_exists($this, 'entityAttributesNamespace') ? $this->entityAttributesNamespace : null;
     }
 
     /**
@@ -160,17 +242,7 @@ abstract class Entity extends Model
      */
     public function getEntityAttributeValueTrash()
     {
-        return $this->trash ?: $this->trash = collect([]);
-    }
-
-    /**
-     * Get the entity attribute relations.
-     *
-     * @return array
-     */
-    public function getEntityAttributeRelations()
-    {
-        return $this->attributeRelations;
+        return $this->entityAttributeValueTrash ?: $this->entityAttributeValueTrash = collect([]);
     }
 
     /**
@@ -198,7 +270,7 @@ abstract class Entity extends Model
         if ($this->isRawEntityAttribute($key)) {
             return $this->getEntityAttributeRelation($key);
         }
-        return $this->getEntityAttributeValue($key);
+        return $this->getAttributeValue($key);
     }
 
     /**
@@ -279,7 +351,7 @@ abstract class Entity extends Model
      *
      * @param Attribute $attribute
      * @param mixed $value
-     * @return $this
+     * @return Model
      */
     protected function setEntityAttributeValue(Attribute $attribute, $value)
     {
@@ -287,10 +359,12 @@ abstract class Entity extends Model
             $model = $attribute->getAttribute('backend_type');
 
             $instance = new $model();
+
             $instance->setAttribute('entity_id', $this->getKey());
             $instance->setAttribute('entity_type_id', $this->getEntityTypeId());
             $instance->setAttribute($attribute->getForeignKey(), $attribute->getKey());
             $instance->setAttribute('value', $value);
+
             $value = $instance;
         }
         return $this->setRelation($attribute->getAttribute('attribute_code'), $value);
@@ -345,11 +419,9 @@ abstract class Entity extends Model
      */
     public function __call($method, $parameters)
     {
-//        $this->bootIfNotBooted();
-
-//        if ($this->isAttributeRelation($method)) {
-//            return call_user_func_array($this->attributeRelations[$method], $parameters);
-//        }
+        if ($this->entityAttributeRelationsBooted && $this->isEntityAttributeRelation($method)) {
+            return call_user_func_array($this->entityAttributeRelations[$method], $parameters);
+        }
 
         return parent::__call($method, $parameters);
     }

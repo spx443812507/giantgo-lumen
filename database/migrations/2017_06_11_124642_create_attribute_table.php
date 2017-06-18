@@ -28,7 +28,8 @@ class CreateAttributeTable extends Migration
             $table->boolean('is_required');
             $table->boolean('is_user_defined');
             $table->boolean('is_unique');
-            $table->string('default')->nullable();
+            $table->boolean('is_collection');
+            $table->string('default_value')->nullable();
             $table->string('description')->nullable();
             $table->timestamps();
             $table->softDeletes();

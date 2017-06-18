@@ -5,7 +5,7 @@ namespace App\Events;
 use App\Models\EAV\Entity;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class EntityWasDeleted
+class EntityDeleted
 {
     /**
      * Handle the entity deletion.

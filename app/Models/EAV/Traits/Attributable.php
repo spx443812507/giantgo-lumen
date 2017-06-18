@@ -8,8 +8,8 @@
 
 namespace App\Models\EAV\Traits;
 
-use App\Events\EntityWasDeleted;
-use App\Events\EntityWasSaved;
+use App\Events\EntityDeleted;
+use App\Events\EntitySaved;
 use App\Models\EAV\Scopes\EagerLoadScope;
 use Closure;
 use Illuminate\Support\Arr;
@@ -63,8 +63,8 @@ trait Attributable
         $attributes = DB::table('entity_attribute')->whereIn('entity_type_id', $entityTypeIds)->get()->pluck('attribute_id');
         static::$entityAttributes = Attribute::whereIn('id', $attributes)->get()->keyBy('attribute_code');
         static::addGlobalScope(new EagerLoadScope());
-        static::saved(EntityWasSaved::class . '@handle');
-        static::deleted(EntityWasDeleted::class . '@handle');
+        static::saved(EntitySaved::class . '@handle');
+        static::deleted(EntityDeleted::class . '@handle');
     }
 
     /**

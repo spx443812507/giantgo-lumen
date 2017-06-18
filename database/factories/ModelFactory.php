@@ -65,7 +65,7 @@ $factory->define(App\Models\EAV\Attribute::class, function (Faker\Generator $fak
         'is_required' => $faker->boolean,
         'is_user_defined' => $faker->boolean,
         'is_unique' => $faker->boolean,
-        'default' => $faker->title,
+        'default_value' => $faker->title,
         'description' => $faker->title
     ];
 });

@@ -38,7 +38,7 @@ class EntitiesTableSeeder extends Seeder
                 'is_required' => true,
                 'is_user_defined' => false,
                 'is_unique' => false,
-                'default' => '张三',
+                'default_value' => '张三',
                 'description' => '该字段记录用户姓名',
             ],
             [
@@ -56,7 +56,7 @@ class EntitiesTableSeeder extends Seeder
                 'is_required' => false,
                 'is_user_defined' => false,
                 'is_unique' => false,
-                'default' => '18',
+                'default_value' => '18',
                 'description' => '该字段记录用户年龄',
             ]
         ];

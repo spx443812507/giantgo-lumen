@@ -7,7 +7,7 @@ use App\Models\EAV\Supports\ValueCollection;
 use App\Models\EAV\Value;
 use Exception;
 
-class EntityWasSaved
+class EntitySaved
 {
     /**
      * The entity instance.
@@ -40,13 +40,13 @@ class EntityWasSaved
         $connection->beginTransaction();
         try {
             foreach ($this->entity->getEntityAttributes() as $attribute) {
-                if ($this->entity->relationLoaded($relation = $attribute->getAttribute('slug'))) {
+                if ($this->entity->relationLoaded($relation = $attribute->getAttribute('attribute_code'))) {
                     $relationValue = $this->entity->getRelationValue($relation);
                     if ($relationValue instanceof ValueCollection) {
                         foreach ($relationValue as $value) {
                             $this->saveOrTrashValue($value);
                         }
-                    } elseif (!is_null($relationValue)) {
+                    } else if (!is_null($relationValue)) {
                         $this->saveOrTrashValue($relationValue);
                     }
                 }
@@ -98,7 +98,7 @@ class EntityWasSaved
      */
     protected function trashValue(Value $value)
     {
-        if (!is_null($value->getAttribute('content'))) {
+        if (!is_null($value->getAttribute('value'))) {
             return false;
         }
         if ($value->exists) {

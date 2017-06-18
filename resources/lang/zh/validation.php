@@ -45,7 +45,7 @@ return [
     'not_in' => '选定的 :attribute 是无效的',
     'numeric' => ':attribute 必须是数字',
     'regex' => ':attribute 格式是无效的',
-    'required' => ':attribute 字段必须填写',
+    'required' => '请填写:attribute',
     'required_if' => ':attribute 字段是必须的当 :other 是 :value',
     'required_with' => ':attribute 字段是必须的当 :values 是存在的',
     'required_with_all' => ':attribute 字段是必须的当 :values 是存在的',
@@ -96,6 +96,11 @@ return [
         'identity' => '手机号/用户名',
         'name' => '名称',
         'display_name' => '显示名称',
-        'description' => '描述'
+        'description' => '描述',
+        'attributes' => '属性',
+        'entity_type_id' => '所属实体',
+        'attributes.*.attribute_code' => '属性码',
+        'attributes.*.frontend_label' => '属性标题',
+        'attributes.*.frontend_input' => '属性类型'
     ],
 ];
