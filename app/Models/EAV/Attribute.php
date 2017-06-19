@@ -27,6 +27,15 @@ class Attribute extends Model implements AttributeInterface
         'is_required', 'is_user_defined', 'is_unique', 'default_value', 'description'
     ];
 
+    /**
+     * The attributes excluded from the model's JSON form.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'backend_model', 'backend_type', 'backend_table', 'deleted_at'
+    ];
+
     protected $table = 'attributes';
 
     protected $casts = [
@@ -37,31 +46,31 @@ class Attribute extends Model implements AttributeInterface
 
     protected $inputMappings = [
         'text' => [
-            'backend_type' => 'varchar',
+            'backend_type' => 'App\Models\EAV\Types\Varchar',
             'is_collection' => false
         ],
         'textarea' => [
-            'backend_type' => 'text',
+            'backend_type' => 'App\Models\EAV\Types\Text',
             'is_collection' => false
         ],
         'swith' => [
-            'backend_type' => 'boolean',
+            'backend_type' => 'App\Models\EAV\Types\Boolean',
             'is_collection' => false
         ],
         'radio' => [
-            'backend_type' => 'integer',
+            'backend_type' => 'App\Models\EAV\Types\Integer',
             'is_collection' => false
         ],
         'checkbox' => [
-            'backend_type' => 'integer',
+            'backend_type' => 'App\Models\EAV\Types\Integer',
             'is_collection' => true
         ],
         'number' => [
-            'backend_type' => 'integer',
+            'backend_type' => 'App\Models\EAV\Types\Integer',
             'is_collection' => false
         ],
         'datetime' => [
-            'backend_type' => 'datetime',
+            'backend_type' => 'App\Models\EAV\Types\Datetime',
             'is_collection' => false
         ]
     ];

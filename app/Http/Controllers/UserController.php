@@ -53,45 +53,21 @@ class UserController extends Controller
         return response()->json(User::all());
     }
 
-    public function getAttributes(Request $request)
-    {
-        $userClass = EntityFactory::getEntity(1);
-
-        $user = new $userClass();
-
-        return response()->json($user->attributes());
-    }
-
-    public function createAttributes(Request $request)
+    public function updateUser(Request $request)
     {
         $this->validate($request, [
             'entity_type_id' => 'required|integer',
-            'attributes' => 'required|array',
-            'attributes.*.attribute_code' => 'required|unique:attributes,attribute_code',
-            'attributes.*.frontend_label' => 'required',
-            'attributes.*.frontend_input' => 'required',
+            'user_id' => 'required|integer'
         ]);
 
-        $result = [];
+        $entityTypeId = $request->input('entity_type_id');
 
-        $attributes = $request->input('attributes');
+        $userId = $request->input('user_id');
 
-        for ($index = 0; $index < count($attributes); $index++) {
-            $result[] = Attribute::create([
-                'entity_type_id' => $request->input('entity_type_id'),
-                'attribute_code' => $attributes[$index]['attribute_code'],
-                'frontend_input' => $attributes[$index]['frontend_input'],
-                'frontend_model' => empty($attributes[$index]['frontend_model']) ? '' : $attributes[$index]['frontend_model'],
-                'frontend_label' => $attributes[$index]['frontend_label'],
-                'frontend_class' => empty($attributes[$index]['frontend_class']) ? '' : $attributes[$index]['frontend_class'],
-                'is_required' => $attributes[$index]['is_required'],
-                'is_user_defined' => false,
-                'is_unique' => $attributes[$index]['is_unique'],
-                'default_value' => $attributes[$index]['default_value'],
-                'description' => $attributes[$index]['description'],
-            ]);
-        }
+        $userClass = EntityFactory::getEntity($entityTypeId);
 
-        return response()->json($result, 200);
+        $user = $userClass::find($userId);
+
+        return response()->json($user->name()->get());
     }
 }

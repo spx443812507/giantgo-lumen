@@ -26,13 +26,13 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->get('/users/me', 'UserController@me');
 
         $app->get('/users', ['as' => 'users.get', 'uses' => 'UserController@getList', 'middleware' => 'role:admin']);
+        $app->patch('/users', ['as' => 'user.update', 'uses' => 'UserController@updateUser']);
 
         $app->post('/roles', ['as' => 'roles.create', 'uses' => 'RoleController@create', 'middleware' => 'permission:role-create']);
 
         $app->post('/products', ['as' => 'products.create', 'uses' => 'ProductController@create', 'middleware' => 'permission:product-create']);
 
-        $app->get('/users/attributes', ['as' => 'attributes.get', 'uses' => 'UserController@getAttributes']);
-        $app->post('/users/attributes', ['as' => 'attributes.create', 'uses' => 'UserController@createAttributes']);
+        $app->post('/attributes', ['as' => 'attributes.create', 'uses' => 'AttributeController@createAttributes']);
     });
 
     $app->get('/products/export', ['as' => 'products.export', 'uses' => 'ProductController@export']);

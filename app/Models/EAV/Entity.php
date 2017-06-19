@@ -14,11 +14,13 @@ use App\Models\EAV\Scopes\EagerLoadScope;
 use App\Models\Model;
 use App\Models\EAV\Supports\RelationBuilder;
 use App\Models\EAV\Supports\ValueCollection;
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use SuperClosure\Serializer;
 
 abstract class Entity extends Model
 {
@@ -51,7 +53,6 @@ abstract class Entity extends Model
      */
     protected $entityAttributeRelationsBooted = false;
 
-
     public function getEntityTypeId()
     {
         return self::$entityTypeId;
@@ -62,30 +63,32 @@ abstract class Entity extends Model
         return self::$entityTypeId = $entityTypeId;
     }
 
+    public function setEntityTypeIdAttribute($entityTypeId)
+    {
+        $this->setEntityTypeId($entityTypeId);
+    }
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
 
         if (isset(static::$entityTypeId)) {
-            $this->setEntityTypeId(static::$entityTypeId);
-
-            $attributeIds = DB::table('entity_attribute')->where('entity_type_id', $this->getEntityTypeId())->get()->pluck('attribute_id');
-
-            static::$entityAttributes = Attribute::whereIn('id', $attributeIds)->get()->keyBy('attribute_code');
-
-            if (!$this->entityAttributeRelationsBooted) {
-                app(RelationBuilder::class)->build($this);
-                $this->entityAttributeRelationsBooted = true;
-            }
+            $this->bootEntityAttribute(static::$entityTypeId);
         }
     }
 
-    /**
-     * Registering events.
-     */
-    public static function boot()
+    public function bootEntityAttribute($entityTypeId)
     {
-        parent::boot();
+        $this->setEntityTypeId($entityTypeId);
+
+        $attributeIds = DB::table('entity_attribute')->where('entity_type_id', $this->getEntityTypeId())->get()->pluck('attribute_id');
+
+        static::$entityAttributes = Attribute::whereIn('id', $attributeIds)->get()->keyBy('attribute_code');
+
+        if (!$this->entityAttributeRelationsBooted) {
+            app(RelationBuilder::class)->build($this);
+            $this->entityAttributeRelationsBooted = true;
+        }
 
         static::addGlobalScope(new EagerLoadScope());
         static::saved(EntitySaved::class . '@handle');
@@ -359,12 +362,10 @@ abstract class Entity extends Model
             $model = $attribute->getAttribute('backend_type');
 
             $instance = new $model();
-
             $instance->setAttribute('entity_id', $this->getKey());
             $instance->setAttribute('entity_type_id', $this->getEntityTypeId());
             $instance->setAttribute($attribute->getForeignKey(), $attribute->getKey());
             $instance->setAttribute('value', $value);
-
             $value = $instance;
         }
         return $this->setRelation($attribute->getAttribute('attribute_code'), $value);
@@ -410,19 +411,58 @@ abstract class Entity extends Model
         });
     }
 
+
     /**
      * Dynamically pipe calls to attribute relations.
      *
-     * @param  string $method
-     * @param  array $parameters
+     * @param string $method
+     * @param array $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters)
     {
-        if ($this->entityAttributeRelationsBooted && $this->isEntityAttributeRelation($method)) {
+        if ($this->isEntityAttributeRelation($method)) {
             return call_user_func_array($this->entityAttributeRelations[$method], $parameters);
         }
-
         return parent::__call($method, $parameters);
+    }
+
+    /**
+     * Prepare the instance for serialization.
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        if ($this->entityAttributeRelations && current($this->entityAttributeRelations) instanceof Closure) {
+            $relations = $this->entityAttributeRelations;
+            $this->entityAttributeRelations = [];
+            foreach ($relations as $key => $value) {
+                if ($value instanceof Closure) {
+                    $this->setEntityAttributeRelation($key, (new Serializer())->serialize($value));
+                }
+            }
+        }
+        return array_keys(get_object_vars($this));
+    }
+
+    /**
+     * Restore the model after serialization.
+     *
+     * @return void
+     */
+    public function __wakeup()
+    {
+        parent::__wakeup();
+        if ($this->entityAttributeRelations && is_string(current($this->entityAttributeRelations))) {
+            $relations = $this->entityAttributeRelations;
+            $this->entityAttributeRelations = [];
+            foreach ($relations as $key => $value) {
+                if (is_string($value)) {
+                    $this->setEntityAttributeRelation($key, (new Serializer())->unserialize($value));
+                }
+            }
+        }
     }
 }
