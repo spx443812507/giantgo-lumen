@@ -98,7 +98,7 @@ return [
         'display_name' => '显示名称',
         'description' => '描述',
         'attributes' => '属性',
-        'entity_type_id' => '所属实体',
+        'entity_type_id' => '实体类型',
         'attributes.*.attribute_code' => '属性码',
         'attributes.*.frontend_label' => '属性标题',
         'attributes.*.frontend_input' => '属性类型'

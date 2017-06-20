@@ -43,14 +43,27 @@ class UserController extends Controller
         return response()->json($user);
     }
 
-    public function get($id)
+    public function get($userId)
     {
-        return $id;
+        $user = User::find($userId);
+        return response()->json($user);
     }
 
     public function getList(Request $request)
     {
-        return response()->json(User::all());
+        $this->validate($request, [
+            'entity_type_id' => 'required|integer'
+        ]);
+
+        $entityTypeId = $request->input('entity_type_id');
+
+        $userClass = EntityFactory::getEntity($entityTypeId);
+
+        $users = $userClass::all();
+
+        $users->load('name');
+
+        return response()->json($users);
     }
 
     public function updateUser(Request $request)
@@ -64,10 +77,14 @@ class UserController extends Controller
 
         $userId = $request->input('user_id');
 
+        $userInfo = $request->except(['entity_type_id', 'user_id']);
+
         $userClass = EntityFactory::getEntity($entityTypeId);
 
         $user = $userClass::find($userId);
 
-        return response()->json($user->name()->get());
+        $user->load('eav');
+
+        return response()->json($user);
     }
 }

@@ -118,22 +118,6 @@ abstract class Entity extends Model
     /**
      * {@inheritdoc}
      */
-    protected function fillFromArray(array $attributes)
-    {
-        foreach (array_diff_key($attributes, array_flip($this->getFillable())) as $key => $value) {
-            if ($this->isEntityAttribute($key)) {
-                $this->setEntityAttribute($key, $value);
-            }
-        }
-        if (count($this->getFillable()) > 0 && !static::$unguarded) {
-            return array_intersect_key($attributes, array_flip($this->getFillable()));
-        }
-        return $attributes;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function setAttribute($key, $value)
     {
         if ($this->entityAttributeRelationsBooted) {
@@ -273,7 +257,7 @@ abstract class Entity extends Model
         if ($this->isRawEntityAttribute($key)) {
             return $this->getEntityAttributeRelation($key);
         }
-        return $this->getAttributeValue($key);
+        return $this->getEntityAttributeValue($key);
     }
 
     /**
@@ -305,10 +289,30 @@ abstract class Entity extends Model
     protected function getEntityAttributeRelation($key)
     {
         $key = $this->getEntityAttributeName($key);
+
         if ($this->relationLoaded($key)) {
             return $this->getRelation($key);
         }
+
         return $this->getRelationValue($key);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRelationValue($key)
+    {
+        $value = parent::getRelationValue($key);
+        // In case any relation value is found, we will just provide it as is.
+        // Otherwise, we will check if exists any attribute relation for the
+        // given key. If so, we will load the relation calling its method.
+        if (is_null($value) && !$this->relationLoaded($key) && $this->isEntityAttributeRelation($key)) {
+            $value = $this->getRelationshipFromMethod($key);
+        }
+        if ($value instanceof ValueCollection) {
+            $value->link($this, $this->getEntityAttributes()->get($key));
+        }
+        return $value;
     }
 
     /**
