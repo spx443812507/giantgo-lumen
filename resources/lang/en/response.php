@@ -18,4 +18,5 @@ return [
     'token_expired' => 'The token is expired',
     'token_invalid' => 'The token is invalid',
     'token_absent' => 'The token is absent',
+    'entity_not_match' => 'The entity is not match',
 ];

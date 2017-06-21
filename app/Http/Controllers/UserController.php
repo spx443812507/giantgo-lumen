@@ -40,12 +40,35 @@ class UserController extends Controller
             return response()->json(['error' => 'token_absent'], 500);
         }
 
+        $entityTypeId = $user->entity_type_id;
+
+        $user->bootEntityAttribute($entityTypeId);
+
+        $relations = $user->getEntityAttributeRelations();
+
+        $user->load(array_keys($relations));
+
         return response()->json($user);
     }
 
-    public function get($userId)
+    public function get(Request $request, $userId)
     {
-        $user = User::find($userId);
+        $this->validate($request, [
+            'entity_type_id' => 'required|integer'
+        ]);
+
+        $entityTypeId = $request->input('entity_type_id');
+
+        $userClass = EntityFactory::getEntity($entityTypeId);
+
+        $user = $userClass::find($userId);
+
+        if (empty($user)) {
+            return response()->json('user_not_exists', 500);
+        }
+
+        $user->with('*');
+
         return response()->json($user);
     }
 
@@ -61,8 +84,6 @@ class UserController extends Controller
 
         $users = $userClass::all();
 
-        $users->load('name');
-
         return response()->json($users);
     }
 
@@ -70,20 +91,24 @@ class UserController extends Controller
     {
         $this->validate($request, [
             'entity_type_id' => 'required|integer',
-            'user_id' => 'required|integer'
+            'user.user_id' => 'required|integer'
         ]);
 
         $entityTypeId = $request->input('entity_type_id');
 
-        $userId = $request->input('user_id');
-
-        $userInfo = $request->except(['entity_type_id', 'user_id']);
+        $userInfo = $request->input('user');
 
         $userClass = EntityFactory::getEntity($entityTypeId);
 
-        $user = $userClass::find($userId);
+        $user = $userClass::find($userInfo['user_id']);
 
-        $user->load('eav');
+        if (empty($user)) {
+            return response()->json('user_not_exists', 500);
+        }
+
+        $user->fill($userInfo);
+
+        $user->save();
 
         return response()->json($user);
     }

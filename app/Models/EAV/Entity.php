@@ -142,6 +142,26 @@ abstract class Entity extends Model
     /**
      * {@inheritdoc}
      */
+    protected function fillableFromArray(array $attributes)
+    {
+        if ($this->entityAttributeRelationsBooted) {
+            foreach (array_diff_key($attributes, array_flip($this->getFillable())) as $key => $value) {
+                if ($this->isEntityAttribute($key)) {
+                    $this->setEntityAttribute($key, $value);
+                }
+            }
+        }
+
+        if (count($this->getFillable()) > 0 && !static::$unguarded) {
+            return array_intersect_key($attributes, array_flip($this->getFillable()));
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function relationsToArray()
     {
         $eavAttributes = [];

@@ -18,4 +18,5 @@ return [
     'token_expired' => '签名过期',
     'token_invalid' => '无效的签名',
     'token_absent' => '签名确实',
+    'entity_not_match' => '实体不匹配',
 ];

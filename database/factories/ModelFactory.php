@@ -13,6 +13,7 @@
 
 $factory->define(App\Models\User::class, function (Faker\Generator $faker) {
     return [
+        'entity_type_id' => $faker->uuid,
         'email' => $faker->unique()->email
     ];
 });
