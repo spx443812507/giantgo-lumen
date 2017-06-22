@@ -32,7 +32,8 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
 
         $app->post('/products', ['as' => 'products.create', 'uses' => 'ProductController@create', 'middleware' => 'permission:product-create']);
 
-        $app->post('/entities/{entityTypeId}/attributes', ['as' => 'attributes.create', 'uses' => 'AttributeController@createAttributes']);
+        $app->post('/attributes', ['as' => 'attributes.create', 'uses' => 'AttributeController@createAttributes']);
+        $app->get('/attributes', ['as' => 'attributes.get', 'uses' => 'AttributeController@getAttributes']);
     });
 
     $app->get('/products/export', ['as' => 'products.export', 'uses' => 'ProductController@export']);

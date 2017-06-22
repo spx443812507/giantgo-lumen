@@ -26,7 +26,7 @@ class EntityFactory extends Model
 
     public static function getEntity($entityTypeId)
     {
-        $entity = DB::table('entity_type')->where('entity_type_code', 'user')->first();
+        $entity = DB::table('entity_type')->find($entityTypeId);
 
         if (empty($entity)) {
             throw new MissingEntityException();

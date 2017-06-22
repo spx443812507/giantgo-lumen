@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EAV\Attribute;
+use App\Models\EAV\Factories\EntityFactory;
 use Illuminate\Http\Request;
 
 class AttributeController extends Controller
@@ -44,5 +45,18 @@ class AttributeController extends Controller
         }
 
         return response()->json($result, 200);
+    }
+
+    public function getAttributes(Request $request)
+    {
+        $this->validate($request, [
+            'entity_type_id' => 'required|integer'
+        ]);
+
+        $entityClass = EntityFactory::getEntity($request->input('entity_type_id'));
+
+        $entity = new  $entityClass();
+
+        return response()->json($entity->attributes());
     }
 }

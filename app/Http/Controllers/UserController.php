@@ -67,7 +67,9 @@ class UserController extends Controller
             return response()->json('user_not_exists', 500);
         }
 
-        $user->with('*');
+        $relations = $user->getEntityAttributeRelations();
+
+        $user->load(array_keys($relations));
 
         return response()->json($user);
     }

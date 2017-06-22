@@ -42,6 +42,7 @@ class EntitySaved
             foreach ($this->entity->getEntityAttributes() as $attribute) {
                 if ($this->entity->relationLoaded($relation = $attribute->getAttribute('attribute_code'))) {
                     $relationValue = $this->entity->getRelationValue($relation);
+
                     if ($relationValue instanceof ValueCollection) {
                         foreach ($relationValue as $value) {
                             $this->saveOrTrashValue($value);

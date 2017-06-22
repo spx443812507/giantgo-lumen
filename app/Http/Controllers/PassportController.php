@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EAV\Factories\EntityFactory;
 use App\Models\SocialAccount;
 use App\Models\User;
 use Exception;
@@ -15,6 +16,7 @@ use Firebase\JWT\ExpiredException;
 use Firebase\JWT\SignatureInvalidException;
 use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
+use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Exceptions;
 
@@ -79,15 +81,26 @@ class PassportController extends Controller
     public function signUp(Request $request)
     {
         $this->validate($request, [
-            'email' => 'required|email|max:255|unique:users',
-            'password' => 'required',
-            'name' => 'required|max:255'
+            'users.email' => 'email|max:255|unique:users',
+            'users.mobile' => 'max:255|unique:users',
+            'users.password' => 'required'
         ]);
 
-        $userInfo = $request->only('email', 'password', 'name', 'mobile');
+        $entityTypeId = $request->input('entity_type_id');
+
+        $userClass = empty($entityTypeId) ? User::class : EntityFactory::getEntity($entityTypeId);
+
+        $userInfo = $request->input('users');
 
         try {
-            $user = User::create($userInfo);
+            $user = new $userClass;
+
+            $user->fill($userInfo);
+
+            $user->entity_type_id = $entityTypeId;
+
+            $user->save();
+
         } catch (Exception $exception) {
             return response()->json(['error' => 'user_already_exists'], 500);
         }

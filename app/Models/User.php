@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\EAV\Entity;
+use App\Models\EAV\Entity as EavEntity;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Hash;
@@ -11,7 +11,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Zizaco\Entrust\Traits\EntrustUserTrait;
 
-class User extends Entity implements JWTSubject, AuthenticatableContract, AuthorizableContract
+class User extends EavEntity implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, SoftDeletes, EntrustUserTrait;
 

@@ -53,7 +53,7 @@ class Attribute extends Model implements AttributeInterface
             'backend_type' => 'App\Models\EAV\Types\Text',
             'is_collection' => false
         ],
-        'swith' => [
+        'switch' => [
             'backend_type' => 'App\Models\EAV\Types\Boolean',
             'is_collection' => false
         ],
