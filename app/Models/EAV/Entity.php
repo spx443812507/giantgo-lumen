@@ -11,6 +11,7 @@ namespace App\Models\EAV;
 use App\Events\EntityDeleted;
 use App\Events\EntitySaved;
 use App\Models\EAV\Scopes\EagerLoadScope;
+use App\Models\EAV\Scopes\EntityTypeScope;
 use App\Models\Model;
 use App\Models\EAV\Supports\RelationBuilder;
 use App\Models\EAV\Supports\ValueCollection;
@@ -91,6 +92,7 @@ abstract class Entity extends Model
         }
 
         static::addGlobalScope(new EagerLoadScope());
+        static::addGlobalScope(new EntityTypeScope());
         static::saved(EntitySaved::class . '@handle');
         static::deleted(EntityDeleted::class . '@handle');
     }

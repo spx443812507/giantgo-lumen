@@ -45,10 +45,10 @@ class EntitySaved
 
                     if ($relationValue instanceof ValueCollection) {
                         foreach ($relationValue as $value) {
-                            $this->saveOrTrashValue($value);
+                            $this->saveOrTrashValue($value, $entity);
                         }
                     } else if (!is_null($relationValue)) {
-                        $this->saveOrTrashValue($relationValue);
+                        $this->saveOrTrashValue($relationValue, $entity);
                     }
                 }
             }
@@ -76,8 +76,12 @@ class EntitySaved
      *
      * @return void
      */
-    protected function saveOrTrashValue(Value $value)
+    protected function saveOrTrashValue(Value $value, Entity $entity)
     {
+        if (empty($value->getAttribute('entity_id'))) {
+            $value->setAttribute('entity_id', $entity->getKey());
+        }
+
         // In order to provide flexibility and let the values have their own
         // relationships, here we'll check if a value should be completely
         // saved with its relations or just save its own current state.

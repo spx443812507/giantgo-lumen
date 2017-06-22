@@ -28,9 +28,7 @@ class EagerLoadScope implements Scope
         // If there is any eagerload matching the eav key, we will replace it with
         // all the registered properties for the entity. We'll simulate as if the
         // user has manually added all of these withs in purpose when querying.
-        if (array_key_exists('eav', $eagerLoads)) {
-            $eagerLoads = array_merge($eagerLoads, $entity->getEntityAttributeRelations());
-            $builder->setEagerLoads(array_except($eagerLoads, 'eav'));
-        }
+        $eagerLoads = array_merge($eagerLoads, $entity->getEntityAttributeRelations());
+        $builder->setEagerLoads(array_except($eagerLoads, 'eav'));
     }
 }

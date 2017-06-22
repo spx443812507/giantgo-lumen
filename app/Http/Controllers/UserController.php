@@ -67,10 +67,6 @@ class UserController extends Controller
             return response()->json('user_not_exists', 500);
         }
 
-        $relations = $user->getEntityAttributeRelations();
-
-        $user->load(array_keys($relations));
-
         return response()->json($user);
     }
 
@@ -93,12 +89,14 @@ class UserController extends Controller
     {
         $this->validate($request, [
             'entity_type_id' => 'required|integer',
-            'user.user_id' => 'required|integer'
+            'users.user_id' => 'required|integer',
+            'users.email' => 'email|max:255|unique:users',
+            'users.mobile' => 'max:255|unique:users'
         ]);
 
         $entityTypeId = $request->input('entity_type_id');
 
-        $userInfo = $request->input('user');
+        $userInfo = $request->input('users');
 
         $userClass = EntityFactory::getEntity($entityTypeId);
 

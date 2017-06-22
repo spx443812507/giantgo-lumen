@@ -16,10 +16,12 @@ class AttributeController extends Controller
 {
     public function createAttributes(Request $request)
     {
+        $entityTypeId = $request->input('entity_type_id');
+
         $this->validate($request, [
             'entity_type_id' => 'required|integer',
             'attributes' => 'required|array',
-            'attributes.*.attribute_code' => 'required|unique:attributes,attribute_code',
+            'attributes.*.attribute_code' => 'required|unique:attributes,attribute_code,NULL,id,entity_type_id,' . $entityTypeId,
             'attributes.*.frontend_label' => 'required',
             'attributes.*.frontend_input' => 'required',
         ]);
@@ -30,7 +32,7 @@ class AttributeController extends Controller
 
         for ($index = 0; $index < count($attributes); $index++) {
             $result[] = Attribute::create([
-                'entity_type_id' => $request->input('entity_type_id'),
+                'entity_type_id' => $entityTypeId,
                 'attribute_code' => $attributes[$index]['attribute_code'],
                 'frontend_input' => $attributes[$index]['frontend_input'],
                 'frontend_model' => empty($attributes[$index]['frontend_model']) ? '' : $attributes[$index]['frontend_model'],
@@ -55,7 +57,7 @@ class AttributeController extends Controller
 
         $entityClass = EntityFactory::getEntity($request->input('entity_type_id'));
 
-        $entity = new  $entityClass();
+        $entity = new $entityClass();
 
         return response()->json($entity->attributes());
     }
