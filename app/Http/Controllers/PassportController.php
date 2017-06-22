@@ -97,8 +97,6 @@ class PassportController extends Controller
 
             $user->fill($userInfo);
 
-            $user->entity_type_id = $entityTypeId;
-
             $user->save();
 
         } catch (Exception $exception) {

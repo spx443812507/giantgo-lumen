@@ -24,6 +24,7 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
 
     $app->group(['middleware' => 'auth'], function () use ($app) {
         $app->get('/users/me', 'UserController@me');
+        $app->patch('/users/me', 'UserController@me');
         $app->get('/users/{userId}', ['as' => 'users.get', 'uses' => 'UserController@get', 'middleware' => 'role:admin']);
         $app->get('/users', ['as' => 'users.getList', 'uses' => 'UserController@getList', 'middleware' => 'role:admin']);
         $app->patch('/users', ['as' => 'user.update', 'uses' => 'UserController@updateUser']);

@@ -64,7 +64,7 @@ class UserController extends Controller
         $user = $userClass::find($userId);
 
         if (empty($user)) {
-            return response()->json('user_not_exists', 500);
+            return response()->json(['error' => 'user_not_exists'], 500);
         }
 
         return response()->json($user);
@@ -103,7 +103,7 @@ class UserController extends Controller
         $user = $userClass::find($userInfo['user_id']);
 
         if (empty($user)) {
-            return response()->json('user_not_exists', 500);
+            return response()->json(['error' => 'user_not_exists'], 500);
         }
 
         $user->fill($userInfo);

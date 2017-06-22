@@ -10,6 +10,7 @@ namespace App\Models\EAV;
 
 use App\Events\EntityDeleted;
 use App\Events\EntitySaved;
+use App\Events\EntitySaving;
 use App\Models\EAV\Scopes\EagerLoadScope;
 use App\Models\EAV\Scopes\EntityTypeScope;
 use App\Models\Model;
@@ -64,11 +65,6 @@ abstract class Entity extends Model
         return self::$entityTypeId = $entityTypeId;
     }
 
-    public function setEntityTypeIdAttribute($entityTypeId)
-    {
-        $this->setEntityTypeId($entityTypeId);
-    }
-
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
@@ -93,6 +89,7 @@ abstract class Entity extends Model
 
         static::addGlobalScope(new EagerLoadScope());
         static::addGlobalScope(new EntityTypeScope());
+        static::saving(EntitySaving::class . '@handle');
         static::saved(EntitySaved::class . '@handle');
         static::deleted(EntityDeleted::class . '@handle');
     }
