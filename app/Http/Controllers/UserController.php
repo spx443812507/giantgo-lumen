@@ -8,10 +8,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EAV\Attribute;
+use Illuminate\Support\Facades\Validator;
 use App\Models\EAV\Factories\EntityFactory;
-use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Exceptions;
 
@@ -89,10 +89,23 @@ class UserController extends Controller
     {
         $this->validate($request, [
             'entity_type_id' => 'required|integer',
-            'users.user_id' => 'required|integer',
-            'users.email' => 'email|max:255|unique:users',
-            'users.mobile' => 'max:255|unique:users'
+            'users.user_id' => 'required|integer'
         ]);
+
+        $userData = $request->input('users');
+
+        $validator = Validator::make($userData, [
+            'email' => [
+                Rule::unique('users')->ignore($userData['user_id']),
+            ],
+            'mobile' => [
+                Rule::unique('users')->ignore($userData['user_id']),
+            ]
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
 
         $entityTypeId = $request->input('entity_type_id');
 

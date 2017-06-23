@@ -16,7 +16,6 @@ use Firebase\JWT\ExpiredException;
 use Firebase\JWT\SignatureInvalidException;
 use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
-use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Exceptions;
 
@@ -49,13 +48,32 @@ class PassportController extends Controller
     public function signIn(Request $request)
     {
         $this->validate($request, [
-            'email' => 'required|email',
             'password' => 'required',
+            'email' => 'required_without:mobile'
         ]);
 
+        $entityTypeId = $request->input('entity_type_id') ?: 0;
+
+        $email = $request->input('email');
+        $mobile = $request->input('mobile');
+
+        $credential = [
+            'password' => $request->input('password')
+        ];
+
+        if (isset($email)) {
+            $credential['email'] = $request->input('email');
+        } else if (isset($mobile)) {
+            $credential['mobile'] = $request->input('mobile');
+        }
+
+        if (isset($entityTypeId)) {
+            $credential['entity_type_id'] = $entityTypeId;
+        }
+
         try {
-            if (!$token = $this->jwt->attempt($request->only('email', 'password'))) {
-                return response()->json(['error' => 'user_not_exists'], 404);
+            if (!$token = $this->jwt->attempt($credential)) {
+                return response()->json(['error' => 'username_or_password_error'], 404);
             }
         } catch (Exceptions\TokenExpiredException $e) {
             return response()->json(['error' => 'token_expired'], 500);
@@ -80,17 +98,17 @@ class PassportController extends Controller
 
     public function signUp(Request $request)
     {
-        $this->validate($request, [
-            'users.email' => 'email|max:255|unique:users',
-            'users.mobile' => 'max:255|unique:users',
-            'users.password' => 'required'
-        ]);
-
         $entityTypeId = $request->input('entity_type_id');
+
+        $this->validate($request, [
+            'email' => 'email|max:255|unique:users,email,NULL,id,entity_type_id,' . $entityTypeId,
+            'mobile' => 'max:255|unique:users,mobile,NULL,id,entity_type_id,' . $entityTypeId,
+            'password' => 'required'
+        ]);
 
         $userClass = empty($entityTypeId) ? User::class : EntityFactory::getEntity($entityTypeId);
 
-        $userInfo = $request->input('users');
+        $userInfo = $request->all();
 
         try {
             $user = new $userClass;
@@ -98,7 +116,6 @@ class PassportController extends Controller
             $user->fill($userInfo);
 
             $user->save();
-
         } catch (Exception $exception) {
             return response()->json(['error' => 'user_already_exists'], 500);
         }
