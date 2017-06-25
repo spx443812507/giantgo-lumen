@@ -52,7 +52,7 @@ class PassportController extends Controller
             'email' => 'required_without:mobile'
         ]);
 
-        $entityTypeId = $request->input('entity_type_id') ?: 0;
+        $entityTypeId = $request->input('entity_type_id') ?: 1;
 
         $email = $request->input('email');
         $mobile = $request->input('mobile');
@@ -98,7 +98,7 @@ class PassportController extends Controller
 
     public function signUp(Request $request)
     {
-        $entityTypeId = $request->input('entity_type_id');
+        $entityTypeId = $request->input('entity_type_id') ?: 1;
 
         $this->validate($request, [
             'email' => 'email|max:255|unique:users,email,NULL,id,entity_type_id,' . $entityTypeId,

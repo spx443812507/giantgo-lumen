@@ -21,4 +21,5 @@ return [
     'token_absent' => '签名确实',
     'entity_not_match' => '实体不匹配',
     'social_account_not_exists' => '不存在的第三方用户',
+    'entity_type_not_support' => '不支持的实体类型',
 ];

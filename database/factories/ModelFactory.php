@@ -11,10 +11,22 @@
 |
 */
 
+$factory->define(App\Models\EAV\Factories\EntityFactory::class, function (Faker\Generator $faker) {
+    return [
+        'id' => $faker->unique(),
+        'entity_type_name' => $faker->name,
+        'entity_type_code' => $faker->name,
+        'entity_model' => $faker->name,
+        'entity_table' => $faker->name,
+        'description' => $faker->title
+    ];
+});
+
+
 $factory->define(App\Models\User::class, function (Faker\Generator $faker) {
     return [
-        'entity_type_id' => $faker->uuid,
-        'email' => $faker->unique()->email
+        'email' => $faker->unique()->email,
+        'mobile' => $faker->unique()->phoneNumber
     ];
 });
 

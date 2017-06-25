@@ -18,7 +18,7 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
         $user = factory(App\Models\User::class)->create([
-            'entity_type_id' => '1',
+            'entity_type_id' => 1,
             'email' => 'admin@admin.com',
             'mobile' => '15930181489',
             'password' => 'admin',

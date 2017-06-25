@@ -21,8 +21,10 @@ class EntityFactory extends Model
      * @var array
      */
     protected $fillable = [
-        'entity_type_code', 'entity_model', 'attribute_model', 'entity_table'
+        'entity_type_name', 'entity_type_code', 'entity_model', 'attribute_model', 'entity_table', 'description'
     ];
+
+    protected $table = 'entity_type';
 
     public static function getEntity($entityTypeId)
     {

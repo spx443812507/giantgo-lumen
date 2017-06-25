@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use App\Models\EAV\Factories\EntityFactory;
 use Illuminate\Http\Request;
@@ -53,32 +54,28 @@ class UserController extends Controller
 
     public function get(Request $request, $userId)
     {
-        $this->validate($request, [
-            'entity_type_id' => 'required|integer'
-        ]);
-
-        $entityTypeId = $request->input('entity_type_id');
-
-        $userClass = EntityFactory::getEntity($entityTypeId);
-
-        $user = $userClass::find($userId);
+        $user = User::find($userId);
 
         if (empty($user)) {
             return response()->json(['error' => 'user_not_exists'], 500);
         }
+
+        $entityTypeId = $user->entity_type_id;
+
+        $user->bootEntityAttribute($entityTypeId);
+
+        $relations = $user->getEntityAttributeRelations();
+
+        $user->load(array_keys($relations));
 
         return response()->json($user);
     }
 
     public function getList(Request $request)
     {
-        $this->validate($request, [
-            'entity_type_id' => 'required|integer'
-        ]);
-
         $entityTypeId = $request->input('entity_type_id');
 
-        $userClass = EntityFactory::getEntity($entityTypeId);
+        $userClass = empty($entityTypeId) ? User::class : EntityFactory::getEntity($entityTypeId);
 
         $users = $userClass::all();
 
