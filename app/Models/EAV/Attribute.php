@@ -10,10 +10,9 @@ namespace App\Models\EAV;
 
 
 use App\Events\AttributeSaved;
-use App\Models\EAV\Contracts\AttributeInterface;
 use Illuminate\Database\Eloquent\Model;
 
-class Attribute extends Model implements AttributeInterface
+class Attribute extends Model
 {
     /**
      * Fillable attributes.
@@ -22,7 +21,6 @@ class Attribute extends Model implements AttributeInterface
      */
     protected $fillable = [
         'entity_type_id', 'attribute_code', 'attribute_model',
-        'backend_model', 'backend_type', 'backend_table',
         'frontend_model', 'frontend_input', 'frontend_label', 'frontend_class',
         'is_required', 'is_user_defined', 'is_unique', 'default_value', 'description'
     ];
@@ -47,54 +45,45 @@ class Attribute extends Model implements AttributeInterface
     protected $inputMappings = [
         'text' => [
             'backend_type' => 'App\Models\EAV\Types\Varchar',
-            'is_collection' => false
+            'is_collection' => false,
+            'has_options' => false,
         ],
         'textarea' => [
             'backend_type' => 'App\Models\EAV\Types\Text',
-            'is_collection' => false
+            'is_collection' => false,
+            'has_options' => false,
         ],
         'switch' => [
             'backend_type' => 'App\Models\EAV\Types\Boolean',
-            'is_collection' => false
+            'is_collection' => false,
+            'has_options' => false,
         ],
         'radio' => [
             'backend_type' => 'App\Models\EAV\Types\Integer',
-            'is_collection' => false
+            'is_collection' => false,
+            'has_options' => true,
         ],
         'checkbox' => [
             'backend_type' => 'App\Models\EAV\Types\Integer',
-            'is_collection' => true
+            'is_collection' => true,
+            'has_options' => true,
+        ],
+        'select' => [
+            'backend_type' => 'App\Models\EAV\Types\Integer',
+            'is_collection' => true,
+            'has_options' => true,
         ],
         'number' => [
             'backend_type' => 'App\Models\EAV\Types\Integer',
-            'is_collection' => false
+            'is_collection' => false,
+            'has_options' => false,
         ],
         'datetime' => [
             'backend_type' => 'App\Models\EAV\Types\Datetime',
-            'is_collection' => false
+            'is_collection' => false,
+            'has_options' => false,
         ]
     ];
-
-    /** @var EntityInterface */
-    protected $entity;
-
-    /** @var string */
-    protected $group;
-
-    /** @var array */
-    protected $options = [];
-
-    /** @var array */
-    protected $validationRules = [];
-
-    /**
-     * Attribute constructor.
-     * @param array $attributes
-     */
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-    }
 
     /**
      * Registering events.
@@ -108,104 +97,14 @@ class Attribute extends Model implements AttributeInterface
 
     public function setFrontendInputAttribute($input)
     {
+        $this->attributes['frontend_input'] = $input;
         $this->attributes['backend_type'] = $this->inputMappings[$input]['backend_type'];
         $this->attributes['is_collection'] = $this->inputMappings[$input]['is_collection'];
     }
 
-    /**
-     * @return EntityInterface
-     */
-    public function getEntity()
+    public function hasOptions()
     {
-        return $this->entity;
-    }
-
-    /**
-     * @param EntityInterface $entity
-     */
-    public function setEntity(EntityInterface $entity)
-    {
-        $this->entity = $entity;
-    }
-
-    /**
-     * @return array
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * @param string $code
-     * @param mixed $default
-     *
-     * @return mixed
-     */
-    public function getOption($code, $default = null)
-    {
-        if (!array_key_exists($code, $this->options)) {
-            return $default;
-        }
-
-        return $this->options[$code];
-    }
-
-    /**
-     * @param string $code
-     * @param mixed $value
-     */
-    public function addOption($code, $value)
-    {
-        $this->options[$code] = $value;
-    }
-
-    /**
-     * @param array $options
-     */
-    public function setOptions($options)
-    {
-        $this->options = $options;
-    }
-
-    /**
-     * @return array
-     */
-    public function getValidationRules()
-    {
-        return $this->validationRules;
-    }
-
-    /**
-     * @param array $options
-     */
-    public function addValidationRule(array $options)
-    {
-        $this->validationRules[] = $options;
-    }
-
-    /**
-     * @param array $validationRules
-     */
-    public function setValidationRules(array $validationRules)
-    {
-        $this->validationRules = $validationRules;
-    }
-
-    /**
-     * @return string
-     */
-    public function getGroup()
-    {
-        return $this->group;
-    }
-
-    /**
-     * @param string $group
-     */
-    public function setGroup($group)
-    {
-        $this->group = $group;
+        return $this->inputMappings[$this->attributes['frontend_input']]['has_options'];
     }
 
     /**
@@ -216,5 +115,15 @@ class Attribute extends Model implements AttributeInterface
     public function isCollection()
     {
         return $this->getAttribute('is_collection');
+    }
+
+    /**
+     * Relationship to the options.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function options()
+    {
+        return $this->hasMany(Option::class, 'attribute_id', 'id');
     }
 }

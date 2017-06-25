@@ -8,7 +8,6 @@
 
 namespace App\Events;
 
-
 use App\Models\EAV\Attribute;
 use Illuminate\Support\Facades\DB;
 

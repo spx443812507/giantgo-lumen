@@ -73,9 +73,9 @@ class UserController extends Controller
 
     public function getList(Request $request)
     {
-        $entityTypeId = $request->input('entity_type_id');
+        $entityTypeId = $request->input('entity_type_id') ?: 1;
 
-        $userClass = empty($entityTypeId) ? User::class : EntityFactory::getEntity($entityTypeId);
+        $userClass = EntityFactory::getEntity($entityTypeId);
 
         $users = $userClass::all();
 
