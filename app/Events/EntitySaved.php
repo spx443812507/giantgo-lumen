@@ -74,6 +74,7 @@ class EntitySaved
      *
      * @param Value $value
      *
+     * @param Entity $entity
      * @return void
      */
     protected function saveOrTrashValue(Value $value, Entity $entity)

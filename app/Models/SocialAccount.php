@@ -9,10 +9,12 @@
 namespace App\Models;
 
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class SocialAccount extends Model implements JWTSubject
 {
+    use SoftDeletes;
     /**
      * The attributes that are mass assignable.
      *

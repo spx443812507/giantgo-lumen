@@ -9,9 +9,12 @@
 namespace App\Models\EAV;
 
 use App\Models\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Option extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = ['attribute_id', 'value'];
 
     /**

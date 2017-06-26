@@ -17,6 +17,67 @@ use Illuminate\Support\Facades\DB;
 
 class AttributeController extends Controller
 {
+    private function saveAttribute($entityTypeId, $attributeInfo)
+    {
+        $attribute = Attribute::create([
+            'entity_type_id' => $entityTypeId,
+            'attribute_code' => $attributeInfo['attribute_code'],
+            'frontend_input' => $attributeInfo['frontend_input'],
+            'frontend_model' => empty($attributeInfo['frontend_model']) ? '' : $attributeInfo['frontend_model'],
+            'frontend_label' => $attributeInfo['frontend_label'],
+            'frontend_class' => empty($attributeInfo['frontend_class']) ? '' : $attributeInfo['frontend_class'],
+            'is_required' => $attributeInfo['is_required'],
+            'is_user_defined' => false,
+            'is_unique' => $attributeInfo['is_unique'],
+            'default_value' => $attributeInfo['default_value'],
+            'description' => $attributeInfo['description'],
+        ]);
+
+        if (array_has($attributeInfo, 'options') && count($attributeInfo['options']) > 0) {
+            $options = $attributeInfo['options'];
+
+            $optionDataList = [];
+
+            foreach ($options as $option) {
+                $optionDataList[] = new Option([
+                    'attribute_id' => $attribute->id,
+                    'value' => $option['value']
+                ]);
+            }
+
+            $attribute['options'] = $attribute->options()->saveMany($optionDataList);
+        }
+
+        return $attribute;
+    }
+
+    public function createAttribute(Request $request)
+    {
+        $entityTypeId = $request->input('entity_type_id');
+
+        $this->validate($request, [
+            'entity_type_id' => 'required|integer',
+            'attribute_code' => 'required|unique:attributes,attribute_code,NULL,id,entity_type_id,' . $entityTypeId,
+            'frontend_label' => 'required',
+            'frontend_input' => 'required',
+            'options' => 'array',
+            'options.*.value' => 'required'
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $attribute = $this->saveAttribute($entityTypeId, $request->all());
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'create_error'], 500);
+        }
+
+        DB::commit();
+
+        return response()->json($attribute, 200);
+    }
+
     public function createAttributes(Request $request)
     {
         $entityTypeId = $request->input('entity_type_id');
@@ -27,7 +88,8 @@ class AttributeController extends Controller
             'attributes.*.attribute_code' => 'required|unique:attributes,attribute_code,NULL,id,entity_type_id,' . $entityTypeId,
             'attributes.*.frontend_label' => 'required',
             'attributes.*.frontend_input' => 'required',
-            'attributes.*.options' => 'array'
+            'attributes.*.options' => 'array',
+            'attributes.*.options.*.value' => 'required'
         ]);
 
         $result = [];
@@ -37,37 +99,8 @@ class AttributeController extends Controller
         DB::beginTransaction();
 
         try {
-
             for ($index = 0; $index < count($attributes); $index++) {
-                $attribute = Attribute::create([
-                    'entity_type_id' => $entityTypeId,
-                    'attribute_code' => $attributes[$index]['attribute_code'],
-                    'frontend_input' => $attributes[$index]['frontend_input'],
-                    'frontend_model' => empty($attributes[$index]['frontend_model']) ? '' : $attributes[$index]['frontend_model'],
-                    'frontend_label' => $attributes[$index]['frontend_label'],
-                    'frontend_class' => empty($attributes[$index]['frontend_class']) ? '' : $attributes[$index]['frontend_class'],
-                    'is_required' => $attributes[$index]['is_required'],
-                    'is_user_defined' => false,
-                    'is_unique' => $attributes[$index]['is_unique'],
-                    'default_value' => $attributes[$index]['default_value'],
-                    'description' => $attributes[$index]['description'],
-                ]);
-
-                if (array_has($attributes[$index], 'options') && count($attributes[$index]['options']) > 0) {
-                    $options = $attributes[$index]['options'];
-
-                    $optionDataList = [];
-
-                    foreach ($options as $option) {
-                        $optionDataList[] = new Option([
-                            'attribute_id' => $attribute->id,
-                            'value' => $option
-                        ]);
-                    }
-
-                    $attribute['options'] = $attribute->options()->saveMany($optionDataList);
-                }
-
+                $attribute = $this->saveAttribute($entityTypeId, $attributes[$index]);
                 $result[] = $attribute;
             }
         } catch (Exception $e) {
@@ -79,6 +112,61 @@ class AttributeController extends Controller
         DB::commit();
 
         return response()->json($result, 200);
+    }
+
+    public function updateAttribute(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'required',
+            'attribute_code' => 'required',
+            'frontend_label' => 'required',
+            'options' => 'array',
+            'options.*.value' => 'required'
+        ]);
+
+        $attribute = Attribute::find($request->input('id'));
+
+        if (empty($attribute)) {
+            return response()->json(['error' => 'attribute_not_exists']);
+        }
+
+        $attribute->attribute_code = $request->input('attribute_code');
+        $attribute->frontend_label = $request->input('frontend_label');
+        $attribute->frontend_input = $request->input('frontend_input');
+
+        $options = $request->input('options');
+
+        if (isset($options)) {
+            $requestOptionIds = [];
+
+            $attributeOptions = $attribute->options()->get();
+            $attributeOptionMaps = $attributeOptions->keyBy('id');
+            $attributeOptionIds = $attributeOptions->pluck('id');
+
+            foreach ($options as $option) {
+                if (isset($option['id'])) {
+                    $requestOptionIds[] = $option['id'];
+
+                    if (array_has($attributeOptionMaps, $option['id'])) {
+                        $attributeOptionMaps[$option['id']]->value = $option['value'];
+                        $attributeOptionMaps[$option['id']]->save();
+                    }
+                } else {
+                    $attribute->options()->saveMany([
+                        new Option([
+                            'attribute_id' => $attribute->id,
+                            'value' => $option['value']
+                        ])
+                    ]);
+                }
+            }
+
+            Option::whereIn('id', array_diff($attributeOptionIds->toArray(), $requestOptionIds))->delete();
+        }
+
+        $attribute->save();
+
+        return response()->json($attribute, 200);
     }
 
     public function getAttributes(Request $request)

@@ -11,9 +11,12 @@ namespace App\Models\EAV;
 
 use App\Events\AttributeSaved;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Attribute extends Model
 {
+    use SoftDeletes;
+
     /**
      * Fillable attributes.
      *

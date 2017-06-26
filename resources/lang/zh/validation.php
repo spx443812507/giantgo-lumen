@@ -86,6 +86,7 @@ return [
     |
     */
     'attributes' => [
+        'id' => 'ID',
         'email' => '邮箱',
         'username' => '用户名',
         'account' => '账号',
