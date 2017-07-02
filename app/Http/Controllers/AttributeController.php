@@ -14,6 +14,8 @@ use App\Models\EAV\Option;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class AttributeController extends Controller
 {
@@ -124,15 +126,29 @@ class AttributeController extends Controller
             'options.*.value' => 'required'
         ]);
 
+        $attributeData = $request->all();
+
+        $validator = Validator::make($attributeData, [
+            'attribute_code' => [
+                Rule::unique('attributes')->ignore($attributeData['id']),
+            ]
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => 'attribute_code_has_exists'], 400);
+        }
+
         $attribute = Attribute::find($request->input('id'));
 
         if (empty($attribute)) {
-            return response()->json(['error' => 'attribute_not_exists']);
+            return response()->json(['error' => 'attribute_not_exists'], 400);
         }
 
         $attribute->attribute_code = $request->input('attribute_code');
         $attribute->frontend_label = $request->input('frontend_label');
         $attribute->frontend_input = $request->input('frontend_input');
+        $attribute->is_required = $request->input('is_required');
+        $attribute->is_unique = $request->input('is_unique');
 
         $options = $request->input('options');
 
@@ -144,7 +160,7 @@ class AttributeController extends Controller
             $attributeOptionIds = $attributeOptions->pluck('id');
 
             foreach ($options as $option) {
-                if (isset($option['id'])) {
+                if (isset($option['id']) && !empty($option['id'])) {
                     $requestOptionIds[] = $option['id'];
 
                     if (array_has($attributeOptionMaps, $option['id'])) {

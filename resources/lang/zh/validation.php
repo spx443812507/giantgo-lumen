@@ -102,6 +102,7 @@ return [
         'entity_type_id' => '实体类型',
         'attributes.*.attribute_code' => '属性码',
         'attributes.*.frontend_label' => '属性标题',
-        'attributes.*.frontend_input' => '属性类型'
+        'attributes.*.frontend_input' => '属性类型',
+        'attribute_code' => '属性代码'
     ],
 ];
