@@ -31,26 +31,6 @@ class PermissionTableSeeder extends Seeder
                 'name' => 'role-delete',
                 'display_name' => 'Delete Role',
                 'description' => 'Delete Role'
-            ],
-            [
-                'name' => 'product-list',
-                'display_name' => 'Display product Listing',
-                'description' => 'See only Listing Of product'
-            ],
-            [
-                'name' => 'product-create',
-                'display_name' => 'Create product',
-                'description' => 'Create New product'
-            ],
-            [
-                'name' => 'product-edit',
-                'display_name' => 'Edit product',
-                'description' => 'Edit product'
-            ],
-            [
-                'name' => 'product-delete',
-                'display_name' => 'Delete product',
-                'description' => 'Delete product'
             ]
         ];
 

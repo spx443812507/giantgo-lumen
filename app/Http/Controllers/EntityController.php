@@ -57,7 +57,7 @@ class EntityController extends Controller
         }
 
         try {
-            $entities = EntityFactory::where('entity_type_code', $entityTypeCode)->where('id', '<>', '1')->get();
+            $entities = EntityFactory::where('entity_type_code', $entityTypeCode)->get();
 
             foreach ($entities as $entity) {
                 $entityClass = EntityFactory::getEntity($entity->id);

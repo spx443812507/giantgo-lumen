@@ -46,14 +46,6 @@ $factory->define(App\Models\Permission::class, function (Faker\Generator $faker)
     ];
 });
 
-$factory->define(App\Models\Product::class, function (Faker\Generator $faker) {
-    return [
-        'title' => $faker->unique()->name,
-        'description' => $faker->name,
-        'price' => $faker->title
-    ];
-});
-
 $factory->define(App\Models\Application::class, function (Faker\Generator $faker) {
     return [
         'client_id' => $faker->unique()->name,

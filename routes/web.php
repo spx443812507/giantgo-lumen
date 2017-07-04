@@ -31,8 +31,6 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
 
         $app->post('/roles', ['as' => 'roles.create', 'uses' => 'RoleController@create', 'middleware' => 'permission:role-create']);
 
-        $app->post('/products', ['as' => 'products.create', 'uses' => 'ProductController@create', 'middleware' => 'permission:product-create']);
-
         $app->post('/entities', ['as' => 'entities.create', 'uses' => 'EntityController@createEntity', 'middleware' => 'role:admin']);
         $app->get('/entities/{entity_type_code}', ['as' => 'entities.list', 'uses' => 'EntityController@getEntityList']);
 
@@ -41,8 +39,6 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->put('/attributes', ['as' => 'attributes.update', 'uses' => 'AttributeController@updateAttribute']);
         $app->get('/attributes', ['as' => 'attributes.get', 'uses' => 'AttributeController@getAttributes']);
     });
-
-    $app->get('/products/export', ['as' => 'products.export', 'uses' => 'ProductController@export']);
 
     $app->get('/socials/me', 'SocialAccountController@me');
 });

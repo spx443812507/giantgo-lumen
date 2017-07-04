@@ -61,11 +61,6 @@ class User extends EavEntity implements JWTSubject, AuthenticatableContract, Aut
         return ['provider' => 'giantgo'];
     }
 
-    public function products()
-    {
-        return $this->hasMany('App\Models\Product');
-    }
-
     public function socialAccounts()
     {
         return $this->hasMany('App\Models\SocialAccount');
