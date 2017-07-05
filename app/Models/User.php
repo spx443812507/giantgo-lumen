@@ -60,7 +60,7 @@ class User extends EavEntity implements JWTSubject, AuthenticatableContract, Aut
     {
         return [
             'provider' => 'giantgo',
-            'roles' => $this->roles()->get()->keyBy('name')->keys()
+            'roles' => $this->roles()->get()->pluck('name')
         ];
     }
 
