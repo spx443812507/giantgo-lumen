@@ -31,6 +31,26 @@ class PermissionTableSeeder extends Seeder
                 'name' => 'role-delete',
                 'display_name' => 'Delete Role',
                 'description' => 'Delete Role'
+            ],
+            [
+                'name' => 'entity-list',
+                'display_name' => 'Display Entity Listing',
+                'description' => 'See only Listing Of Entity'
+            ],
+            [
+                'name' => 'entity-create',
+                'display_name' => 'Create entity',
+                'description' => 'Create New entity'
+            ],
+            [
+                'name' => 'entity-edit',
+                'display_name' => 'Edit entity',
+                'description' => 'Edit entity'
+            ],
+            [
+                'name' => 'entity-delete',
+                'display_name' => 'Delete Role',
+                'description' => 'Delete Role'
             ]
         ];
 

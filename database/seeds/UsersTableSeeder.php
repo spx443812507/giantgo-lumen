@@ -38,8 +38,8 @@ class UsersTableSeeder extends Seeder
 
         factory(App\Models\Role::class)->create([
             'name' => 'customer',
-            'display_name' => '消费者',
-            'description' => '消费者',
+            'display_name' => '联系人',
+            'description' => '联系人',
         ]);
 
         $user->attachRole($admin);

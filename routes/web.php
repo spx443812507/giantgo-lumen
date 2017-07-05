@@ -25,14 +25,14 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
     $app->group(['middleware' => 'auth'], function () use ($app) {
         $app->get('/users/me', 'UserController@me');
         $app->patch('/users/me', 'UserController@me');
-        $app->get('/users/{userId}', ['as' => 'users.get', 'uses' => 'UserController@get', 'middleware' => 'role:admin']);
-        $app->get('/users', ['as' => 'users.getList', 'uses' => 'UserController@getList', 'middleware' => 'role:admin']);
+        $app->get('/users/{userId}', ['as' => 'users.get', 'uses' => 'UserController@get', 'middleware' => 'role:admin|owner']);
+        $app->get('/users', ['as' => 'users.getList', 'uses' => 'UserController@getList', 'middleware' => 'role:admin|owner']);
         $app->patch('/users', ['as' => 'user.update', 'uses' => 'UserController@updateUser']);
 
-        $app->post('/roles', ['as' => 'roles.create', 'uses' => 'RoleController@create', 'middleware' => 'permission:role-create']);
+        $app->post('/roles', ['as' => 'roles.create', 'uses' => 'RoleController@create', 'middleware' => ['ability:admin,role-create']]);
 
-        $app->post('/entities', ['as' => 'entities.create', 'uses' => 'EntityController@createEntity', 'middleware' => 'role:admin']);
-        $app->get('/entities/{entity_type_code}', ['as' => 'entities.list', 'uses' => 'EntityController@getEntityList']);
+        $app->post('/entities', ['as' => 'entities.create', 'uses' => 'EntityController@createEntity', 'middleware' => ['ability:admin,entity-create']]);
+        $app->get('/entities/{entity_type_code}', ['as' => 'entities.list', 'uses' => 'EntityController@getEntityList', 'middleware' => ['ability:admin,entity-list']]);
 
         $app->post('/attributes/batch', ['as' => 'attributes.batchCreate', 'uses' => 'AttributeController@createAttributes']);
         $app->post('/attributes', ['as' => 'attributes.create', 'uses' => 'AttributeController@createAttribute']);

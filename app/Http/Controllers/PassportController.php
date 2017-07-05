@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EAV\Factories\EntityFactory;
+use App\Models\Role;
 use App\Models\SocialAccount;
 use App\Models\User;
 use Exception;
@@ -38,10 +39,10 @@ class PassportController extends Controller
             return response()->json(['error' => 'token_invalid'], 500);
         }
 
-        $oAuthUser = SocialAccount::find($payload->sub)->first();
+        $socialAccount = SocialAccount::find($payload->sub)->first();
 
         if (!empty($oAuthUser)) {
-            $user->oAuthUsers()->save($oAuthUser);
+            $user->socialAccounts()->save($socialAccount);
         }
     }
 
@@ -118,6 +119,10 @@ class PassportController extends Controller
             $user->fill($userInfo);
 
             $user->save();
+
+            $customerRole = Role::where('name', 'customer')->first();
+
+            $user->attachRole($customerRole);
         } catch (Exception $exception) {
             return response()->json(['error' => 'user_already_exists'], 500);
         }

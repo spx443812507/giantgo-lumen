@@ -58,7 +58,10 @@ class User extends EavEntity implements JWTSubject, AuthenticatableContract, Aut
 
     public function getJWTCustomClaims()
     {
-        return ['provider' => 'giantgo'];
+        return [
+            'provider' => 'giantgo',
+            'roles' => $this->roles()->get()->keyBy('name')->keys()
+        ];
     }
 
     public function socialAccounts()
