@@ -20,13 +20,15 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
     $app->group(['prefix' => 'passports'], function () use ($app) {
         $app->patch('/', 'PassportController@signIn');
         $app->post('/', 'PassportController@signUp');
+
+        $app->group(['middleware' => 'auth'], function () use ($app) {
+            $app->get('/me', 'UserController@me');
+        });
     });
 
     $app->group(['middleware' => 'auth'], function () use ($app) {
-        $app->get('/users/me', 'UserController@me');
-        $app->patch('/users/me', 'UserController@me');
-        $app->get('/users/{userId}', ['as' => 'users.get', 'uses' => 'UserController@get', 'middleware' => 'role:admin|owner']);
-        $app->get('/users', ['as' => 'users.getList', 'uses' => 'UserController@getList', 'middleware' => 'role:admin|owner']);
+        $app->get('/users/{userId}', ['as' => 'users.get', 'middleware' => ['role:admin|owner'], 'uses' => 'UserController@get']);
+        $app->get('/users', ['as' => 'users.getList', 'middleware' => ['role:admin|owner'], 'uses' => 'UserController@getList']);
         $app->patch('/users', ['as' => 'user.update', 'uses' => 'UserController@updateUser']);
 
         $app->post('/roles', ['as' => 'roles.create', 'uses' => 'RoleController@create', 'middleware' => ['ability:admin,role-create']]);
@@ -50,4 +52,3 @@ $app->get('/oauth/wechat/open/login', 'PlatformController@login');
 $app->get('/oauth/wechat/open/callback', 'PlatformController@callback');
 $app->get('/oauth/wechat/open/auth', 'PlatformController@auth');
 $app->get('/oauth/wechat/open/response', 'PlatformController@response');
-

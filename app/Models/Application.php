@@ -13,4 +13,9 @@ class Application extends Model
     protected $fillable = [
         'client_id', 'client_secret', 'redirect'
     ];
+
+    public function admin()
+    {
+        return $this->belongsTo('App\Models\User');
+    }
 }

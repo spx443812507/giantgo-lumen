@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateEntityTypeTable extends Migration
+class CreateCheckinsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,14 +13,14 @@ class CreateEntityTypeTable extends Migration
      */
     public function up()
     {
-        Schema::create('entity_type', function (Blueprint $table) {
+        Schema::create('checkins', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('user_id');
-            $table->string('entity_type_name');
-            $table->string('entity_type_code');
-            $table->string('entity_model');
-            $table->string('entity_table');
-            $table->string('description')->nullable();
+            $table->integer('entity_type_id');
+            $table->integer('user_id');
+            $table->integer('seminar_id');
+            $table->string('title');
+            $table->dateTime('staff_name');
+            $table->dateTime('staff_mobile');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -34,6 +33,6 @@ class CreateEntityTypeTable extends Migration
      */
     public function down()
     {
-        Schema::drop('entity_type');
+        Schema::drop('checkins');
     }
 }

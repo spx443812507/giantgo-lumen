@@ -24,7 +24,7 @@ class UsersTableSeeder extends Seeder
             'last_login' => new DateTime()
         ]);
 
-        $admin = factory(App\Models\Role::class)->create([
+        $adminRole = factory(App\Models\Role::class)->create([
             'name' => 'admin',
             'display_name' => '系统管理员',
             'description' => '系统管理员，拥有整个系统最大权限',
@@ -42,6 +42,18 @@ class UsersTableSeeder extends Seeder
             'description' => '联系人',
         ]);
 
-        $user->attachRole($admin);
+        $user->attachRole($adminRole);
+
+        factory(App\Models\EAV\Factories\EntityFactory::class)->create([
+            'id' => 1,
+            'user_id' => $user->id,
+            'entity_type_name' => '华为员工模型',
+            'entity_type_code' => 'user',
+            'entity_model' => 'App\Models\User',
+            'entity_table' => 'users',
+            'description' => '用户自定义模型',
+            'created_at' => new \DateTime(),
+            'updated_at' => new \DateTime()
+        ]);
     }
 }

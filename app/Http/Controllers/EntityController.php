@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 use App\Models\EAV\Entity;
 use App\Models\EAV\Factories\EntityFactory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Mockery\Exception;
 
 class EntityController extends Controller
@@ -39,6 +40,7 @@ class EntityController extends Controller
         $entityInfo = array_merge($request->only('entity_type_name', 'entity_type_code', 'description'), [
             'entity_model' => $this->entityMappings[$entityTypeCode]['entity_model'],
             'entity_table' => $this->entityMappings[$entityTypeCode]['entity_table'],
+            'user_id' => Auth::user()->id
         ]);
 
         try {

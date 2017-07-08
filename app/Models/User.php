@@ -21,7 +21,7 @@ class User extends EavEntity implements JWTSubject, AuthenticatableContract, Aut
      * @var array
      */
     protected $fillable = [
-        'email', 'mobile', 'password', 'is_active'
+        'email', 'mobile', 'name', 'password', 'is_active'
     ];
 
     /**
@@ -67,5 +67,10 @@ class User extends EavEntity implements JWTSubject, AuthenticatableContract, Aut
     public function socialAccounts()
     {
         return $this->hasMany('App\Models\SocialAccount');
+    }
+
+    public function seminars()
+    {
+        return $this->belongsToMany('App\Models\Seminar');
     }
 }

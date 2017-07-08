@@ -25,33 +25,6 @@ class UserController extends Controller
         $this->jwt = $jwt;
     }
 
-    public function me()
-    {
-        try {
-            $user = $this->jwt->parseToken()->toUser();
-
-            if (!$user) {
-                return response()->json(['error' => 'unauthorized'], 401);
-            }
-        } catch (Exceptions\TokenExpiredException $e) {
-            return response()->json(['error' => 'token_expired'], 500);
-        } catch (Exceptions\TokenInvalidException $e) {
-            return response()->json(['error' => 'token_invalid'], 500);
-        } catch (Exceptions\JWTException $e) {
-            return response()->json(['error' => 'token_absent'], 500);
-        }
-
-        $entityTypeId = $user->entity_type_id;
-
-        $user->bootEntityAttribute($entityTypeId);
-
-        $relations = $user->getEntityAttributeRelations();
-
-        $user->load(array_keys($relations));
-
-        return response()->json($user);
-    }
-
     public function get(Request $request, $userId)
     {
         $user = User::find($userId);
