@@ -18,6 +18,11 @@ class PermissionTableSeeder extends Seeder
                 'description' => 'See only Listing Of Role'
             ],
             [
+                'name' => 'role-get',
+                'display_name' => 'Display Role instance',
+                'description' => 'See only instance Of Role'
+            ],
+            [
                 'name' => 'role-create',
                 'display_name' => 'Create Role',
                 'description' => 'Create New Role'

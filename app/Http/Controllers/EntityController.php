@@ -21,6 +21,14 @@ class EntityController extends Controller
         'user' => [
             'entity_model' => 'App\Models\User',
             'entity_table' => 'users'
+        ],
+        'seminar' => [
+            'entity_model' => 'App\Models\Seminar',
+            'entity_table' => 'seminars'
+        ],
+        'speaker' => [
+            'entity_model' => 'App\Models\Speaker',
+            'entity_table' => 'speakers'
         ]
     ];
 

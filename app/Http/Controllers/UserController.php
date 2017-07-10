@@ -14,7 +14,6 @@ use App\Models\EAV\Factories\EntityFactory;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Tymon\JWTAuth\JWTAuth;
-use Tymon\JWTAuth\Exceptions;
 
 class UserController extends Controller
 {

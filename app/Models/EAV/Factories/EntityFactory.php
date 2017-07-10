@@ -11,10 +11,13 @@ namespace App\Models\EAV\Factories;
 
 use app\Exceptions\MissingEntityException;
 use App\Models\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 class EntityFactory extends Model
 {
+    use SoftDeletes;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -24,6 +27,16 @@ class EntityFactory extends Model
         'user_id', 'entity_type_name', 'entity_type_code',
         'entity_model', 'attribute_model', 'entity_table', 'description'
     ];
+
+    /**
+     * The attributes excluded from the model's JSON form.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'deleted_at'
+    ];
+
 
     protected $table = 'entity_type';
 

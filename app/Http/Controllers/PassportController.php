@@ -151,7 +151,7 @@ class PassportController extends Controller
 
             $user->attachRole($customerRole);
         } catch (Exception $exception) {
-            return response()->json(['error' => 'user_already_exists'], 500);
+            return response()->json(['error' => 'create_user_fail'], 500);
         }
 
         if (!empty($request->input('verify'))) {

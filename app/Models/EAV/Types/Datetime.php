@@ -16,7 +16,7 @@ class Datetime extends Value
     /**
      * {@inheritdoc}
      */
-    protected $dates = ['content'];
+    protected $dates = ['value'];
 
     protected $table = 'value_datetime';
 

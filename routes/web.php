@@ -22,7 +22,7 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->post('/', 'PassportController@signUp');
 
         $app->group(['middleware' => 'auth'], function () use ($app) {
-            $app->get('/me', 'UserController@me');
+            $app->get('/me', 'PassportController@me');
         });
     });
 
@@ -31,7 +31,8 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->get('/users', ['as' => 'users.getList', 'middleware' => ['role:admin|owner'], 'uses' => 'UserController@getList']);
         $app->patch('/users', ['as' => 'user.update', 'uses' => 'UserController@updateUser']);
 
-        $app->post('/roles', ['as' => 'roles.create', 'uses' => 'RoleController@create', 'middleware' => ['ability:admin,role-create']]);
+        $app->post('/roles', ['as' => 'roles.create', 'uses' => 'RoleController@createRole', 'middleware' => ['ability:admin,role-create']]);
+        $app->get('/roles/{role_id}', ['as' => 'roles.get', 'uses' => 'RoleController@getRole', 'middleware' => ['ability:admin,role-get']]);
 
         $app->post('/entities', ['as' => 'entities.create', 'uses' => 'EntityController@createEntity', 'middleware' => ['ability:admin,entity-create']]);
         $app->get('/entities/{entity_type_code}', ['as' => 'entities.list', 'uses' => 'EntityController@getEntityList', 'middleware' => ['ability:admin,entity-list']]);
@@ -40,6 +41,9 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->post('/attributes', ['as' => 'attributes.create', 'uses' => 'AttributeController@createAttribute']);
         $app->put('/attributes', ['as' => 'attributes.update', 'uses' => 'AttributeController@updateAttribute']);
         $app->get('/attributes', ['as' => 'attributes.get', 'uses' => 'AttributeController@getAttributes']);
+
+        $app->post('/seminars', ['as' => 'seminar.create', 'uses' => 'SeminarController@createSeminar']);
+
     });
 
     $app->get('/socials/me', 'SocialAccountController@me');

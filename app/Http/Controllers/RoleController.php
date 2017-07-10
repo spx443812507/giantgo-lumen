@@ -22,7 +22,7 @@ class RoleController extends Controller
         $this->jwt = $jwt;
     }
 
-    public function create(Request $request)
+    public function createRole(Request $request)
     {
         $this->validate($request, [
             'name' => 'required|unique:roles',
@@ -45,14 +45,14 @@ class RoleController extends Controller
         return response()->json($role, 200);
     }
 
-    public function get(Request $request)
+    public function getRole(Request $request, $roleId)
     {
-        $this->validate($request, [
-            'name' => 'required|unique:roles',
-            'display_name' => 'required',
-            'description' => 'required'
-        ]);
+        $role = Role::find($roleId);
 
-        return response()->json();
+        if (empty($role)) {
+            return response()->json(['error' => 'role_not_exists'], 400);
+        }
+
+        return response()->json($role, 200);
     }
 }
