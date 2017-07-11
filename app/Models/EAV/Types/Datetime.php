@@ -19,6 +19,18 @@ class Datetime extends Value
 
     protected $table = 'value_datetime';
 
+
+    protected function getValueAttribute()
+    {
+        $value = $this->attributes['value'];
+
+        if (!empty($value)) {
+            return $this->serializeDate($this->asDateTime($value));
+        }
+
+        return $value;
+    }
+
     /**
      * Create a new Eloquent model instance.
      *
