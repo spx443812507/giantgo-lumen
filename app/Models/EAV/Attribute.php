@@ -73,7 +73,7 @@ class Attribute extends Model
         ],
         'select' => [
             'backend_type' => 'App\Models\EAV\Types\Integer',
-            'is_collection' => true,
+            'is_collection' => false,
             'has_options' => true,
         ],
         'number' => [

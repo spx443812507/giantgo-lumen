@@ -8,7 +8,6 @@
 
 namespace App\Models\EAV\Types;
 
-
 use App\Models\EAV\Value;
 
 class Datetime extends Value
