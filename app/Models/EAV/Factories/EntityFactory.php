@@ -37,7 +37,6 @@ class EntityFactory extends Model
         'deleted_at'
     ];
 
-
     protected $table = 'entity_type';
 
     public static function getEntity($entityTypeId)

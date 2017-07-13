@@ -77,7 +77,7 @@ class PassportController extends Controller
     {
         $this->validate($request, [
             'password' => 'required',
-            'email' => 'required_without:mobile'
+            'email' => 'email|required_without:mobile'
         ]);
 
         $entityTypeId = $request->input('entity_type_id');

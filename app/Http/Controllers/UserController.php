@@ -54,21 +54,27 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-    public function updateUser(Request $request)
+    public function updateUser(Request $request, $userId)
     {
         $this->validate($request, [
             'entity_type_id' => 'required|integer',
-            'users.user_id' => 'required|integer'
+            'email' => 'email'
         ]);
 
-        $userData = $request->input('users');
+        $userInfo = $request->except('id');
 
-        $validator = Validator::make($userData, [
+        $entityTypeId = $request->input('entity_type_id');
+
+        $validator = Validator::make($userInfo, [
             'email' => [
-                Rule::unique('users')->ignore($userData['user_id']),
+                Rule::unique('users')->where(function ($query) use ($entityTypeId) {
+                    $query->where('entity_type_id', $entityTypeId);
+                })->ignore($userId),
             ],
             'mobile' => [
-                Rule::unique('users')->ignore($userData['user_id']),
+                Rule::unique('users')->where(function ($query) use ($entityTypeId) {
+                    $query->where('entity_type_id', $entityTypeId);
+                })->ignore($userId),
             ]
         ]);
 
@@ -76,13 +82,10 @@ class UserController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $entityTypeId = $request->input('entity_type_id');
-
-        $userInfo = $request->input('users');
 
         $userClass = EntityFactory::getEntity($entityTypeId);
 
-        $user = $userClass::find($userInfo['user_id']);
+        $user = $userClass::find($userId);
 
         if (empty($user)) {
             return response()->json(['error' => 'user_not_exists'], 500);
