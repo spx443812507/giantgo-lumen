@@ -18,9 +18,9 @@ use Mockery\Exception;
 class EntityController extends Controller
 {
     private $entityMappings = [
-        'user' => [
-            'entity_model' => 'App\Models\User',
-            'entity_table' => 'users'
+        'contact' => [
+            'entity_model' => 'App\Models\Contact',
+            'entity_table' => 'contacts'
         ],
         'seminar' => [
             'entity_model' => 'App\Models\Seminar',

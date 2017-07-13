@@ -8,17 +8,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EAV\Factories\EntityFactory;
 use App\Models\Role;
-use App\Models\SocialAccount;
 use App\Models\User;
 use Exception;
-use Firebase\JWT\ExpiredException;
-use Firebase\JWT\SignatureInvalidException;
 use Illuminate\Http\Request;
-use Firebase\JWT\JWT;
-use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Exceptions;
+use Tymon\JWTAuth\JWTAuth;
 
 class PassportController extends Controller
 {
@@ -27,23 +22,6 @@ class PassportController extends Controller
     public function __construct(JWTAuth $jwt)
     {
         $this->jwt = $jwt;
-    }
-
-    private function bindSocialAccount($user, $token)
-    {
-        try {
-            $payload = JWT::decode($token, env('JWT_SECRET'), array('HS256'));
-        } catch (ExpiredException $e) {
-            return response()->json(['error' => 'token_expired'], 500);
-        } catch (SignatureInvalidException $e) {
-            return response()->json(['error' => 'token_invalid'], 500);
-        }
-
-        $socialAccount = SocialAccount::find($payload->sub)->first();
-
-        if (!empty($oAuthUser)) {
-            $user->socialAccounts()->save($socialAccount);
-        }
     }
 
     public function me()
@@ -62,14 +40,6 @@ class PassportController extends Controller
             return response()->json(['error' => 'token_absent'], 500);
         }
 
-        $entityTypeId = $user->entity_type_id;
-
-        $user->bootEntityAttribute($entityTypeId);
-
-        $relations = $user->getEntityAttributeRelations();
-
-        $user->load(array_keys($relations));
-
         return response()->json($user);
     }
 
@@ -79,8 +49,6 @@ class PassportController extends Controller
             'password' => 'required',
             'email' => 'email|required_without:mobile'
         ]);
-
-        $entityTypeId = $request->input('entity_type_id');
 
         $email = $request->input('email');
         $mobile = $request->input('mobile');
@@ -93,10 +61,6 @@ class PassportController extends Controller
             $credential['email'] = $request->input('email');
         } else if (isset($mobile)) {
             $credential['mobile'] = $request->input('mobile');
-        }
-
-        if (isset($entityTypeId)) {
-            $credential['entity_type_id'] = $entityTypeId;
         }
 
         try {
@@ -117,45 +81,31 @@ class PassportController extends Controller
 
         $user->save();
 
-        if (!empty($request->input('verify'))) {
-            $this->bindSocialAccount($user, $request->input('verify'));
-        }
-
         return response()->json(compact('token'));
     }
 
     public function signUp(Request $request)
     {
-        $entityTypeId = $request->input('entity_type_id');
-
-        $uniqueRule = isset($entityTypeId) ? ',NULL,id,entity_type_id,' . $entityTypeId : '';
-
         $this->validate($request, [
-            'email' => 'email|max:255|unique:users,email' . $uniqueRule,
-            'mobile' => 'max:255|unique:users,mobile' . $uniqueRule,
+            'email' => 'email|max:255|unique:users',
+            'mobile' => 'max:255|unique:users',
             'password' => 'required'
         ]);
-
-        $userClass = empty($entityTypeId) ? User::class : EntityFactory::getEntity($entityTypeId);
 
         $userInfo = $request->all();
 
         try {
-            $user = new $userClass;
+            $user = new User;
 
             $user->fill($userInfo);
 
             $user->save();
 
-            $customerRole = Role::where('name', 'customer')->first();
+            $customerRole = Role::where('name', 'owner')->first();
 
             $user->attachRole($customerRole);
         } catch (Exception $exception) {
             return response()->json(['error' => 'create_user_fail'], 500);
-        }
-
-        if (!empty($request->input('verify'))) {
-            $this->bindSocialAccount($user, $request->input('verify'));
         }
 
         $token = $this->jwt->fromUser($user);

@@ -11,7 +11,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Zizaco\Entrust\Traits\EntrustUserTrait;
 
-class User extends EavEntity implements JWTSubject, AuthenticatableContract, AuthorizableContract
+class Contact extends EavEntity implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, SoftDeletes, EntrustUserTrait;
 
@@ -21,7 +21,7 @@ class User extends EavEntity implements JWTSubject, AuthenticatableContract, Aut
      * @var array
      */
     protected $fillable = [
-        'email', 'mobile', 'name', 'company', 'password', 'is_active'
+        'email', 'mobile', 'name', 'password', 'is_active'
     ];
 
     /**
@@ -60,7 +60,12 @@ class User extends EavEntity implements JWTSubject, AuthenticatableContract, Aut
     {
         return [
             'provider' => 'giantgo',
-            'roles' => $this->roles()->get()->pluck('name')
+            'roles' => ['contact']
         ];
+    }
+
+    public function socialAccounts()
+    {
+        return $this->hasMany('App\Models\SocialAccount');
     }
 }

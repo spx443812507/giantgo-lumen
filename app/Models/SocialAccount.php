@@ -38,8 +38,8 @@ class SocialAccount extends Model implements JWTSubject
         return ['provider' => $this->attributes['provider']];
     }
 
-    public function admin()
+    public function contact()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo('App\Models\Contact');
     }
 }

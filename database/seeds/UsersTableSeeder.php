@@ -20,6 +20,8 @@ class UsersTableSeeder extends Seeder
         $user = factory(App\Models\User::class)->create([
             'email' => 'admin@admin.com',
             'mobile' => '15930181489',
+            'name' => '申鹏翔',
+            'company' => '赛诺贝斯',
             'password' => 'admin',
             'last_login' => new DateTime()
         ]);
@@ -34,12 +36,6 @@ class UsersTableSeeder extends Seeder
             'name' => 'owner',
             'display_name' => '项目所有者',
             'description' => '项目所有者，与其他项目隔离',
-        ]);
-
-        factory(App\Models\Role::class)->create([
-            'name' => 'customer',
-            'display_name' => '联系人',
-            'description' => '联系人',
         ]);
 
         $user->attachRole($adminRole);

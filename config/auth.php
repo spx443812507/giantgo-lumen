@@ -19,7 +19,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => env('AUTH_GUARD', 'api'),
+        'guard' => env('AUTH_GUARD', 'web'),
     ],
 
     /*
@@ -40,10 +40,15 @@ return [
     */
 
     'guards' => [
-        'api' => [
+        'web' => [
             'driver' => 'jwt',
             'provider' => 'users',
             'table' => 'users',
+        ],
+        'api' => [
+            'driver' => 'jwt',
+            'provider' => 'contacts',
+            'table' => 'contacts',
         ],
     ],
 
@@ -68,6 +73,10 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => \App\Models\User::class,
+        ],
+        'contacts' => [
+            'driver' => 'eloquent',
+            'model' => \App\Models\Contact::class,
         ],
     ],
 
