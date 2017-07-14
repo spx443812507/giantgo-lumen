@@ -24,6 +24,7 @@ return [
     'entity_not_match' => '实体不匹配',
     'social_account_not_exists' => '不存在的第三方用户',
     'entity_type_not_support' => '不支持的实体类型',
+    'entity_type_not_exists' => '不存在的实体类型',
     'attribute_not_exists' => '字段不存在',
     'attribute_code_has_exists' => '属性代码已存在',
     'seminar_not_exists' => '会议不存在'

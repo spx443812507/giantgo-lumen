@@ -10,7 +10,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
-use App\Models\EAV\Factories\EntityFactory;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Tymon\JWTAuth\JWTAuth;
@@ -32,24 +31,12 @@ class UserController extends Controller
             return response()->json(['error' => 'user_not_exists'], 500);
         }
 
-        $entityTypeId = $user->entity_type_id;
-
-        $user->bootEntityAttribute($entityTypeId);
-
-        $relations = $user->getEntityAttributeRelations();
-
-        $user->load(array_keys($relations));
-
         return response()->json($user);
     }
 
     public function getList(Request $request)
     {
-        $entityTypeId = $request->input('entity_type_id') ?: 1;
-
-        $userClass = EntityFactory::getEntity($entityTypeId);
-
-        $users = $userClass::all();
+        $users = User::all();
 
         return response()->json($users);
     }
@@ -83,7 +70,7 @@ class UserController extends Controller
         }
 
 
-        $userClass = EntityFactory::getEntity($entityTypeId);
+        $userClass = Entity::getEntity($entityTypeId);
 
         $user = $userClass::find($userId);
 

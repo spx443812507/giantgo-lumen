@@ -2,18 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\EAV\Entity as EavEntity;
-use Illuminate\Auth\Authenticatable;
+use App\Traits\Attributable;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Zizaco\Entrust\Traits\EntrustUserTrait;
 
-class Agenda extends EavEntity
+class Agenda extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, Attributable;
 
     /**
      * The attributes that are mass assignable.

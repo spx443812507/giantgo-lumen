@@ -10,7 +10,6 @@ namespace App\Http\Controllers;
 
 
 use App\Models\EAV\Entity;
-use App\Models\EAV\Factories\EntityFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Mockery\Exception;
@@ -52,7 +51,7 @@ class EntityController extends Controller
         ]);
 
         try {
-            $entity = EntityFactory::create($entityInfo);
+            $entity = Entity::create($entityInfo);
         } catch (Exception $e) {
             return response()->json('create_error', 500);
         }
@@ -67,10 +66,10 @@ class EntityController extends Controller
         }
 
         try {
-            $entities = EntityFactory::where('entity_type_code', $entityTypeCode)->get();
+            $entities = Entity::where('entity_type_code', $entityTypeCode)->get();
 
             foreach ($entities as $entity) {
-                $entityClass = EntityFactory::getEntity($entity->id);
+                $entityClass = Entity::getEntity($entity->id);
 
                 $entity->entity_instance_count = count($entityClass::where('entity_type_id', $entity->id)->get());
             }

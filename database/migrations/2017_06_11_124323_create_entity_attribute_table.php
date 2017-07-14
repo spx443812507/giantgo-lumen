@@ -18,8 +18,6 @@ class CreateEntityAttributeTable extends Migration
             $table->integer('entity_type_id');
             $table->integer('attribute_id');
             $table->integer('sort_order');
-            $table->timestamps();
-            $table->softDeletes();
         });
     }
 

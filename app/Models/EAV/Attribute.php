@@ -9,7 +9,6 @@
 namespace App\Models\EAV;
 
 
-use App\Events\AttributeSaved;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -88,16 +87,6 @@ class Attribute extends Model
         ]
     ];
 
-    /**
-     * Registering events.
-     */
-    public static function boot()
-    {
-        parent::boot();
-
-        static::saved(AttributeSaved::class . '@handle');
-    }
-
     public function setFrontendInputAttribute($input)
     {
         $this->attributes['frontend_input'] = $input;
@@ -128,5 +117,10 @@ class Attribute extends Model
     public function options()
     {
         return $this->hasMany(Option::class, 'attribute_id', 'id');
+    }
+
+    public function entities()
+    {
+        return $this->belongsToMany('App\Models\Eav\Entity', 'entity_attribute', 'attribute_id', 'entity_type_id');
     }
 }

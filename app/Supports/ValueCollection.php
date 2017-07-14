@@ -6,8 +6,7 @@
  * Time: 下午8:47
  */
 
-namespace App\Models\EAV\Supports;
-
+namespace App\Supports;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;

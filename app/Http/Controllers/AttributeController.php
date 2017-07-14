@@ -9,7 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EAV\Attribute;
-use App\Models\EAV\Factories\EntityFactory;
+use App\Models\EAV\Entity;
 use App\Models\EAV\Option;
 use Exception;
 use Illuminate\Http\Request;
@@ -19,10 +19,10 @@ use Illuminate\Validation\Rule;
 
 class AttributeController extends Controller
 {
-    private function saveAttribute($entityTypeId, $attributeInfo)
+    private function saveAttribute(Entity $entity, $attributeInfo)
     {
-        $attribute = Attribute::create([
-            'entity_type_id' => $entityTypeId,
+        $attribute = $entity->attributes()->create([
+            'entity_type_id' => $entity->id,
             'attribute_code' => $attributeInfo['attribute_code'],
             'frontend_input' => $attributeInfo['frontend_input'],
             'frontend_model' => empty($attributeInfo['frontend_model']) ? '' : $attributeInfo['frontend_model'],
@@ -66,10 +66,16 @@ class AttributeController extends Controller
             'options.*.value' => 'required'
         ]);
 
+        $entity = Entity::find($entityTypeId);
+
+        if (empty($entity)) {
+            return response()->json(['error' => 'entity_type_not_exists'], 500);
+        }
+
         DB::beginTransaction();
 
         try {
-            $attribute = $this->saveAttribute($entityTypeId, $request->all());
+            $attribute = $this->saveAttribute($entity, $request->all());
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'create_error'], 500);
@@ -98,11 +104,17 @@ class AttributeController extends Controller
 
         $attributes = $request->input('attributes');
 
+        $entity = Entity::find($entityTypeId);
+
+        if (empty($entity)) {
+            return response()->json(['error' => 'entity_type_not_exists'], 500);
+        }
+
         DB::beginTransaction();
 
         try {
             for ($index = 0; $index < count($attributes); $index++) {
-                $attribute = $this->saveAttribute($entityTypeId, $attributes[$index]);
+                $attribute = $this->saveAttribute($entity, $attributes[$index]);
                 $result[] = $attribute;
             }
         } catch (Exception $e) {
@@ -191,7 +203,7 @@ class AttributeController extends Controller
             'entity_type_id' => 'required|integer'
         ]);
 
-        $entityClass = EntityFactory::getEntity($request->input('entity_type_id'));
+        $entityClass = Entity::getEntity($request->input('entity_type_id'));
 
         $entity = new $entityClass();
 

@@ -20,6 +20,7 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
     $app->group(['prefix' => 'passports'], function () use ($app) {
         $app->patch('/', 'PassportController@signIn');
         $app->post('/', 'PassportController@signUp');
+        $app->get('/me', ['as' => 'passports.me', 'uses' => 'PassportController@me', 'middleware' => 'auth:web']);
     });
 
     $app->group(['prefix' => 'contacts'], function () use ($app) {
@@ -28,7 +29,6 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
     });
 
     $app->group(['middleware' => 'auth:web'], function () use ($app) {
-        $app->get('/users/me', ['as' => 'users.me', 'uses' => 'UserController@me']);
         $app->get('/users/{userId}', ['as' => 'users.get', 'middleware' => ['role:admin'], 'uses' => 'UserController@get']);
         $app->get('/users', ['as' => 'users.getList', 'middleware' => ['role:admin'], 'uses' => 'UserController@getList']);
         $app->patch('/users/{user_id}', ['as' => 'user.update', 'uses' => 'UserController@updateUser']);

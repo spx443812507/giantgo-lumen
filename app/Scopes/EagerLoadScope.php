@@ -6,7 +6,7 @@
  * Time: 下午8:56
  */
 
-namespace App\Models\EAV\Scopes;
+namespace App\Scopes;
 
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Database\Eloquent\Builder;

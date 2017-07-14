@@ -6,7 +6,7 @@
  * Time: 下午4:27
  */
 
-namespace App\Models\EAV\Supports;
+namespace App\Supports;
 
 use Closure;
 use App\Models\EAV\Attribute;

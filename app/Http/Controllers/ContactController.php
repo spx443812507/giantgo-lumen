@@ -9,7 +9,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contact;
-use App\Models\EAV\Factories\EntityFactory;
 use App\Models\SocialAccount;
 use Exception;
 use Firebase\JWT\ExpiredException;
@@ -50,7 +49,7 @@ class ContactController extends Controller
             'password' => 'required'
         ]);
 
-        $contactClass = empty($entityTypeId) ? Contact::class : EntityFactory::getEntity($entityTypeId);
+        $contactClass = empty($entityTypeId) ? Contact::class : Entity::getEntity($entityTypeId);
 
         $contactInfo = $request->all();
 

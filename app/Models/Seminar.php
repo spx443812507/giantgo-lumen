@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\EAV\Entity as EavEntity;
+use App\Traits\Attributable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Seminar extends EavEntity
+class Seminar extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, Attributable;
 
     /**
      * The attributes that are mass assignable.

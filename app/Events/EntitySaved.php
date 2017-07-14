@@ -3,7 +3,7 @@
 namespace App\Events;
 
 use App\Models\EAV\Entity;
-use App\Models\EAV\Supports\ValueCollection;
+use App\Supports\ValueCollection;
 use App\Models\EAV\Value;
 use Exception;
 

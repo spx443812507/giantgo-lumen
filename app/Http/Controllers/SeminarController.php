@@ -8,7 +8,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EAV\Factories\EntityFactory;
 use App\Models\Seminar;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -20,7 +19,7 @@ class SeminarController extends Controller
     {
         $entityTypeId = $request->input('entity_type_id');
 
-        $seminarClass = empty($entityTypeId) ? Seminar::class : EntityFactory::getEntity($entityTypeId);
+        $seminarClass = empty($entityTypeId) ? Seminar::class : Entity::getEntity($entityTypeId);
 
         $seminar = $seminarClass::find($seminarId);
 
@@ -46,7 +45,7 @@ class SeminarController extends Controller
             'end_date' => 'required|date|after:start_date',
         ]);
 
-        $seminarClass = empty($entityTypeId) ? Seminar::class : EntityFactory::getEntity($entityTypeId);
+        $seminarClass = empty($entityTypeId) ? Seminar::class : Entity::getEntity($entityTypeId);
 
         $seminarInfo = $request->all();
 
@@ -72,7 +71,7 @@ class SeminarController extends Controller
             'end_date' => 'required|date|after:start_date',
         ]);
 
-        $seminarClass = empty($entityTypeId) ? Seminar::class : EntityFactory::getEntity($entityTypeId);
+        $seminarClass = empty($entityTypeId) ? Seminar::class : Entity::getEntity($entityTypeId);
 
         $seminarInfo = $request->except('id');
 
