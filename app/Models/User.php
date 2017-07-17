@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Traits\Attributable;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Hash;
@@ -13,7 +12,7 @@ use Zizaco\Entrust\Traits\EntrustUserTrait;
 
 class User extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, SoftDeletes, EntrustUserTrait, Attributable;
+    use Authenticatable, SoftDeletes, EntrustUserTrait;
 
     /**
      * The attributes that are mass assignable.

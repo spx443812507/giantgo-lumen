@@ -11,6 +11,8 @@ namespace App\Traits;
 use App\Events\EntityDeleted;
 use App\Events\EntitySaved;
 use App\Events\EntitySaving;
+use App\Models\EAV\Attribute;
+use App\Models\EAV\Value;
 use App\Scopes\EagerLoadScope;
 use App\Scopes\EntityTypeScope;
 use App\Models\Model;
@@ -55,6 +57,42 @@ trait Attributable
      */
     protected $entityAttributeRelationsBooted = false;
 
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        if (isset(static::$entityTypeId)) {
+            $this->bootAttributable();
+        }
+    }
+
+    public static function bootAttributable()
+    {
+        $attributeIds = DB::table('entity_attribute')->where('entity_type_id', static::$entityTypeId)->get()->pluck('attribute_id');
+
+        static::$entityAttributes = Attribute::whereIn('id', $attributeIds)->get()->keyBy('attribute_code');
+
+        static::addGlobalScope(new EagerLoadScope());
+        static::addGlobalScope(new EntityTypeScope());
+        static::saving(EntitySaving::class . '@handle');
+        static::saved(EntitySaved::class . '@handle');
+        static::deleted(EntityDeleted::class . '@handle');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function bootIfNotBooted()
+    {
+        parent::bootIfNotBooted();
+
+        if (!$this->entityAttributeRelationsBooted) {
+            app(RelationBuilder::class)->build($this);
+
+            $this->entityAttributeRelationsBooted = true;
+        }
+    }
+
     public function getEntityTypeId()
     {
         return self::$entityTypeId;
@@ -63,35 +101,6 @@ trait Attributable
     public function setEntityTypeId($entityTypeId)
     {
         return self::$entityTypeId = $entityTypeId;
-    }
-
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-
-        if (isset(static::$entityTypeId)) {
-            $this->bootEntityAttribute(static::$entityTypeId);
-        }
-    }
-
-    public function bootEntityAttribute($entityTypeId)
-    {
-        $this->setEntityTypeId($entityTypeId);
-
-        $attributeIds = DB::table('entity_attribute')->where('entity_type_id', $this->getEntityTypeId())->get()->pluck('attribute_id');
-
-        static::$entityAttributes = Attribute::whereIn('id', $attributeIds)->get()->keyBy('attribute_code');
-
-        if (!$this->entityAttributeRelationsBooted) {
-            app(RelationBuilder::class)->build($this);
-            $this->entityAttributeRelationsBooted = true;
-        }
-
-        static::addGlobalScope(new EagerLoadScope());
-        static::addGlobalScope(new EntityTypeScope());
-        static::saving(EntitySaving::class . '@handle');
-        static::saved(EntitySaved::class . '@handle');
-        static::deleted(EntityDeleted::class . '@handle');
     }
 
     /**
@@ -367,7 +376,7 @@ trait Attributable
             $value = $value->getAttribute('value');
         }
 
-        $current->setAttribute('entity_type_id', $this->getEntityTypeId());
+        $current->setAttribute('entity_type_id', static::$entityTypeId);
 
         return $current->setAttribute('value', $value);
     }
@@ -386,7 +395,7 @@ trait Attributable
 
             $instance = new $model();
             $instance->setAttribute('entity_id', $this->getKey());
-            $instance->setAttribute('entity_type_id', $this->getEntityTypeId());
+            $instance->setAttribute('entity_type_id', static::$entityTypeId);
             $instance->setAttribute($attribute->getForeignKey(), $attribute->getKey());
             $instance->setAttribute('value', $value);
             $value = $instance;
@@ -430,7 +439,7 @@ trait Attributable
     public function scopeHasAttribute(Builder $query, $key, $value)
     {
         return $query->whereHas($key, function (Builder $query) use ($value) {
-            $query->where('value', $value)->where('entity_type_id', $this->getEntityTypeId());
+            $query->where('value', $value)->where('entity_type_id', static::$entityTypeId);
         });
     }
 

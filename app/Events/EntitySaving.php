@@ -8,14 +8,13 @@
 
 namespace App\Events;
 
-use App\Models\EAV\Entity;
-use Exception;
+use Illuminate\Database\Eloquent\Model as Entity;
 
 class EntitySaving
 {
     public function handle(Entity $entity)
     {
-        if (empty($entity->entity_type_id)) {
+        if (empty($entity->entity_type_id) && !empty($entity->getEntityTypeId())) {
             $entity->entity_type_id = $entity->getEntityTypeId();
         }
     }

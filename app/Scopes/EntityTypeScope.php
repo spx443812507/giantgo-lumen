@@ -16,6 +16,8 @@ class EntityTypeScope implements Scope
 {
     public function apply(Builder $builder, Entity $entity)
     {
-        $builder->where('entity_type_id', $entity->getEntityTypeId());
+        if (!empty($entity->getEntityTypeId())) {
+            $builder->where('entity_type_id', $entity->getEntityTypeId());
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\EAV\Entity;
+use Illuminate\Database\Eloquent\Model as Entity;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EntityDeleted

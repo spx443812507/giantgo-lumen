@@ -18,14 +18,9 @@ $app->get($prefix . '/', function () use ($app) {
 
 $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app) {
     $app->group(['prefix' => 'passports'], function () use ($app) {
-        $app->patch('/', 'PassportController@signIn');
-        $app->post('/', 'PassportController@signUp');
-        $app->get('/me', ['as' => 'passports.me', 'uses' => 'PassportController@me', 'middleware' => 'auth:web']);
-    });
-
-    $app->group(['prefix' => 'contacts'], function () use ($app) {
-        $app->patch('/', 'ContactController@signIn');
-        $app->post('/', 'ContactController@signUp');
+        $app->patch('/', 'UserController@signIn');
+        $app->post('/', 'UserController@signUp');
+        $app->get('/me', ['as' => 'passports.me', 'uses' => 'UserController@me', 'middleware' => 'auth:web']);
     });
 
     $app->group(['middleware' => 'auth:web'], function () use ($app) {
@@ -49,6 +44,13 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->post('/seminars', ['as' => 'seminar.create', 'uses' => 'SeminarController@createSeminar']);
         $app->patch('/seminars/{seminar_id}', ['as' => 'seminar.update', 'uses' => 'SeminarController@updateSeminar']);
 
+        $app->get('/contacts', ['as' => 'contacts.list', 'uses' => 'ContactController@getList']);
+    });
+
+    $app->group(['prefix' => 'contacts'], function () use ($app) {
+        $app->patch('/', 'ContactController@signIn');
+        $app->post('/', 'ContactController@signUp');
+        $app->post('/me', ['as' => 'passports.me', 'uses' => 'ContactController@me', 'middleware' => 'auth:api']);
     });
 
     $app->group(['middleware' => 'auth:api'], function () use ($app) {

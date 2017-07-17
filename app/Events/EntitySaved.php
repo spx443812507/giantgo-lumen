@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\EAV\Entity;
+use Illuminate\Database\Eloquent\Model as Entity;
 use App\Supports\ValueCollection;
 use App\Models\EAV\Value;
 use Exception;

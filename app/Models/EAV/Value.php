@@ -9,7 +9,7 @@
 namespace App\Models\EAV;
 
 
-use App\Models\EAV\Supports\ValueCollection;
+use App\Supports\ValueCollection;
 use App\Models\Model;
 
 abstract class Value extends Model

@@ -49,16 +49,16 @@ class ContactController extends Controller
             'password' => 'required'
         ]);
 
-        $contactClass = empty($entityTypeId) ? Contact::class : Entity::getEntity($entityTypeId);
-
         $contactInfo = $request->all();
 
+        if (isset($entityTypeId) && !empty($entityTypeId)) {
+            Contact::$entityTypeId = $entityTypeId;
+        }
+
         try {
-            $contact = new $contactClass;
+            $contact = new Contact;
 
-            $contact->fill($contactInfo);
-
-            $contact->save();
+            $contact->fill($contactInfo)->save();
         } catch (Exception $exception) {
             return response()->json(['error' => 'create_contact_fail'], 500);
         }
@@ -126,9 +126,15 @@ class ContactController extends Controller
     public function me()
     {
         try {
-            $user = Auth::guard('api')->user();
+            $contact = Auth::guard('api')->user();
 
-            if (!$user) {
+//            if (!empty($contact->entity_type_id)) {
+//                $contact->setEntityTypeId($contact->entity_type_id);
+//                $contact::bootAttributable();
+//                $contact->load('nickname');
+//            }
+
+            if (!$contact) {
                 return response()->json(['error' => 'unauthorized'], 401);
             }
         } catch (Exceptions\TokenExpiredException $e) {
@@ -139,7 +145,26 @@ class ContactController extends Controller
             return response()->json(['error' => 'token_absent'], 500);
         }
 
-        return response()->json($user);
+        return response()->json($contact);
+    }
+
+    public function updateMyInfo(Request $request)
+    {
+        $this->validate($request, [
+            'email' => 'require|email'
+        ]);
+
+        $entityTypeId = $request->input('entity_type_id');
+
+        $contact = Auth::guard('api')->user();
+
+        if (!$contact) {
+            return response()->json(['error' => 'unauthorized'], 401);
+        }
+
+        if (isset($entityTypeId) && !empty($entityTypeId)) {
+//            $contact::bootAttributable($entityTypeId);
+        }
     }
 
     public function get(Request $request, $contactId)
@@ -151,5 +176,12 @@ class ContactController extends Controller
         }
 
         return response()->json($contact);
+    }
+
+    public function getList(Request $request)
+    {
+        $contacts = Contact::all();
+
+        return response()->json($contacts);
     }
 }
