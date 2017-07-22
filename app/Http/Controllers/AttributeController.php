@@ -86,7 +86,7 @@ class AttributeController extends Controller
         return response()->json($attribute, 200);
     }
 
-    public function createAttributes(Request $request)
+    public function batchCreateAttribute(Request $request)
     {
         $entityTypeId = $request->input('entity_type_id');
 
@@ -197,26 +197,34 @@ class AttributeController extends Controller
         return response()->json($attribute, 200);
     }
 
-    public function getAttributes(Request $request)
+    public function getAttributeList(Request $request)
     {
         $this->validate($request, [
             'entity_type_id' => 'required|integer'
         ]);
 
-        $entityClass = Entity::getEntity($request->input('entity_type_id'));
+        $entityTypeId = $request->input('entity_type_id');
 
-        $entity = new $entityClass();
+        $entityType = Entity::find($entityTypeId);
 
-        $attributes = $entity->attributes();
+        if (empty($entityType)) {
+            return response()->json(['error' => 'entity_type_not_exists'], 500);
+        }
+
+        $instance = new $entityType->entity_model();
+
+        $attributes = $instance->attributes();
 
         $result = [];
 
-        foreach ($attributes as $key => $attribute) {
-            if ($attribute->hasOptions()) {
-                $attribute->load('options');
-            }
+        if (!empty($attributes)) {
+            foreach ($attributes as $key => $attribute) {
+                if ($attribute->hasOptions()) {
+                    $attribute->load('options');
+                }
 
-            $result[] = $attribute;
+                $result[] = $attribute;
+            }
         }
 
         return response()->json($result);

@@ -23,6 +23,41 @@ use Illuminate\Validation\Rule;
 
 class ContactController extends Controller
 {
+    private function getValidators($contactInfo)
+    {
+        $validators = [];
+
+        $contact = new Contact;
+
+        foreach ($contactInfo as $key => $value) {
+            if ($contact->isEntityAttribute($key)) {
+                $validators[$key] = [];
+
+                $attributes = $contact->attributes();
+
+                if ($attributes[$key]->is_required) {
+                    $validators[$key][] = 'required';
+                }
+
+                if ($attributes[$key]->is_unique) {
+                    $validators[$key][] = Rule::unique($attributes[$key]->backend_table)->ignore($contact->id);
+                }
+
+                if ($attributes[$key]->hasOptions()) {
+                    $optionIds = $attributes[$key]->options()->get()->pluck('id')->toArray();
+
+                    if ($attributes[$key]->is_collection) {
+                        $validators[$key . '.*'][] = Rule::in($optionIds);
+                    } else {
+                        $validators[$key][] = Rule::in($optionIds);
+                    }
+                }
+            }
+        }
+
+        return $validators;
+    }
+
     private function bindSocialAccount($contact, $token)
     {
         try {
@@ -129,11 +164,7 @@ class ContactController extends Controller
 
     public function updateMyInfo(Request $request)
     {
-        $this->validate($request, [
-            'email' => 'required|email'
-        ]);
-
-        $contactInfo = $request->except('id', 'password');
+        $contactInfo = $request->except('id', 'password', 'email', 'mobile');
 
         $contact = Auth::guard('api')->user();
 
@@ -141,21 +172,14 @@ class ContactController extends Controller
             return response()->json(['error' => 'unauthorized'], 401);
         }
 
-        $validator = Validator::make($contactInfo, [
-            'email' => [
-                Rule::unique('contacts')->ignore($contact->id),
-            ],
-            'mobile' => [
-                Rule::unique('contacts')->ignore($contact->id),
-            ]
-        ]);
+        if (!empty($contact->entity_type_id)) {
+            $contact->bootEntityAttribute($contact->entity_type_id);
+        }
+
+        $validator = Validator::make($contactInfo, $this->getValidators($contactInfo));
 
         if ($validator->fails()) {
             return response()->json($this->formatValidationErrors($validator), 422);
-        }
-
-        if (!empty($contact->entity_type_id)) {
-            $contact->bootEntityAttribute($contact->entity_type_id);
         }
 
         $contact->fill($contactInfo);

@@ -110,7 +110,7 @@ class ValueCollection extends EloquentCollection
             return $value;
         }
 
-        $model = $this->attribute->getAttribute('backend_type');
+        $model = $this->attribute->getAttribute('backend_model');
 
         $instance = new $model();
         $instance->setAttribute('entity_id', $this->entity->getKey());

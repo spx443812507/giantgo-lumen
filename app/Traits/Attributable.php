@@ -395,7 +395,7 @@ trait Attributable
     protected function setEntityAttributeValue(Attribute $attribute, $value)
     {
         if (!is_null($value) && !$value instanceof Value) {
-            $model = $attribute->getAttribute('backend_type');
+            $model = $attribute->getAttribute('backend_model');
 
             $instance = new $model();
             $instance->setAttribute('entity_id', $this->getKey());

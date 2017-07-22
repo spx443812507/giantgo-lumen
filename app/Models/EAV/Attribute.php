@@ -9,6 +9,11 @@
 namespace App\Models\EAV;
 
 
+use App\Models\EAV\Types\Varchar;
+use App\Models\EAV\Types\Text;
+use App\Models\EAV\Types\Boolean;
+use App\Models\EAV\Types\Datetime;
+use App\Models\EAV\Types\Integer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -46,42 +51,58 @@ class Attribute extends Model
 
     protected $inputMappings = [
         'text' => [
-            'backend_type' => 'App\Models\EAV\Types\Varchar',
+            'backend_model' => Varchar::class,
+            'backend_type' => 'Varchar',
+            'backend_table' => 'value_varchar',
             'is_collection' => false,
             'has_options' => false,
         ],
         'textarea' => [
-            'backend_type' => 'App\Models\EAV\Types\Text',
+            'backend_model' => Text::class,
+            'backend_type' => 'Text',
+            'backend_table' => 'value_text',
             'is_collection' => false,
             'has_options' => false,
         ],
         'switch' => [
-            'backend_type' => 'App\Models\EAV\Types\Boolean',
+            'backend_model' => Boolean::class,
+            'backend_type' => 'Boolean',
+            'backend_table' => 'value_boolean',
             'is_collection' => false,
             'has_options' => false,
         ],
         'radio' => [
-            'backend_type' => 'App\Models\EAV\Types\Integer',
+            'backend_model' => Integer::class,
+            'backend_type' => 'Integer',
+            'backend_table' => 'value_integer',
             'is_collection' => false,
             'has_options' => true,
         ],
         'checkbox' => [
-            'backend_type' => 'App\Models\EAV\Types\Integer',
+            'backend_model' => Integer::class,
+            'backend_type' => 'Integer',
+            'backend_table' => 'value_integer',
             'is_collection' => true,
             'has_options' => true,
         ],
         'select' => [
-            'backend_type' => 'App\Models\EAV\Types\Integer',
+            'backend_model' => Integer::class,
+            'backend_type' => 'Integer',
+            'backend_table' => 'value_integer',
             'is_collection' => false,
             'has_options' => true,
         ],
         'number' => [
-            'backend_type' => 'App\Models\EAV\Types\Integer',
+            'backend_model' => Integer::class,
+            'backend_type' => 'Integer',
+            'backend_table' => 'value_integer',
             'is_collection' => false,
             'has_options' => false,
         ],
         'datetime' => [
-            'backend_type' => 'App\Models\EAV\Types\Datetime',
+            'backend_model' => Datetime::class,
+            'backend_type' => 'Datetime',
+            'backend_table' => 'value_datetime',
             'is_collection' => false,
             'has_options' => false,
         ]
@@ -90,7 +111,9 @@ class Attribute extends Model
     public function setFrontendInputAttribute($input)
     {
         $this->attributes['frontend_input'] = $input;
+        $this->attributes['backend_model'] = $this->inputMappings[$input]['backend_model'];
         $this->attributes['backend_type'] = $this->inputMappings[$input]['backend_type'];
+        $this->attributes['backend_table'] = $this->inputMappings[$input]['backend_table'];
         $this->attributes['is_collection'] = $this->inputMappings[$input]['is_collection'];
     }
 

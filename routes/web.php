@@ -34,15 +34,16 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->post('/entities', ['as' => 'entities.create', 'uses' => 'EntityController@createEntity', 'middleware' => ['ability:admin,entity-create']]);
         $app->get('/entities/{entity_type_code}', ['as' => 'entities.list', 'uses' => 'EntityController@getEntityList', 'middleware' => ['ability:admin,entity-list']]);
 
-        $app->post('/attributes/batch', ['as' => 'attributes.batchCreate', 'uses' => 'AttributeController@createAttributes']);
+
+        $app->post('/attributes/batch', ['as' => 'attributes.batchCreate', 'uses' => 'AttributeController@batchCreateAttribute']);
         $app->post('/attributes', ['as' => 'attributes.create', 'uses' => 'AttributeController@createAttribute']);
         $app->put('/attributes', ['as' => 'attributes.update', 'uses' => 'AttributeController@updateAttribute']);
-        $app->get('/attributes', ['as' => 'attributes.get', 'uses' => 'AttributeController@getAttributes']);
+        $app->get('/attributes', ['as' => 'attributes.list', 'uses' => 'AttributeController@getAttributeList']);
 
-        $app->get('/seminars', ['as' => 'seminar.list', 'uses' => 'SeminarController@getSeminarList']);
-        $app->get('/seminars/{seminar_id}', ['as' => 'seminar.get', 'uses' => 'SeminarController@getSeminar']);
-        $app->post('/seminars', ['as' => 'seminar.create', 'uses' => 'SeminarController@createSeminar']);
-        $app->patch('/seminars/{seminar_id}', ['as' => 'seminar.update', 'uses' => 'SeminarController@updateSeminar']);
+        $app->get('/seminars', ['as' => 'seminars.list', 'uses' => 'SeminarController@getSeminarList']);
+        $app->get('/seminars/{seminar_id}', ['as' => 'seminars.get', 'uses' => 'SeminarController@getSeminar']);
+        $app->post('/seminars', ['as' => 'seminars.create', 'uses' => 'SeminarController@createSeminar']);
+        $app->patch('/seminars/{seminar_id}', ['as' => 'seminars.update', 'uses' => 'SeminarController@updateSeminar']);
 
         $app->get('/contacts', ['as' => 'contacts.list', 'uses' => 'ContactController@getList']);
     });
