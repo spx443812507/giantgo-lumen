@@ -31,7 +31,7 @@ class Entity extends Model
      * @var array
      */
     protected $hidden = [
-        'deleted_at'
+        'deleted_at', 'entity_model', 'entity_table'
     ];
 
     protected $table = 'entity_type';

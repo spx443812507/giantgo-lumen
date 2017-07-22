@@ -69,7 +69,7 @@ class EntityController extends Controller
             $entities = Entity::where('entity_type_code', $entityTypeCode)->get();
 
             foreach ($entities as $entity) {
-                $entityClass = Entity::getEntity($entity->id);
+                $entityClass = $entity->entity_model;
 
                 $entity->entity_instance_count = count($entityClass::where('entity_type_id', $entity->id)->get());
             }

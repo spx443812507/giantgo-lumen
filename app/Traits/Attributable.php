@@ -14,7 +14,6 @@ use App\Events\EntitySaving;
 use App\Models\EAV\Attribute;
 use App\Models\EAV\Value;
 use App\Scopes\EagerLoadScope;
-use App\Scopes\EntityTypeScope;
 use App\Models\Model;
 use App\Supports\RelationBuilder;
 use App\Supports\ValueCollection;
@@ -57,23 +56,14 @@ trait Attributable
      */
     protected $entityAttributeRelationsBooted = false;
 
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-
-        if (isset(static::$entityTypeId)) {
-            $this->bootAttributable();
-        }
-    }
-
     public static function bootAttributable()
     {
-        $attributeIds = DB::table('entity_attribute')->where('entity_type_id', static::$entityTypeId)->get()->pluck('attribute_id');
-
-        static::$entityAttributes = Attribute::whereIn('id', $attributeIds)->get()->keyBy('attribute_code');
+        if (!empty(static::$entityTypeId)) {
+            $attributeIds = DB::table('entity_attribute')->where('entity_type_id', static::$entityTypeId)->get()->pluck('attribute_id');
+            static::$entityAttributes = Attribute::whereIn('id', $attributeIds)->get()->keyBy('attribute_code');
+        }
 
         static::addGlobalScope(new EagerLoadScope());
-        static::addGlobalScope(new EntityTypeScope());
         static::saving(EntitySaving::class . '@handle');
         static::saved(EntitySaved::class . '@handle');
         static::deleted(EntityDeleted::class . '@handle');
@@ -86,21 +76,35 @@ trait Attributable
     {
         parent::bootIfNotBooted();
 
-        if (!$this->entityAttributeRelationsBooted) {
+        if (!$this->entityAttributeRelationsBooted && !empty(static::$entityTypeId)) {
             app(RelationBuilder::class)->build($this);
 
             $this->entityAttributeRelationsBooted = true;
         }
     }
 
+    public function bootEntityAttribute($entityTypeId)
+    {
+        if (!empty($entityTypeId)) {
+            static::$entityTypeId = $entityTypeId;
+        }
+
+        static::bootAttributable();
+        $this->bootIfNotBooted();
+
+        $relations = $this->getEntityAttributeRelations();
+
+        $this->load(array_keys($relations));
+    }
+
     public function getEntityTypeId()
     {
-        return self::$entityTypeId;
+        return static::$entityTypeId;
     }
 
     public function setEntityTypeId($entityTypeId)
     {
-        return self::$entityTypeId = $entityTypeId;
+        return static::$entityTypeId = $entityTypeId;
     }
 
     /**

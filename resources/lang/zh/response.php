@@ -27,5 +27,6 @@ return [
     'entity_type_not_exists' => '不存在的实体类型',
     'attribute_not_exists' => '字段不存在',
     'attribute_code_has_exists' => '属性代码已存在',
-    'seminar_not_exists' => '会议不存在'
+    'seminar_not_exists' => '会议不存在',
+    'contact_not_exists' => '联系人不存在'
 ];

@@ -65,6 +65,7 @@ $app->singleton(
 
 $app->middleware([
     'localization' => App\Http\Middleware\Localization::class,
+    'eav' => App\Http\Middleware\EntityAttributeValue::class,
 ]);
 
 $app->routeMiddleware([

@@ -17,6 +17,9 @@ use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Exceptions;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+
 
 class ContactController extends Controller
 {
@@ -39,21 +42,13 @@ class ContactController extends Controller
 
     public function signUp(Request $request)
     {
-        $entityTypeId = $request->input('entity_type_id');
-
-        $uniqueRule = isset($entityTypeId) ? ',NULL,id,entity_type_id,' . $entityTypeId : '';
-
         $this->validate($request, [
-            'email' => 'email|max:255|unique:contacts,email' . $uniqueRule,
-            'mobile' => 'max:255|unique:contacts,mobile' . $uniqueRule,
+            'email' => 'email|max:255|unique:contacts,email',
+            'mobile' => 'max:255|unique:contacts,mobile',
             'password' => 'required'
         ]);
 
         $contactInfo = $request->all();
-
-        if (isset($entityTypeId) && !empty($entityTypeId)) {
-            Contact::$entityTypeId = $entityTypeId;
-        }
 
         try {
             $contact = new Contact;
@@ -79,8 +74,6 @@ class ContactController extends Controller
             'email' => 'email|required_without:mobile'
         ]);
 
-        $entityTypeId = $request->input('entity_type_id');
-
         $email = $request->input('email');
         $mobile = $request->input('mobile');
 
@@ -94,20 +87,8 @@ class ContactController extends Controller
             $credential['mobile'] = $request->input('mobile');
         }
 
-        if (isset($entityTypeId)) {
-            $credential['entity_type_id'] = $entityTypeId;
-        }
-
-        try {
-            if (!$token = Auth::guard('api')->attempt($credential)) {
-                return response()->json(['error' => 'username_or_password_error'], 404);
-            }
-        } catch (Exceptions\TokenExpiredException $e) {
-            return response()->json(['error' => 'token_expired'], 500);
-        } catch (Exceptions\TokenInvalidException $e) {
-            return response()->json(['error' => 'token_invalid'], 500);
-        } catch (Exceptions\JWTException $e) {
-            return response()->json(['error' => 'token_absent'], 500);
+        if (!$token = Auth::guard('api')->attempt($credential)) {
+            return response()->json(['error' => 'username_or_password_error'], 404);
         }
 
         $user = Auth::guard('api')->user();
@@ -128,14 +109,12 @@ class ContactController extends Controller
         try {
             $contact = Auth::guard('api')->user();
 
-//            if (!empty($contact->entity_type_id)) {
-//                $contact->setEntityTypeId($contact->entity_type_id);
-//                $contact::bootAttributable();
-//                $contact->load('nickname');
-//            }
-
-            if (!$contact) {
+            if (empty($contact)) {
                 return response()->json(['error' => 'unauthorized'], 401);
+            }
+
+            if (!empty($contact->entity_type_id)) {
+                $contact->bootEntityAttribute($contact->entity_type_id);
             }
         } catch (Exceptions\TokenExpiredException $e) {
             return response()->json(['error' => 'token_expired'], 500);
@@ -151,10 +130,10 @@ class ContactController extends Controller
     public function updateMyInfo(Request $request)
     {
         $this->validate($request, [
-            'email' => 'require|email'
+            'email' => 'required|email'
         ]);
 
-        $entityTypeId = $request->input('entity_type_id');
+        $contactInfo = $request->except('id', 'password');
 
         $contact = Auth::guard('api')->user();
 
@@ -162,9 +141,28 @@ class ContactController extends Controller
             return response()->json(['error' => 'unauthorized'], 401);
         }
 
-        if (isset($entityTypeId) && !empty($entityTypeId)) {
-//            $contact::bootAttributable($entityTypeId);
+        $validator = Validator::make($contactInfo, [
+            'email' => [
+                Rule::unique('contacts')->ignore($contact->id),
+            ],
+            'mobile' => [
+                Rule::unique('contacts')->ignore($contact->id),
+            ]
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($this->formatValidationErrors($validator), 422);
         }
+
+        if (!empty($contact->entity_type_id)) {
+            $contact->bootEntityAttribute($contact->entity_type_id);
+        }
+
+        $contact->fill($contactInfo);
+
+        $contact->save();
+
+        return $contact;
     }
 
     public function get(Request $request, $contactId)
@@ -173,6 +171,10 @@ class ContactController extends Controller
 
         if (empty($contact)) {
             return response()->json(['error' => 'contact_not_exists'], 500);
+        }
+
+        if (!empty($contact->entity_type_id)) {
+            $contact->bootEntityAttribute($contact->entity_type_id);
         }
 
         return response()->json($contact);

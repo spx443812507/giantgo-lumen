@@ -136,34 +136,22 @@ class UserController extends Controller
 
     public function updateUser(Request $request, $userId)
     {
-        $this->validate($request, [
-            'email' => 'require|email'
-        ]);
-
         $userInfo = $request->except('id');
-
-        $entityTypeId = $request->input('entity_type_id');
 
         $validator = Validator::make($userInfo, [
             'email' => [
-                Rule::unique('users')->where(function ($query) use ($entityTypeId) {
-                    $query->where('entity_type_id', $entityTypeId);
-                })->ignore($userId),
+                Rule::unique('users')->ignore($userId),
             ],
             'mobile' => [
-                Rule::unique('users')->where(function ($query) use ($entityTypeId) {
-                    $query->where('entity_type_id', $entityTypeId);
-                })->ignore($userId),
+                Rule::unique('users')->ignore($userId),
             ]
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json($this->formatValidationErrors($validator), 422);
         }
 
-        $userClass = Entity::getEntity($entityTypeId);
-
-        $user = $userClass::find($userId);
+        $user = User::find($userId);
 
         if (empty($user)) {
             return response()->json(['error' => 'user_not_exists'], 500);

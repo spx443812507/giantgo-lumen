@@ -39,26 +39,28 @@ class EntitySaved
         $connection = $this->entity->getConnection();
         $connection->beginTransaction();
         try {
-            foreach ($this->entity->getEntityAttributes() as $attribute) {
-                if ($this->entity->relationLoaded($relation = $attribute->getAttribute('attribute_code'))) {
-                    $relationValue = $this->entity->getRelationValue($relation);
+            if (!empty($this->entity->getEntityAttributes())) {
+                foreach ($this->entity->getEntityAttributes() as $attribute) {
+                    if ($this->entity->relationLoaded($relation = $attribute->getAttribute('attribute_code'))) {
+                        $relationValue = $this->entity->getRelationValue($relation);
 
-                    if ($relationValue instanceof ValueCollection) {
-                        foreach ($relationValue as $value) {
-                            $this->saveOrTrashValue($value, $entity);
+                        if ($relationValue instanceof ValueCollection) {
+                            foreach ($relationValue as $value) {
+                                $this->saveOrTrashValue($value, $entity);
+                            }
+                        } else if (!is_null($relationValue)) {
+                            $this->saveOrTrashValue($relationValue, $entity);
                         }
-                    } else if (!is_null($relationValue)) {
-                        $this->saveOrTrashValue($relationValue, $entity);
                     }
                 }
-            }
-            if ($this->trash->count()) {
-                // Fetch the first item's class to know the model used for deletion
-                $class = get_class($this->trash->first());
-                // Let's batch delete all the values based on their ids
-                $class::whereIn('id', $this->trash->pluck('id'))->delete();
-                // Now, empty the trash
-                $this->trash = collect([]);
+                if ($this->trash->count()) {
+                    // Fetch the first item's class to know the model used for deletion
+                    $class = get_class($this->trash->first());
+                    // Let's batch delete all the values based on their ids
+                    $class::whereIn('id', $this->trash->pluck('id'))->delete();
+                    // Now, empty the trash
+                    $this->trash = collect([]);
+                }
             }
         } catch (Exception $e) {
             // Rollback transaction on failure

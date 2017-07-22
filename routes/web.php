@@ -24,7 +24,7 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
     });
 
     $app->group(['middleware' => 'auth:web'], function () use ($app) {
-        $app->get('/users/{userId}', ['as' => 'users.get', 'middleware' => ['role:admin'], 'uses' => 'UserController@get']);
+        $app->get('/users/{user_id}', ['as' => 'users.get', 'middleware' => ['role:admin'], 'uses' => 'UserController@get']);
         $app->get('/users', ['as' => 'users.getList', 'middleware' => ['role:admin'], 'uses' => 'UserController@getList']);
         $app->patch('/users/{user_id}', ['as' => 'user.update', 'uses' => 'UserController@updateUser']);
 
@@ -55,6 +55,8 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
 
     $app->group(['middleware' => 'auth:api'], function () use ($app) {
         $app->get('/contacts/me', ['as' => 'contacts.me', 'uses' => 'ContactController@me']);
+        $app->patch('/contacts/me', ['as' => 'contacts.updateMyInfo', 'uses' => 'ContactController@updateMyInfo']);
+        $app->get('/contacts/{contact_id}', ['as' => 'contacts.me', 'uses' => 'ContactController@get']);
 
     });
 
