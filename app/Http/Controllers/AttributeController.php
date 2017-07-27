@@ -8,49 +8,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EAV\Attribute;
-use App\Models\EAV\Entity;
-use App\Models\EAV\Option;
-use Exception;
+use App\Services\AttributeService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class AttributeController extends Controller
 {
-    private function saveAttribute(Entity $entity, $attributeInfo)
+    protected $attributeService;
+
+    public function __construct(AttributeService $attributeService)
     {
-        $attribute = $entity->attributes()->create([
-            'entity_type_id' => $entity->id,
-            'attribute_code' => $attributeInfo['attribute_code'],
-            'frontend_input' => $attributeInfo['frontend_input'],
-            'frontend_model' => empty($attributeInfo['frontend_model']) ? '' : $attributeInfo['frontend_model'],
-            'frontend_label' => $attributeInfo['frontend_label'],
-            'frontend_class' => empty($attributeInfo['frontend_class']) ? '' : $attributeInfo['frontend_class'],
-            'is_required' => $attributeInfo['is_required'],
-            'is_user_defined' => false,
-            'is_unique' => $attributeInfo['is_unique'],
-            'default_value' => $attributeInfo['default_value'],
-            'description' => $attributeInfo['description'],
-        ]);
-
-        if (array_has($attributeInfo, 'options') && count($attributeInfo['options']) > 0) {
-            $options = $attributeInfo['options'];
-
-            $optionDataList = [];
-
-            foreach ($options as $option) {
-                $optionDataList[] = new Option([
-                    'attribute_id' => $attribute->id,
-                    'value' => $option['value']
-                ]);
-            }
-
-            $attribute['options'] = $attribute->options()->saveMany($optionDataList);
-        }
-
-        return $attribute;
+        $this->attributeService = $attributeService;
     }
 
     public function createAttribute(Request $request)
@@ -66,24 +35,9 @@ class AttributeController extends Controller
             'options.*.value' => 'required'
         ]);
 
-        $entity = Entity::find($entityTypeId);
+        $attribute = $this->attributeService->createAttribute($entityTypeId, $request->all());
 
-        if (empty($entity)) {
-            return response()->json(['error' => 'entity_type_not_exists'], 500);
-        }
-
-        DB::beginTransaction();
-
-        try {
-            $attribute = $this->saveAttribute($entity, $request->all());
-        } catch (Exception $e) {
-            DB::rollBack();
-            return response()->json(['error' => 'create_error'], 500);
-        }
-
-        DB::commit();
-
-        return response()->json($attribute, 200);
+        return response()->json($attribute[0], 200);
     }
 
     public function batchCreateAttribute(Request $request)
@@ -100,30 +54,7 @@ class AttributeController extends Controller
             'attributes.*.options.*.value' => 'required'
         ]);
 
-        $result = [];
-
-        $attributes = $request->input('attributes');
-
-        $entity = Entity::find($entityTypeId);
-
-        if (empty($entity)) {
-            return response()->json(['error' => 'entity_type_not_exists'], 500);
-        }
-
-        DB::beginTransaction();
-
-        try {
-            for ($index = 0; $index < count($attributes); $index++) {
-                $attribute = $this->saveAttribute($entity, $attributes[$index]);
-                $result[] = $attribute;
-            }
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            return response()->json(['error' => 'create_error'], 500);
-        }
-
-        DB::commit();
+        $result = $this->attributeService->createAttribute($entityTypeId, $request->input('attributes'));
 
         return response()->json($result, 200);
     }
@@ -150,49 +81,7 @@ class AttributeController extends Controller
             return response()->json(['error' => 'attribute_code_has_exists'], 400);
         }
 
-        $attribute = Attribute::find($request->input('id'));
-
-        if (empty($attribute)) {
-            return response()->json(['error' => 'attribute_not_exists'], 400);
-        }
-
-        $attribute->attribute_code = $request->input('attribute_code');
-        $attribute->frontend_label = $request->input('frontend_label');
-        $attribute->frontend_input = $request->input('frontend_input');
-        $attribute->is_required = $request->input('is_required');
-        $attribute->is_unique = $request->input('is_unique');
-
-        $options = $request->input('options');
-
-        if (isset($options)) {
-            $requestOptionIds = [];
-
-            $attributeOptions = $attribute->options()->get();
-            $attributeOptionMaps = $attributeOptions->keyBy('id');
-            $attributeOptionIds = $attributeOptions->pluck('id');
-
-            foreach ($options as $option) {
-                if (isset($option['id']) && !empty($option['id'])) {
-                    $requestOptionIds[] = $option['id'];
-
-                    if (array_has($attributeOptionMaps, $option['id'])) {
-                        $attributeOptionMaps[$option['id']]->value = $option['value'];
-                        $attributeOptionMaps[$option['id']]->save();
-                    }
-                } else {
-                    $attribute->options()->saveMany([
-                        new Option([
-                            'attribute_id' => $attribute->id,
-                            'value' => $option['value']
-                        ])
-                    ]);
-                }
-            }
-
-            Option::whereIn('id', array_diff($attributeOptionIds->toArray(), $requestOptionIds))->delete();
-        }
-
-        $attribute->save();
+        $attribute = $this->attributeService->updateAttribute($request->input('id'), $attributeData);
 
         return response()->json($attribute, 200);
     }
@@ -205,27 +94,7 @@ class AttributeController extends Controller
 
         $entityTypeId = $request->input('entity_type_id');
 
-        $entityType = Entity::find($entityTypeId);
-
-        if (empty($entityType)) {
-            return response()->json(['error' => 'entity_type_not_exists'], 500);
-        }
-
-        $instance = new $entityType->entity_model();
-
-        $attributes = $instance->attributes();
-
-        $result = [];
-
-        if (!empty($attributes)) {
-            foreach ($attributes as $key => $attribute) {
-                if ($attribute->hasOptions()) {
-                    $attribute->load('options');
-                }
-
-                $result[] = $attribute;
-            }
-        }
+        $result = $this->attributeService->getAttributeList($entityTypeId);
 
         return response()->json($result);
     }

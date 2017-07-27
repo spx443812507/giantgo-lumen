@@ -20,10 +20,9 @@ use Tymon\JWTAuth\Exceptions;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-
 class ContactController extends Controller
 {
-    private function getValidators($contactInfo)
+    private function generateValidators($contactInfo)
     {
         $validators = [];
 
@@ -176,7 +175,7 @@ class ContactController extends Controller
             $contact->bootEntityAttribute($contact->entity_type_id);
         }
 
-        $validator = Validator::make($contactInfo, $this->getValidators($contactInfo));
+        $validator = Validator::make($contactInfo, $this->generateValidators($contactInfo));
 
         if ($validator->fails()) {
             return response()->json($this->formatValidationErrors($validator), 422);
