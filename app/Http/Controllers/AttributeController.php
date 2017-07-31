@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\AttributeService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -54,7 +55,11 @@ class AttributeController extends Controller
             'attributes.*.options.*.value' => 'required'
         ]);
 
-        $result = $this->attributeService->createAttribute($entityTypeId, $request->input('attributes'));
+        try {
+            $result = $this->attributeService->createAttribute($entityTypeId, $request->input('attributes'));
+        } catch (Exception $e) {
+            throw $e;
+        }
 
         return response()->json($result, 200);
     }

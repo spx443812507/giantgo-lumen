@@ -8,70 +8,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Contact;
-use App\Models\SocialAccount;
-use Exception;
-use Firebase\JWT\ExpiredException;
-use Firebase\JWT\SignatureInvalidException;
+use App\Services\ContactService;
 use Illuminate\Http\Request;
-use Firebase\JWT\JWT;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Exceptions;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 
 class ContactController extends Controller
 {
-    private function generateValidators($contactInfo)
+    protected $contactService;
+
+    public function __construct(ContactService $contactService)
     {
-        $validators = [];
-
-        $contact = new Contact;
-
-        foreach ($contactInfo as $key => $value) {
-            if ($contact->isEntityAttribute($key)) {
-                $validators[$key] = [];
-
-                $attributes = $contact->attributes();
-
-                if ($attributes[$key]->is_required) {
-                    $validators[$key][] = 'required';
-                }
-
-                if ($attributes[$key]->is_unique) {
-                    $validators[$key][] = Rule::unique($attributes[$key]->backend_table)->ignore($contact->id);
-                }
-
-                if ($attributes[$key]->hasOptions()) {
-                    $optionIds = $attributes[$key]->options()->get()->pluck('id')->toArray();
-
-                    if ($attributes[$key]->is_collection) {
-                        $validators[$key . '.*'][] = Rule::in($optionIds);
-                    } else {
-                        $validators[$key][] = Rule::in($optionIds);
-                    }
-                }
-            }
-        }
-
-        return $validators;
-    }
-
-    private function bindSocialAccount($contact, $token)
-    {
-        try {
-            $payload = JWT::decode($token, env('JWT_SECRET'), array('HS256'));
-        } catch (ExpiredException $e) {
-            return response()->json(['error' => 'token_expired'], 500);
-        } catch (SignatureInvalidException $e) {
-            return response()->json(['error' => 'token_invalid'], 500);
-        }
-
-        $socialAccount = SocialAccount::find($payload->sub)->first();
-
-        if (!empty($oAuthContact)) {
-            $contact->socialAccounts()->save($socialAccount);
-        }
+        $this->contactService = $contactService;
     }
 
     public function signUp(Request $request)
@@ -82,19 +31,7 @@ class ContactController extends Controller
             'password' => 'required'
         ]);
 
-        $contactInfo = $request->all();
-
-        try {
-            $contact = new Contact;
-
-            $contact->fill($contactInfo)->save();
-        } catch (Exception $exception) {
-            return response()->json(['error' => 'create_contact_fail'], 500);
-        }
-
-        if (!empty($request->input('verify'))) {
-            $this->bindSocialAccount($contact, $request->input('verify'));
-        }
+        $contact = $this->contactService->createContact($request->all(), $request->input('verify'));
 
         $token = Auth::guard('api')->fromUser($contact);
 
@@ -125,14 +62,16 @@ class ContactController extends Controller
             return response()->json(['error' => 'username_or_password_error'], 404);
         }
 
-        $user = Auth::guard('api')->user();
+        $contact = Auth::guard('api')->user();
 
-        $user['last_login'] = new \DateTime();
+        $contact['last_login'] = new \DateTime();
 
-        $user->save();
+        $contact->save();
 
-        if (!empty($request->input('verify'))) {
-            $this->bindSocialAccount($user, $request->input('verify'));
+        $verify = $request->input('verify');
+
+        if (!empty($verify)) {
+            $this->bindSocialAccount($contact, $verify);
         }
 
         return response()->json(compact('token'));
@@ -175,7 +114,7 @@ class ContactController extends Controller
             $contact->bootEntityAttribute($contact->entity_type_id);
         }
 
-        $validator = Validator::make($contactInfo, $this->generateValidators($contactInfo));
+        $validator = Validator::make($contactInfo, $this->generateValidators($contact, array_keys($contactInfo)));
 
         if ($validator->fails()) {
             return response()->json($this->formatValidationErrors($validator), 422);
@@ -190,22 +129,16 @@ class ContactController extends Controller
 
     public function get(Request $request, $contactId)
     {
-        $contact = Contact::find($contactId);
-
-        if (empty($contact)) {
-            return response()->json(['error' => 'contact_not_exists'], 500);
-        }
-
-        if (!empty($contact->entity_type_id)) {
-            $contact->bootEntityAttribute($contact->entity_type_id);
-        }
+        $contact = $this->contactService->getContact($contactId);
 
         return response()->json($contact);
     }
 
     public function getList(Request $request)
     {
-        $contacts = Contact::all();
+        $perPage = $request->input('per_page');
+
+        $contacts = $this->contactService->getContactList($perPage);
 
         return response()->json($contacts);
     }

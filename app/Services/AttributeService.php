@@ -97,7 +97,7 @@ class AttributeService
             }
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'create_error'], 500);
+            throw new Exception('create_error');
         }
 
         DB::commit();

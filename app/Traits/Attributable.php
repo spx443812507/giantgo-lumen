@@ -90,6 +90,7 @@ trait Attributable
         }
 
         static::bootAttributable();
+
         $this->bootIfNotBooted();
 
         $relations = $this->getEntityAttributeRelations();
