@@ -13,9 +13,9 @@ use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\SignatureInvalidException;
-
 use App\Models\SocialAccount;
-
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
 
 class ContactService
 {
@@ -40,26 +40,59 @@ class ContactService
 
     public function createContact($contactInfo, $verify)
     {
-        try {
-            $contact = new Contact;
+        $contact = new Contact;
 
+        $validators = [
+            'email' => 'required_without:mobile|email|max:255|unique:contacts,email',
+            'mobile' => 'max:255|unique:contacts,mobile',
+            'password' => 'required'
+        ];
+        $validators = array_merge($validators, $contact->makeValidators(array_keys($contactInfo)));
+
+        $validator = Validator::make($contactInfo, $validators);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        try {
             $contact->fill($contactInfo)->save();
 
             if (!empty($verify)) {
                 $contact = $this->bindSocialAccount($contact, $verify);
             }
         } catch (Exception $exception) {
-            return response()->json(['error' => 'create_contact_fail'], 500);
+            throw new Exception('create_contact_fail');
         }
 
         return $contact;
     }
 
-    public function updateContact($contactInfo)
+    public function updateContact($contactId, $contactInfo, $verify = null)
     {
-        $contactAttributes = array_keys($contactInfo);
+        $contact = $this->getContact($contactId);
 
+        if (!empty($contact->entity_type_id)) {
+            $contact->bootEntityAttribute($contact->entity_type_id);
+        }
 
+        $validator = Validator::make($contactInfo, $contact->makeValidators(array_keys($contactInfo)));
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        try {
+            $contact->fill($contactInfo)->save();
+
+            if (!empty($verify)) {
+                $contact = $this->bindSocialAccount($contact, $verify);
+            }
+        } catch (Exception $exception) {
+            throw new Exception('update_contact_fail');
+        }
+
+        return $contact;
     }
 
     public function getContact($contactId)
@@ -67,7 +100,7 @@ class ContactService
         $contact = Contact::find($contactId);
 
         if (empty($contact)) {
-            return response()->json(['error' => 'contact_not_exists'], 500);
+            throw new Exception('contact_not_exists');
         }
 
         if (!empty($contact->entity_type_id)) {

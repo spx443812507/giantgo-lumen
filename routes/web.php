@@ -37,7 +37,7 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
 
         $app->post('/attributes/batch', ['as' => 'attributes.batchCreate', 'uses' => 'AttributeController@batchCreateAttribute']);
         $app->post('/attributes', ['as' => 'attributes.create', 'uses' => 'AttributeController@createAttribute']);
-        $app->put('/attributes', ['as' => 'attributes.update', 'uses' => 'AttributeController@updateAttribute']);
+        $app->put('/attributes/{attribute_id}', ['as' => 'attributes.update', 'uses' => 'AttributeController@updateAttribute']);
         $app->get('/attributes', ['as' => 'attributes.list', 'uses' => 'AttributeController@getAttributeList']);
 
         $app->get('/seminars', ['as' => 'seminars.list', 'uses' => 'SeminarController@getSeminarList']);

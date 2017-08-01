@@ -23,6 +23,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use SuperClosure\Serializer;
 
 trait Attributable
@@ -55,15 +56,15 @@ trait Attributable
      * @var bool
      */
     protected $entityAttributeRelationsBooted = false;
+    /**
+     * Determine if the entity attributes have been booted.
+     *
+     * @var bool
+     */
+    protected $entityAttributesBooted = false;
 
     public static function bootAttributable()
     {
-        if (!empty(static::$entityTypeId)) {
-            $attributeIds = DB::table('entity_attribute')->where('entity_type_id', static::$entityTypeId)->get()->pluck('attribute_id');
-            static::$entityAttributes = Attribute::whereIn('id', $attributeIds)->get()->keyBy('attribute_code');
-        }
-
-        static::addGlobalScope(new EagerLoadScope());
         static::saving(EntitySaving::class . '@handle');
         static::saved(EntitySaved::class . '@handle');
         static::deleted(EntityDeleted::class . '@handle');
@@ -76,10 +77,24 @@ trait Attributable
     {
         parent::bootIfNotBooted();
 
-        if (!$this->entityAttributeRelationsBooted && !empty(static::$entityTypeId)) {
-            app(RelationBuilder::class)->build($this);
+        if (!empty(static::$entityTypeId)) {
+            if (!$this->entityAttributesBooted) {
+                $attributeIds = DB::table('entity_attribute')->where('entity_type_id', static::$entityTypeId)->get()->pluck('attribute_id');
 
-            $this->entityAttributeRelationsBooted = true;
+                static::$entityAttributes = Attribute::whereIn('id', $attributeIds)->get()->keyBy('attribute_code');
+
+                $this->entityAttributesBooted = true;
+            }
+
+            if (!$this->entityAttributeRelationsBooted) {
+                app(RelationBuilder::class)->build($this);
+
+                $relations = $this->getEntityAttributeRelations();
+
+                $this->load(array_keys($relations));
+
+                $this->entityAttributeRelationsBooted = true;
+            }
         }
     }
 
@@ -89,13 +104,7 @@ trait Attributable
             static::$entityTypeId = $entityTypeId;
         }
 
-        static::bootAttributable();
-
         $this->bootIfNotBooted();
-
-        $relations = $this->getEntityAttributeRelations();
-
-        $this->load(array_keys($relations));
     }
 
     public function getEntityTypeId()
@@ -448,6 +457,44 @@ trait Attributable
         });
     }
 
+    public function makeValidators($attributes = ['*'])
+    {
+        $validators = [];
+
+        foreach ($attributes as $attribute) {
+            if ($this->isEntityAttribute($attribute)) {
+                $validators[$attribute] = [];
+
+                $attributes = $this->attributes();
+
+                if ($attributes[$attribute]->is_required) {
+                    $validators[$attribute][] = 'required';
+                }
+
+                if ($attributes[$attribute]->is_unique) {
+                    $unique = Rule::unique($attributes[$attribute]->backend_table);
+
+                    if (!empty($this->id)) {
+                        $unique->ignore($this->id);
+                    }
+
+                    $validators[$attribute][] = $unique;
+                }
+
+                if ($attributes[$attribute]->hasOptions()) {
+                    $optionIds = $attributes[$attribute]->options()->get()->pluck('id')->toArray();
+
+                    if ($attributes[$attribute]->is_collection) {
+                        $validators[$attribute . '.*'][] = Rule::in($optionIds);
+                    } else {
+                        $validators[$attribute][] = Rule::in($optionIds);
+                    }
+                }
+            }
+        }
+
+        return $validators;
+    }
 
     /**
      * Dynamically pipe calls to attribute relations.

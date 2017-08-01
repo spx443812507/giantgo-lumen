@@ -11,8 +11,6 @@ namespace App\Http\Controllers;
 use App\Services\AttributeService;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 
 class AttributeController extends Controller
 {
@@ -36,7 +34,11 @@ class AttributeController extends Controller
             'options.*.value' => 'required'
         ]);
 
-        $attribute = $this->attributeService->createAttribute($entityTypeId, $request->all());
+        try {
+            $attribute = $this->attributeService->createAttribute($entityTypeId, $request->all());
+        } catch (Exception $e) {
+            throw $e;
+        }
 
         return response()->json($attribute[0], 200);
     }
@@ -64,29 +66,15 @@ class AttributeController extends Controller
         return response()->json($result, 200);
     }
 
-    public function updateAttribute(Request $request)
+    public function updateAttribute(Request $request, $attributeId)
     {
-        $this->validate($request, [
-            'id' => 'required',
-            'attribute_code' => 'required',
-            'frontend_label' => 'required',
-            'options' => 'array',
-            'options.*.value' => 'required'
-        ]);
+        $attributeInfo = $request->input('attribute');
 
-        $attributeData = $request->all();
-
-        $validator = Validator::make($attributeData, [
-            'attribute_code' => [
-                Rule::unique('attributes')->ignore($attributeData['id']),
-            ]
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => 'attribute_code_has_exists'], 400);
+        try {
+            $attribute = $this->attributeService->updateAttribute($attributeId, $attributeInfo);
+        } catch (Exception $e) {
+            throw $e;
         }
-
-        $attribute = $this->attributeService->updateAttribute($request->input('id'), $attributeData);
 
         return response()->json($attribute, 200);
     }

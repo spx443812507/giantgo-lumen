@@ -9,10 +9,10 @@
 namespace App\Http\Controllers;
 
 use App\Services\ContactService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Exceptions;
-use Illuminate\Support\Facades\Validator;
 
 class ContactController extends Controller
 {
@@ -25,13 +25,15 @@ class ContactController extends Controller
 
     public function signUp(Request $request)
     {
-        $this->validate($request, [
-            'email' => 'email|max:255|unique:contacts,email',
-            'mobile' => 'max:255|unique:contacts,mobile',
-            'password' => 'required'
-        ]);
+        $contactInfo = $request->input('contact');
 
-        $contact = $this->contactService->createContact($request->all(), $request->input('verify'));
+        $verify = $request->input('verify');
+
+        try {
+            $contact = $this->contactService->createContact($contactInfo, $verify);
+        } catch (Exception $e) {
+            throw $e;
+        }
 
         $token = Auth::guard('api')->fromUser($contact);
 
@@ -110,35 +112,29 @@ class ContactController extends Controller
             return response()->json(['error' => 'unauthorized'], 401);
         }
 
-        if (!empty($contact->entity_type_id)) {
-            $contact->bootEntityAttribute($contact->entity_type_id);
-        }
-
-        $validator = Validator::make($contactInfo, $this->generateValidators($contact, array_keys($contactInfo)));
-
-        if ($validator->fails()) {
-            return response()->json($this->formatValidationErrors($validator), 422);
-        }
-
-        $contact->fill($contactInfo);
-
-        $contact->save();
+        $this->contactService->updateContact($contact->id, $contactInfo);
 
         return $contact;
     }
 
     public function get(Request $request, $contactId)
     {
-        $contact = $this->contactService->getContact($contactId);
+        try {
+            $contact = $this->contactService->getContact($contactId);
+        } catch (Exception $e) {
+            throw $e;
+        }
 
         return response()->json($contact);
     }
 
     public function getList(Request $request)
     {
-        $perPage = $request->input('per_page');
-
-        $contacts = $this->contactService->getContactList($perPage);
+        try {
+            $contacts = $this->contactService->getContactList($request->input('per_page'));
+        } catch (Exception $e) {
+            throw $e;
+        }
 
         return response()->json($contacts);
     }

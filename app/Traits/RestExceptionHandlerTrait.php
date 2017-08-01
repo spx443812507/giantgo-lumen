@@ -11,6 +11,8 @@ namespace App\Traits;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
 
 trait RestExceptionHandlerTrait
 {
@@ -25,14 +27,17 @@ trait RestExceptionHandlerTrait
     protected function getJsonResponseForException(Request $request, Exception $e)
     {
         switch (true) {
-            case $this->isModelNotFoundException($e):
-                $retval = $this->modelNotFound();
+            case ($e instanceof ModelNotFoundException):
+                $response = $this->modelNotFound();
+                break;
+            case ($e instanceof ValidationException):
+                $response = $this->validationFail($e->validator);
                 break;
             default:
-                $retval = $this->badRequest($e->getMessage());
+                $response = $this->badRequest($e->getMessage());
         }
 
-        return $retval;
+        return $response;
     }
 
     /**
@@ -59,6 +64,29 @@ trait RestExceptionHandlerTrait
         return $this->jsonResponse(['error' => $message], $statusCode);
     }
 
+    protected function validationFail(Validator $validator)
+    {
+        $errors = $validator->errors()->getMessages();
+        $obj = $validator->failed();
+        $result = [];
+        foreach ($obj as $input => $rules) {
+            $i = 0;
+            $error = [];
+            foreach ($rules as $rule => $ruleInfo) {
+                array_push($error, [
+                    'error' => strtolower($rule) . '_rule_error',
+                    'message' => $errors[$input][$i]
+                ]);
+
+                $i++;
+            }
+
+            $result[$input] = $error;
+        }
+
+        return $this->jsonResponse(['error' => $result], 422);
+    }
+
     /**
      * Returns json response.
      *
@@ -72,16 +100,4 @@ trait RestExceptionHandlerTrait
 
         return response()->json($payload, $statusCode);
     }
-
-    /**
-     * Determines if the given exception is an Eloquent model not found.
-     *
-     * @param Exception $e
-     * @return bool
-     */
-    protected function isModelNotFoundException(Exception $e)
-    {
-        return $e instanceof ModelNotFoundException;
-    }
-
 }
