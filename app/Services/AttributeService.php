@@ -66,14 +66,10 @@ class AttributeService
         return $result;
     }
 
-    public function createAttribute($entityTypeId, $attributes = [])
+    public function createAttribute($entityTypeId, $attributeInfo)
     {
         //已创建的属性
         $results = [];
-
-        if (is_object($attributes)) {
-            $attributes = [$attributes];
-        }
 
         $entity = Entity::find($entityTypeId);
 
@@ -81,43 +77,50 @@ class AttributeService
             throw new Exception('entity_type_not_exists');
         }
 
+        $validators = $this->makeValidators();
+
+        $validator = Validator::make($attributeInfo, $validators);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
         DB::beginTransaction();
 
         try {
-            foreach ($attributes as $attr) {
-                $attribute = $entity->attributes()->create([
-                    'entity_type_id' => $entity->id,
-                    'attribute_code' => $attr['attribute_code'],
-                    'frontend_input' => $attr['frontend_input'],
-                    'frontend_model' => empty($attr['frontend_model']) ? '' : $attr['frontend_model'],
-                    'frontend_label' => $attr['frontend_label'],
-                    'frontend_class' => empty($attr['frontend_class']) ? '' : $attr['frontend_class'],
-                    'is_required' => $attr['is_required'],
-                    'is_user_defined' => false,
-                    'is_unique' => $attr['is_unique'],
-                    'default_value' => $attr['default_value'],
-                    'description' => $attr['description'],
-                ]);
+            $attribute = $entity->attributes()->create([
+                'entity_type_id' => $entity->id,
+                'attribute_code' => $attributeInfo['attribute_code'],
+                'frontend_input' => $attributeInfo['frontend_input'],
+                'frontend_model' => empty($attributeInfo['frontend_model']) ? '' : $attributeInfo['frontend_model'],
+                'frontend_label' => $attributeInfo['frontend_label'],
+                'frontend_class' => empty($attributeInfo['frontend_class']) ? '' : $attributeInfo['frontend_class'],
+                'is_required' => $attributeInfo['is_required'],
+                'is_user_defined' => false,
+                'is_unique' => $attributeInfo['is_unique'],
+                'default_value' => $attributeInfo['default_value'],
+                'description' => $attributeInfo['description'],
+            ]);
 
-                if (array_has($attr, 'options') && count($attr['options']) > 0) {
-                    $options = $attr['options'];
+            if (array_has($attributeInfo, 'options') && count($attributeInfo['options']) > 0) {
+                $options = $attributeInfo['options'];
 
-                    $optionDataList = [];
+                $optionDataList = [];
 
-                    foreach ($options as $option) {
-                        $optionDataList[] = new Option([
-                            'attribute_id' => $attribute->id,
-                            'value' => $option['value']
-                        ]);
-                    }
-
-                    $attribute['options'] = $attribute->options()->saveMany($optionDataList);
+                foreach ($options as $option) {
+                    $optionDataList[] = new Option([
+                        'attribute_id' => $attribute->id,
+                        'value' => $option['value']
+                    ]);
                 }
 
-                $results[] = $attribute;
+                $attribute['options'] = $attribute->options()->saveMany($optionDataList);
             }
+
+            $results[] = $attribute;
         } catch (Exception $e) {
             DB::rollBack();
+
             throw new Exception('create_error');
         }
 

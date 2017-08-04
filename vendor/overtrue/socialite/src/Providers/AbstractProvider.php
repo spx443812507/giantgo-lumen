@@ -93,9 +93,9 @@ abstract class AbstractProvider implements ProviderInterface
      * Create a new provider instance.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param string                                    $clientId
-     * @param string                                    $clientSecret
-     * @param string|null                               $redirectUrl
+     * @param string $clientId
+     * @param string $clientSecret
+     * @param string|null $redirectUrl
      */
     public function __construct(Request $request, $clientId, $clientSecret, $redirectUrl = null)
     {
@@ -146,10 +146,8 @@ abstract class AbstractProvider implements ProviderInterface
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function redirect($redirectUrl = null)
+    public function redirect($redirectUrl = null, $state = null)
     {
-        $state = null;
-
         if (!is_null($redirectUrl)) {
             $this->redirectUrl = $redirectUrl;
         }
@@ -310,7 +308,7 @@ abstract class AbstractProvider implements ProviderInterface
      */
     protected function buildAuthUrlFromBase($url, $state)
     {
-        return $url.'?'.http_build_query($this->getCodeFields($state), '', '&', $this->encodingType);
+        return $url . '?' . http_build_query($this->getCodeFields($state), '', '&', $this->encodingType);
     }
 
     /**
@@ -329,7 +327,7 @@ abstract class AbstractProvider implements ProviderInterface
             'response_type' => 'code',
         ], $this->parameters);
 
-        if ($this->usesState()) {
+        if (!is_null($state)) {
             $fields['state'] = $state;
         }
 
@@ -339,7 +337,7 @@ abstract class AbstractProvider implements ProviderInterface
     /**
      * Format the given scopes.
      *
-     * @param array  $scopes
+     * @param array $scopes
      * @param string $scopeSeparator
      *
      * @return string
@@ -396,7 +394,7 @@ abstract class AbstractProvider implements ProviderInterface
         }
 
         if (empty($body['access_token'])) {
-            throw new AuthorizeFailedException('Authorize Failed: '.json_encode($body, JSON_UNESCAPED_UNICODE), $body);
+            throw new AuthorizeFailedException('Authorize Failed: ' . json_encode($body, JSON_UNESCAPED_UNICODE), $body);
         }
 
         return new AccessToken($body);
@@ -445,9 +443,9 @@ abstract class AbstractProvider implements ProviderInterface
     /**
      * Return array item by key.
      *
-     * @param array  $array
+     * @param array $array
      * @param string $key
-     * @param mixed  $default
+     * @param mixed $default
      *
      * @return mixed
      */

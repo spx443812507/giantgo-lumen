@@ -19,19 +19,28 @@ use Illuminate\Support\Facades\Validator;
 
 class ContactService
 {
-    public function bindSocialAccount($contact, $verify)
+    public function bindSocialAccountByVerify($contact, $verify)
     {
         try {
             $payload = JWT::decode($verify, env('JWT_SECRET'), array('HS256'));
         } catch (ExpiredException $e) {
-            return response()->json(['error' => 'token_expired'], 500);
+            throw new Exception('token_expired');
         } catch (SignatureInvalidException $e) {
-            return response()->json(['error' => 'token_invalid'], 500);
+            throw new Exception('token_invalid');
         }
 
         $socialAccount = SocialAccount::find($payload->sub)->first();
 
-        if (!empty($oAuthContact)) {
+        if (!empty($socialAccount)) {
+            $contact->socialAccounts()->save($socialAccount);
+        }
+
+        return $contact;
+    }
+
+    public function bindSocialAccount(Contact $contact, SocialAccount $socialAccount)
+    {
+        if (!empty($socialAccount)) {
             $contact->socialAccounts()->save($socialAccount);
         }
 

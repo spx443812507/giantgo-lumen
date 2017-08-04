@@ -9,11 +9,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Application;
-use App\Models\SocialAccount;
+use App\Models\Contact;
+use App\Services\ContactService;
+use App\Services\SocialAccountService;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Overtrue\Socialite\AuthorizeFailedException;
 use Overtrue\Socialite\Config;
-use Overtrue\Socialite\User;
 use Tymon\JWTAuth\JWTAuth;
 use Overtrue\Socialite\SocialiteManager as Socialite;
 
@@ -23,13 +26,21 @@ class OAuthController extends Controller
 
     protected $config;
 
+    protected $contactService;
+
+    protected $socialAccountService;
+
     protected $socialite;
 
-    public function __construct(JWTAuth $jwt)
+    public function __construct(JWTAuth $jwt, ContactService $contactService, SocialAccountService $socialAccountService)
     {
         $this->jwt = $jwt;
 
         $this->config = config('oauth');
+
+        $this->contactService = $contactService;
+
+        $this->socialAccountService = $socialAccountService;
 
         $this->socialite = new Socialite($this->config);
     }
@@ -68,51 +79,19 @@ class OAuthController extends Controller
         return $this->config;
     }
 
-    protected function generateToken(User $user, $provider)
-    {
-        $hasBind = false;
-
-        $socialAccount = SocialAccount::where('provider_id', $user->getId())->first();
-
-        //如果没有该微信用户
-        if (empty($socialAccount)) {
-            $socialAccount = SocialAccount::create([
-                'provider_id' => $user->getId(),
-                'name' => $user->getName(),
-                'nickname' => $user->getNickname(),
-                'avatar' => $user->getAvatar(),
-                'email' => $user->getEmail(),
-                'provider' => $provider
-            ]);
-        } else {
-            $socialAccount['name'] = $user->getName();
-            $socialAccount['nickname'] = $user->getNickname();
-            $socialAccount['avatar'] = $user->getAvatar();
-            $socialAccount['email'] = $user->getEmail();
-            $socialAccount['last_auth'] = new \DateTime();
-            $socialAccount->save();
-        }
-        //如果已经绑定用户则返回用户token
-        if ($socialAccount->user) {
-            $user = new \App\Models\User($socialAccount->user->toArray());
-            $user['id'] = $socialAccount->user->id;
-            $token = $this->jwt->fromUser($user);
-            $hasBind = true;
-        } else {
-            $token = $this->jwt->fromUser($socialAccount);
-        }
-
-        return [$hasBind ? 'token' : 'verify' => $token];
-    }
-
     public function login(Request $request, $provider)
     {
+        //第三方应用Id
         $appId = $request->input('app_id');
-
+        //授权作用域
         $scope = $request->input('scope');
+        //已登录用户token
+        $token = $request->input('token');
+        //授权成功后的返回地址
+        $returnUrl = $request->input('return_url') ? $request->input('return_url') : $request->request;
 
         if (isset($appId)) {
-            $config = $this->buildConfig($appId, $request->input('return_url'));
+            $config = $this->buildConfig($appId, $returnUrl);
 
             if (isset($config)) {
                 $this->socialite->config($config);
@@ -125,7 +104,7 @@ class OAuthController extends Controller
             $this->socialite->scopes([$scope]);
         }
 
-        return $this->socialite->stateless(false)->redirect();
+        return $this->socialite->stateless(false)->redirect(null, $token);
     }
 
     public function callback(Request $request, $provider)
@@ -134,7 +113,9 @@ class OAuthController extends Controller
 
         $appId = $request->input('app_id');
 
-        if (isset($appId)) {
+        $token = $request->input('state');
+
+        if (isset($appId) && !empty($appId)) {
             $config = $this->buildConfig($appId, $request->input('return_url'));
 
             if (isset($config)) {
@@ -143,21 +124,35 @@ class OAuthController extends Controller
         }
 
         try {
-            $user = $this->socialite->with($provider)->stateless(false)->user();
+            $oAuthUser = $this->socialite->with($provider)->stateless(false)->user();
+
+            $socialAccount = $this->socialAccountService->generateSocialAccount($oAuthUser, $provider);
+
+            if (isset($token) && !empty($token)) {
+                $contactInfo = Auth::guard('api')->setToken($token);
+
+                $contact = $contactInfo->user();
+
+                $this->contactService->bindSocialAccount($contact, $socialAccount);
+
+                return redirect()->to($returnUrl);
+            } else {
+                $params = [];
+
+                if ($socialAccount->contact) {
+                    $params['token'] = $this->jwt->fromUser($socialAccount->contact);
+                } else {
+                    $params['verify'] = $this->jwt->fromUser($socialAccount);
+                }
+
+                return redirect()->to($this->buildReturnUrl($returnUrl, $params));
+            }
         } catch (AuthorizeFailedException $e) {
             $url = $this->buildReturnUrl($returnUrl, ['error' => '授权失败，请重试']);
 
             return redirect()->to($url);
-        }
-
-        $token = $this->generateToken($user, $provider);
-
-        if (empty($returnUrl)) {
-            return response()->json($token);
-        } else {
-            $url = $this->buildReturnUrl($returnUrl, $token);
-
-            return redirect()->to($url);
+        } catch (Exception $e) {
+            throw $e;
         }
     }
 }

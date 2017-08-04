@@ -73,7 +73,7 @@ class ContactController extends Controller
         $verify = $request->input('verify');
 
         if (!empty($verify)) {
-            $this->bindSocialAccount($contact, $verify);
+            $this->contactService->bindSocialAccountByVerify($contact, $verify);
         }
 
         return response()->json(compact('token'));
