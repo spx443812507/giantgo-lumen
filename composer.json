@@ -19,7 +19,6 @@
     "maatwebsite/excel": "~2.1.0",
     "guzzlehttp/guzzle": "~6.0",
     "tymon/jwt-auth": "1.0.0-beta.3",
-    "zizaco/entrust": "5.2.x-dev",
     "overtrue/wechat": "~3.1",
     "firebase/php-jwt": "^4.0",
     "jakeasmith/http_build_url": "^1",
@@ -29,7 +28,11 @@
   "repositories": [
     {
       "type": "composer",
-      "url": "https://packages.cartalyst.com"
+      "url": "https://github.com/GiantGo/entrust.git"
+    },
+    {
+      "type": "composer",
+      "url": "https://github.com/GiantGo/wechat.git"
     }
   ],
   "require-dev": {

@@ -2,3 +2,4 @@
 Homestead.json
 Homestead.yaml
 .DS_Store
+/vendor/
