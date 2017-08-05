@@ -19,20 +19,21 @@
     "maatwebsite/excel": "~2.1.0",
     "guzzlehttp/guzzle": "~6.0",
     "tymon/jwt-auth": "1.0.0-beta.3",
-    "overtrue/wechat": "~3.1",
     "firebase/php-jwt": "^4.0",
     "jakeasmith/http_build_url": "^1",
     "overtrue/laravel-wechat": "~3.0",
-    "cartalyst/attributes": "^2.0"
+    "overtrue/wechat": "~3.1",
+    "overtrue/socialite": "master",
+    "zizaco/entrust": "master"
   },
   "repositories": [
     {
-      "type": "composer",
+      "type": "vcs",
       "url": "https://github.com/GiantGo/entrust.git"
     },
     {
-      "type": "composer",
-      "url": "https://github.com/GiantGo/wechat.git"
+      "type": "vcs",
+      "url": "https://github.com/GiantGo/socialite.git"
     }
   ],
   "require-dev": {
