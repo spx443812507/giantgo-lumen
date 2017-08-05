@@ -19,16 +19,19 @@ use Illuminate\Validation\ValidationException;
 
 class AttributeService
 {
-    protected function makeValidators($attributeId = null)
+    protected function makeValidators($entityTypeId, $attributeId = null)
     {
         $validators = [
             'attribute_code' => 'required',
             'frontend_label' => 'required',
+            'frontend_input' => 'required',
             'options' => 'array',
             'options.*.value' => 'required'
         ];
 
-        $unique = Rule::unique('attributes');
+        $unique = Rule::unique('attributes')->where(function ($query) use ($entityTypeId) {
+            $query->where('entity_type_id', $entityTypeId);
+        });
 
         if (!empty($attributeId)) {
             $unique = $unique->ignore($attributeId);
@@ -68,8 +71,7 @@ class AttributeService
 
     public function createAttribute($entityTypeId, $attributeInfo)
     {
-        //已创建的属性
-        $results = [];
+        $attribute = null;
 
         $entity = Entity::find($entityTypeId);
 
@@ -77,7 +79,7 @@ class AttributeService
             throw new Exception('entity_type_not_exists');
         }
 
-        $validators = $this->makeValidators();
+        $validators = $this->makeValidators($entityTypeId);
 
         $validator = Validator::make($attributeInfo, $validators);
 
@@ -116,8 +118,6 @@ class AttributeService
 
                 $attribute['options'] = $attribute->options()->saveMany($optionDataList);
             }
-
-            $results[] = $attribute;
         } catch (Exception $e) {
             DB::rollBack();
 
@@ -125,6 +125,36 @@ class AttributeService
         }
 
         DB::commit();
+
+        return $attribute;
+    }
+
+    public function createAttributes($entityTypeId, $attributes)
+    {
+        $results = [];
+
+        $entity = Entity::find($entityTypeId);
+
+        if (empty($entity)) {
+            throw new Exception('entity_type_not_exists');
+        }
+
+        $validator = Validator::make($attributes, [
+            'attributes' => 'required|array',
+            'attributes.*.attribute_code' => 'required|unique:attributes,attribute_code,NULL,id,entity_type_id,' . $entityTypeId,
+            'attributes.*.frontend_label' => 'required',
+            'attributes.*.frontend_input' => 'required',
+            'attributes.*.options' => 'array',
+            'attributes.*.options.*.value' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        foreach ($attributes as $attribute) {
+            $results[] = $this->createAttribute($entityTypeId, $attribute);
+        }
 
         return $results;
     }
@@ -137,7 +167,7 @@ class AttributeService
             throw new Exception('attribute_not_exists');
         }
 
-        $validators = $this->makeValidators($attributeId);
+        $validators = $this->makeValidators($attribute->entity_type_id, $attributeId);
 
         $validator = Validator::make($attributeInfo, $validators);
 

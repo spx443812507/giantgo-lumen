@@ -25,15 +25,6 @@ class AttributeController extends Controller
     {
         $entityTypeId = $request->input('entity_type_id');
 
-        $this->validate($request, [
-            'entity_type_id' => 'required|integer',
-            'attribute_code' => 'required|unique:attributes,attribute_code,NULL,id,entity_type_id,' . $entityTypeId,
-            'frontend_label' => 'required',
-            'frontend_input' => 'required',
-            'options' => 'array',
-            'options.*.value' => 'required'
-        ]);
-
         try {
             $attribute = $this->attributeService->createAttribute($entityTypeId, $request->all());
         } catch (Exception $e) {
@@ -48,7 +39,6 @@ class AttributeController extends Controller
         $entityTypeId = $request->input('entity_type_id');
 
         $this->validate($request, [
-            'entity_type_id' => 'required|integer',
             'attributes' => 'required|array',
             'attributes.*.attribute_code' => 'required|unique:attributes,attribute_code,NULL,id,entity_type_id,' . $entityTypeId,
             'attributes.*.frontend_label' => 'required',
@@ -58,7 +48,7 @@ class AttributeController extends Controller
         ]);
 
         try {
-            $result = $this->attributeService->createAttribute($entityTypeId, $request->input('attributes'));
+            $result = $this->attributeService->createAttributes($entityTypeId, $request->input('attributes'));
         } catch (Exception $e) {
             throw $e;
         }

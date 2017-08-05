@@ -15,7 +15,15 @@ class EntityAttributeValue
 {
     public function handle($request, Closure $next)
     {
-        $entityTypeId = $request->input('entity_type_id');
+        $entityTypeId = null;
+
+        if (!empty($request->route('entity_type_id'))) {
+            $entityTypeId = $request->route('entity_type_id');
+        }
+
+        if (!empty($request->input('entity_type_id'))) {
+            $entityTypeId = $request->route('entity_type_id');
+        }
 
         if (!empty($entityTypeId)) {
             $entity = Entity::find($entityTypeId);
