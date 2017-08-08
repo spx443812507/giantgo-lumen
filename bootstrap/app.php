@@ -1,5 +1,7 @@
 <?php
 
+use Carbon\Carbon;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 try {
@@ -108,5 +110,7 @@ $app->register(Overtrue\LaravelWechat\ServiceProvider::class);
 $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
     require __DIR__ . '/../routes/web.php';
 });
+
+Carbon::setToStringFormat(DateTime::ATOM);
 
 return $app;

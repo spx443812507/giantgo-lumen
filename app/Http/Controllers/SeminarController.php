@@ -9,22 +9,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Seminar;
+use App\Models\User;
+use App\Services\SeminarService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Exception;
 
 class SeminarController extends Controller
 {
+    protected $seminarService;
+
+    public function __construct(SeminarService $seminarService)
+    {
+        $this->seminarService = $seminarService;
+    }
+
     public function getSeminar(Request $request, $seminarId)
     {
-        $entityTypeId = $request->input('entity_type_id');
+        $seminar = null;
 
-        $seminarClass = empty($entityTypeId) ? Seminar::class : Entity::getEntity($entityTypeId);
-
-        $seminar = $seminarClass::find($seminarId);
-
-        if (empty($seminar)) {
-            return response()->json(['error' => 'seminar_not_exists'], 500);
+        try {
+            $seminar = $this->seminarService->getSeminar($seminarId);
+        } catch (Exception $e) {
+            throw $e;
         }
 
         return response()->json($seminar);
@@ -32,30 +40,27 @@ class SeminarController extends Controller
 
     public function getSeminarList(Request $request)
     {
+        $perPage = $request->input('per_page');
 
+        try {
+            $seminars = $this->seminarService->getSeminarList($perPage);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($seminars);
     }
 
     public function createSeminar(Request $request)
     {
-        $entityTypeId = $request->input('entity_type_id');
-
-        $this->validate($request, [
-            'title' => 'required|max:255',
-            'start_date' => 'required|date|after_or_equal:' . Carbon::now(),
-            'end_date' => 'required|date|after:start_date',
-        ]);
-
-        $seminarClass = empty($entityTypeId) ? Seminar::class : Entity::getEntity($entityTypeId);
-
         $seminarInfo = $request->all();
 
+        $user = Auth::user();
+
         try {
-            $seminar = new $seminarClass;
-            $seminar->fill($seminarInfo);
-            $seminar->user_id = Auth::user()->id;
-            $seminar->save();
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'create_seminar_fail'], 500);
+            $seminar = $this->seminarService->createSeminar($seminarInfo, $user);
+        } catch (Exception $e) {
+            throw $e;
         }
 
         return response()->json($seminar, 201);
@@ -67,8 +72,8 @@ class SeminarController extends Controller
 
         $this->validate($request, [
             'title' => 'required|max:255',
-            'start_date' => 'required|date|after_or_equal:' . Carbon::now(),
-            'end_date' => 'required|date|after:start_date',
+            'start_at' => 'required|date|after_or_equal:' . Carbon::now(),
+            'end_at' => 'required|date|after:start_at',
         ]);
 
         $seminarClass = empty($entityTypeId) ? Seminar::class : Entity::getEntity($entityTypeId);

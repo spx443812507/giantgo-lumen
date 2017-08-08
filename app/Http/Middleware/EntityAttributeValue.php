@@ -22,7 +22,7 @@ class EntityAttributeValue
         }
 
         if (!empty($request->input('entity_type_id'))) {
-            $entityTypeId = $request->route('entity_type_id');
+            $entityTypeId = $request->input('entity_type_id');
         }
 
         if (!empty($entityTypeId)) {

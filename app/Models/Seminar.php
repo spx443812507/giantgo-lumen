@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Attributable;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Seminar extends Model
@@ -15,7 +16,7 @@ class Seminar extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'start_date', 'end_date', 'closing_date'
+        'title', 'start_at', 'end_at', 'closed_at'
     ];
 
     /**
@@ -32,13 +33,28 @@ class Seminar extends Model
      *
      * @var array
      */
-    protected $dates = ['start_date', 'end_date', 'closing_date'];
+    protected $dates = ['start_at', 'end_at', 'closed_at'];
 
     protected $casts = [
         'need_audit' => 'boolean'
     ];
 
-    public function admin()
+    public function setStartAtAttribute($value)
+    {
+        $this->attributes['start_at'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
+    }
+
+    public function setEndAtAttribute($value)
+    {
+        $this->attributes['end_at'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
+    }
+
+    public function setClosedAtAttribute($value)
+    {
+        $this->attributes['closed_at'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
+    }
+
+    public function creator()
     {
         return $this->belongsTo('App\Models\User');
     }

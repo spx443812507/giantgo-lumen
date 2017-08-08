@@ -16,7 +16,6 @@ use Illuminate\Validation\Validator;
 
 trait RestExceptionHandlerTrait
 {
-
     /**
      * Creates a new JSON response based on exception type.
      *

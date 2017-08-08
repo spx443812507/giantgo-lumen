@@ -62,4 +62,9 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
             'roles' => $this->roles()->get()->pluck('name')
         ];
     }
+
+    public function seminars()
+    {
+        return $this->hasMany('App\Models\Seminar');
+    }
 }

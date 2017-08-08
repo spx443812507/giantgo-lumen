@@ -18,8 +18,8 @@ class CreateAgendasTable extends Migration
             $table->integer('entity_type_id')->nullable();
             $table->integer('user_id');
             $table->string('title');
-            $table->dateTime('start_date');
-            $table->dateTime('end_date');
+            $table->dateTime('start_at');
+            $table->dateTime('end_at');
             $table->timestamps();
             $table->softDeletes();
         });

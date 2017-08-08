@@ -60,6 +60,7 @@ return [
     ],
     'url' => ':attribute 无效的格式',
     'timezone' => ':attribute 必须个有效的时区',
+    'after_or_equal' => ':attribute 必须大于等于 :date',
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Language Lines
@@ -99,6 +100,9 @@ return [
         'display_name' => '显示名称',
         'description' => '描述',
         'attributes' => '属性',
+        'start_at' => '开始时间',
+        'end_at' => '结束时间',
+        'closed_at' => '关闭时间',
         'entity_type_id' => '实体类型',
         'attributes.*.attribute_code' => '属性码',
         'attributes.*.frontend_label' => '属性标题',

@@ -9,6 +9,7 @@
 namespace App\Models\EAV\Types;
 
 use App\Models\EAV\Value;
+use Carbon\Carbon;
 
 class Datetime extends Value
 {
@@ -29,6 +30,11 @@ class Datetime extends Value
         }
 
         return $value;
+    }
+
+    public function setValueAttribute($value)
+    {
+        $this->attributes['value'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
     }
 
     /**

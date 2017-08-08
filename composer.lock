@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "84d3cbc2a5703043831128eed66bc5b9",
+    "content-hash": "35d94f4428a16f1dc4652d5a541988cc",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -2113,16 +2113,16 @@
         },
         {
             "name": "overtrue/socialite",
-            "version": "1.2.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GiantGo/socialite.git",
-                "reference": "0b943f2b2063c8c4f1672b4d2f4451e57d7415a7"
+                "reference": "cac2d4724721e2b15dfca10a87bbe329dcc1b87b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GiantGo/socialite/zipball/0b943f2b2063c8c4f1672b4d2f4451e57d7415a7",
-                "reference": "0b943f2b2063c8c4f1672b4d2f4451e57d7415a7",
+                "url": "https://api.github.com/repos/GiantGo/socialite/zipball/cac2d4724721e2b15dfca10a87bbe329dcc1b87b",
+                "reference": "cac2d4724721e2b15dfca10a87bbe329dcc1b87b",
                 "shasum": ""
             },
             "require": {
@@ -2159,33 +2159,33 @@
                 "social"
             ],
             "support": {
-                "source": "https://github.com/GiantGo/socialite/tree/1.2.0"
+                "source": "https://github.com/GiantGo/socialite/tree/master"
             },
-            "time": "2017-07-27T08:22:56+00:00"
+            "time": "2017-08-05 14:26:28"
         },
         {
             "name": "overtrue/wechat",
-            "version": "3.3.12",
+            "version": "3.3.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/overtrue/wechat.git",
-                "reference": "7cd51ceb6b44245b724bb565f94d72de7150dfa8"
+                "reference": "5074d36e1a72df13579c84ed0471d8e0f08122bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/overtrue/wechat/zipball/7cd51ceb6b44245b724bb565f94d72de7150dfa8",
-                "reference": "7cd51ceb6b44245b724bb565f94d72de7150dfa8",
+                "url": "https://api.github.com/repos/overtrue/wechat/zipball/5074d36e1a72df13579c84ed0471d8e0f08122bb",
+                "reference": "5074d36e1a72df13579c84ed0471d8e0f08122bb",
                 "shasum": ""
             },
             "require": {
-                "doctrine/cache": "^1.4",
+                "doctrine/cache": "~1.4",
                 "ext-openssl": "*",
-                "guzzlehttp/guzzle": "^6.2",
+                "guzzlehttp/guzzle": "~6.2",
                 "monolog/monolog": "^1.17",
-                "overtrue/socialite": "^1.0.25",
+                "overtrue/socialite": ">=1.0.25",
                 "php": ">=5.5.0",
-                "pimple/pimple": "^3.0",
-                "symfony/http-foundation": "^2.6|^3.0",
+                "pimple/pimple": "~3.0",
+                "symfony/http-foundation": "~2.6|~2.7|~2.8|~3.0",
                 "symfony/psr-http-message-bridge": "~0.3|^1.0"
             },
             "require-dev": {
@@ -2219,7 +2219,7 @@
                 "weixin",
                 "weixin-sdk"
             ],
-            "time": "2017-08-01T09:38:23+00:00"
+            "time": "2017-07-17T11:09:02+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -3510,12 +3510,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/GiantGo/entrust.git",
-                "reference": "4096116f13d7804818d4b3f9a466dc8ea6410e8b"
+                "reference": "f1dd88ca9803fd5b49ef0454b222597c3db76f45"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GiantGo/entrust/zipball/4096116f13d7804818d4b3f9a466dc8ea6410e8b",
-                "reference": "4096116f13d7804818d4b3f9a466dc8ea6410e8b",
+                "url": "https://api.github.com/repos/GiantGo/entrust/zipball/f1dd88ca9803fd5b49ef0454b222597c3db76f45",
+                "reference": "f1dd88ca9803fd5b49ef0454b222597c3db76f45",
                 "shasum": ""
             },
             "require": {
@@ -3577,7 +3577,7 @@
             "support": {
                 "source": "https://github.com/GiantGo/entrust/tree/master"
             },
-            "time": "2017-08-05 13:13:28"
+            "time": "2017-08-05 14:24:14"
         }
     ],
     "packages-dev": [

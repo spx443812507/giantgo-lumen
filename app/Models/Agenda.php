@@ -15,7 +15,7 @@ class Agenda extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'start_date', 'end_date'
+        'title', 'start_at', 'end_at'
     ];
 
     /**
@@ -32,7 +32,7 @@ class Agenda extends Model
      *
      * @var array
      */
-    protected $dates = ['start_date', 'end_date'];
+    protected $dates = ['start_at', 'end_at'];
 
     protected $casts = [];
 
