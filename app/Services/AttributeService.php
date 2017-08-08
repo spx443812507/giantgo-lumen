@@ -26,7 +26,7 @@ class AttributeService
             'frontend_label' => 'required',
             'frontend_input' => 'required',
             'options' => 'array',
-            'options.*.value' => 'required'
+            'options.*.label' => 'required'
         ];
 
         $unique = Rule::unique('attributes')->where(function ($query) use ($entityTypeId) {
@@ -47,12 +47,12 @@ class AttributeService
         $entityType = Entity::find($entityTypeId);
 
         if (empty($entityType)) {
-            return [];
+            throw new Exception('entity_type_not_exists');
         }
 
-        $instance = new $entityType->entity_model();
+        $entityClass = new $entityType->entity_model();
 
-        $attributes = $instance->attributes();
+        $attributes = $entityClass->attributes();
 
         $result = [];
 
@@ -112,7 +112,7 @@ class AttributeService
                 foreach ($options as $option) {
                     $optionDataList[] = new Option([
                         'attribute_id' => $attribute->id,
-                        'value' => $option['value']
+                        'label' => $option['label']
                     ]);
                 }
 
@@ -140,12 +140,11 @@ class AttributeService
         }
 
         $validator = Validator::make($attributes, [
-            'attributes' => 'required|array',
-            'attributes.*.attribute_code' => 'required|unique:attributes,attribute_code,NULL,id,entity_type_id,' . $entityTypeId,
-            'attributes.*.frontend_label' => 'required',
-            'attributes.*.frontend_input' => 'required',
-            'attributes.*.options' => 'array',
-            'attributes.*.options.*.value' => 'required'
+            '*.attribute_code' => 'required|unique:attributes,attribute_code,NULL,id,entity_type_id,' . $entityTypeId,
+            '*.frontend_label' => 'required',
+            '*.frontend_input' => 'required',
+            '*.options' => 'array',
+            '*.options.*.label' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -195,14 +194,14 @@ class AttributeService
                     $requestOptionIds[] = $option['id'];
 
                     if (array_has($attributeOptionMaps, $option['id'])) {
-                        $attributeOptionMaps[$option['id']]->value = $option['value'];
+                        $attributeOptionMaps[$option['id']]->label = $option['label'];
                         $attributeOptionMaps[$option['id']]->save();
                     }
                 } else {
                     $attribute->options()->saveMany([
                         new Option([
                             'attribute_id' => $attribute->id,
-                            'value' => $option['value']
+                            'label' => $option['label']
                         ])
                     ]);
                 }

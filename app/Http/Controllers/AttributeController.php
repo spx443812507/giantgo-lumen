@@ -31,7 +31,7 @@ class AttributeController extends Controller
             throw $e;
         }
 
-        return response()->json($attribute[0], 200);
+        return response()->json($attribute, 200);
     }
 
     public function batchCreateAttribute(Request $request)

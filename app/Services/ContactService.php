@@ -51,12 +51,11 @@ class ContactService
     {
         $contact = new Contact;
 
-        $validators = [
+        $validators = array_merge([
             'email' => 'required_without:mobile|email|max:255|unique:contacts,email',
             'mobile' => 'max:255|unique:contacts,mobile',
             'password' => 'required'
-        ];
-        $validators = array_merge($validators, $contact->makeValidators(array_keys($contactInfo)));
+        ], $contact->makeValidators(array_keys($contactInfo)));
 
         $validator = Validator::make($contactInfo, $validators);
 

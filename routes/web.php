@@ -39,11 +39,13 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->post('/attributes', ['as' => 'attributes.create', 'uses' => 'AttributeController@createAttribute']);
         $app->put('/attributes/{attribute_id}', ['as' => 'attributes.update', 'uses' => 'AttributeController@updateAttribute']);
         $app->get('/attributes', ['as' => 'attributes.list', 'uses' => 'AttributeController@getAttributeList']);
+        $app->delete('/attributes/{attribute_id}', ['as' => 'attributes.delete', 'uses' => 'AttributeController@deleteAttribute']);
 
         $app->get('/seminars', ['as' => 'seminars.list', 'uses' => 'SeminarController@getSeminarList']);
         $app->get('/seminars/{seminar_id}', ['as' => 'seminars.get', 'uses' => 'SeminarController@getSeminar']);
         $app->post('/seminars', ['as' => 'seminars.create', 'uses' => 'SeminarController@createSeminar']);
         $app->put('/seminars/{seminar_id}', ['as' => 'seminars.update', 'uses' => 'SeminarController@updateSeminar']);
+        $app->delete('/seminars/{seminar_id}', ['as' => 'seminars.delete', 'uses' => 'SeminarController@deleteSeminar']);
 
         $app->get('/contacts', ['as' => 'contacts.list', 'uses' => 'ContactController@getList', 'middleware' => ['ability:admin,contact-list']]);
     });

@@ -15,7 +15,17 @@ class Option extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['attribute_id', 'value'];
+    protected $fillable = ['attribute_id', 'label'];
+
+
+    /**
+     * The attributes excluded from the model's JSON form.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'deleted_at'
+    ];
 
     /**
      * Relationship to the options entity.

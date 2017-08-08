@@ -8,13 +8,12 @@
 
 namespace App\Models\EAV;
 
-
 use App\Models\EAV\Types\Varchar;
 use App\Models\EAV\Types\Text;
 use App\Models\EAV\Types\Boolean;
 use App\Models\EAV\Types\Datetime;
 use App\Models\EAV\Types\Integer;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Attribute extends Model
@@ -46,7 +45,8 @@ class Attribute extends Model
     protected $casts = [
         'is_required' => 'boolean',
         'is_user_defined' => 'boolean',
-        'is_unique' => 'boolean'
+        'is_unique' => 'boolean',
+        'is_collection' => 'boolean'
     ];
 
     protected $inputMappings = [

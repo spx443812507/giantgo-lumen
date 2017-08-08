@@ -12,6 +12,8 @@ use App\Events\EntityDeleted;
 use App\Events\EntitySaved;
 use App\Events\EntitySaving;
 use App\Models\EAV\Attribute;
+use App\Models\EAV\Types\Datetime;
+use App\Models\EAV\Types\Integer;
 use App\Models\EAV\Value;
 use App\Scopes\EagerLoadScope;
 use App\Models\Model;
@@ -457,37 +459,52 @@ trait Attributable
         });
     }
 
-    public function makeValidators($attributes = ['*'])
+    public function makeValidators($attributeCodes = ['*'])
     {
         $validators = [];
 
-        foreach ($attributes as $attribute) {
-            if ($this->isEntityAttribute($attribute)) {
-                $validators[$attribute] = [];
+        foreach ($attributeCodes as $attributeCode) {
+            if ($this->isEntityAttribute($attributeCode)) {
+                $validators[$attributeCode] = [];
 
-                $attributes = $this->attributes();
+                $entityAttributes = $this->attributes();
 
-                if ($attributes[$attribute]->is_required) {
-                    $validators[$attribute][] = 'required';
+                $entityAttribute = $entityAttributes[$attributeCode];
+
+                if ($entityAttribute->is_required) {
+                    $validators[$attributeCode][] = 'required';
                 }
 
-                if ($attributes[$attribute]->is_unique) {
-                    $unique = Rule::unique($attributes[$attribute]->backend_table);
+                if ($entityAttribute->is_unique) {
+                    $unique = Rule::unique($entityAttribute->backend_table);
 
                     if (!empty($this->id)) {
                         $unique->ignore($this->id);
                     }
 
-                    $validators[$attribute][] = $unique;
+                    $validators[$attributeCode][] = $unique;
                 }
 
-                if ($attributes[$attribute]->hasOptions()) {
-                    $optionIds = $attributes[$attribute]->options()->get()->pluck('id')->toArray();
+                if (Datetime::class === $entityAttribute->backend_model) {
+                    $validators[$attributeCode][] = 'date';
+                    $validators[$attributeCode][] = 'date_format:' . \DateTime::ATOM;
+                }
 
-                    if ($attributes[$attribute]->is_collection) {
-                        $validators[$attribute . '.*'][] = Rule::in($optionIds);
+                if (Integer::class === $entityAttribute->backend_model) {
+                    if ($entityAttribute->is_collection) {
+                        $validators[$attributeCode][$attributeCode . '.*'] = 'integer';
                     } else {
-                        $validators[$attribute][] = Rule::in($optionIds);
+                        $validators[$attributeCode][] = 'integer';
+                    }
+                }
+
+                if ($entityAttribute->hasOptions()) {
+                    $optionIds = $entityAttribute->options()->get()->pluck('id')->toArray();
+
+                    if ($entityAttribute->is_collection) {
+                        $validators[$attributeCode . '.*'][] = Rule::in($optionIds);
+                    } else {
+                        $validators[$attributeCode][] = Rule::in($optionIds);
                     }
                 }
             }
