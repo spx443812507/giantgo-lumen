@@ -67,4 +67,9 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
     {
         return $this->hasMany('App\Models\Seminar');
     }
+
+    public function agendas()
+    {
+        return $this->hasMany('App\Models\Agenda');
+    }
 }

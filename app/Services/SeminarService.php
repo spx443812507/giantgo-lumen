@@ -24,7 +24,7 @@ class SeminarService
         $seminar = Seminar::find($seminarId);
 
         if (empty($seminar)) {
-            throw new Exception('contact_not_exists');
+            throw new Exception('seminar_not_exists');
         }
 
         if (!empty($seminar->entity_type_id)) {

@@ -8,8 +8,8 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\SocialAccount;
+use Exception;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\SignatureInvalidException;
 use Firebase\JWT\JWT;
@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 
 class SocialAccountController extends Controller
 {
-    public function me(Request $request)
+    public function get(Request $request)
     {
         $this->validate($request, [
             'verify' => 'required',
@@ -26,15 +26,15 @@ class SocialAccountController extends Controller
         try {
             $payload = JWT::decode($request->input('verify'), env('JWT_SECRET'), array('HS256'));
         } catch (ExpiredException $e) {
-            return response()->json(['error' => 'token_expired'], 500);
+            throw new Exception('token_expired');
         } catch (SignatureInvalidException $e) {
-            return response()->json(['error' => 'token_invalid'], 500);
+            throw new Exception('token_invalid');
         }
 
         $oAuthUser = SocialAccount::find($payload->sub);
 
         if (empty($oAuthUser)) {
-            return response()->json(['error' => 'social_account_not_exists'], 500);
+            throw new Exception('social_account_not_exists');
         }
 
         return response()->json($oAuthUser);

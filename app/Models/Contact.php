@@ -68,4 +68,9 @@ class Contact extends Model implements JWTSubject, AuthenticatableContract, Auth
     {
         return $this->hasMany('App\Models\SocialAccount');
     }
+
+    public function seminars()
+    {
+        return $this->belongsToMany('App\Models\Seminar');
+    }
 }

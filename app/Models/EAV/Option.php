@@ -17,7 +17,6 @@ class Option extends Model
 
     protected $fillable = ['attribute_id', 'label'];
 
-
     /**
      * The attributes excluded from the model's JSON form.
      *

@@ -25,8 +25,10 @@ class AttributeController extends Controller
     {
         $entityTypeId = $request->input('entity_type_id');
 
+        $attributeInfo = $request->input('attribute');
+
         try {
-            $attribute = $this->attributeService->createAttribute($entityTypeId, $request->all());
+            $attribute = $this->attributeService->createAttribute($entityTypeId, $attributeInfo);
         } catch (Exception $e) {
             throw $e;
         }

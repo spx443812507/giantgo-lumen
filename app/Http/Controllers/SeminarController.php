@@ -8,10 +8,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Seminar;
-use App\Models\User;
 use App\Services\SeminarService;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Exception;
@@ -68,28 +65,25 @@ class SeminarController extends Controller
 
     public function updateSeminar(Request $request, $seminarId)
     {
-        $entityTypeId = $request->input('entity_type_id');
-
-        $this->validate($request, [
-            'title' => 'required|max:255',
-            'start_at' => 'required|date|after_or_equal:' . Carbon::now(),
-            'end_at' => 'required|date|after:start_at',
-        ]);
-
-        $seminarClass = empty($entityTypeId) ? Seminar::class : Entity::getEntity($entityTypeId);
-
         $seminarInfo = $request->except('id');
 
-        $seminar = $seminarClass::find($seminarId);
-
-        if (empty($seminar)) {
-            return response()->json(['error' => 'seminar_not_exists'], 500);
+        try {
+            $seminar = $this->seminarService->updateSeminar($seminarId, $seminarInfo);
+        } catch (Exception $e) {
+            throw $e;
         }
 
-        $seminar->fill($seminarInfo);
-
-        $seminar->save();
-
         return response()->json($seminar);
+    }
+
+    public function deleteSeminar(Request $request, $seminarId)
+    {
+        try {
+            $this->seminarService->deleteSeminar($seminarId);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json(null, 204);
     }
 }

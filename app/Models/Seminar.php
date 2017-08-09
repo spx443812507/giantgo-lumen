@@ -54,13 +54,13 @@ class Seminar extends Model
         $this->attributes['closed_at'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
     }
 
-    public function creator()
+    public function user()
     {
         return $this->belongsTo('App\Models\User');
     }
 
-    public function users()
+    public function contacts()
     {
-        return $this->belongsToMany('App\Models\User');
+        return $this->belongsToMany('App\Models\Contact');
     }
 }
