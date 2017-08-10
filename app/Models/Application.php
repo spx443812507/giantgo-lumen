@@ -14,7 +14,7 @@ class Application extends Model
         'client_id', 'client_secret', 'redirect'
     ];
 
-    public function admin()
+    public function user()
     {
         return $this->belongsTo('App\Models\User');
     }

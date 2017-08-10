@@ -9,7 +9,6 @@
 namespace App\Services;
 
 use App\Models\Agenda;
-use App\Models\Seminar;
 use DateTime;
 use Exception;
 use Illuminate\Support\Facades\Validator;
@@ -85,8 +84,10 @@ class AgendaService
         return $agenda;
     }
 
-    public function updateAgenda(Seminar $seminar, $agendaId, $agendaInfo)
+    public function updateAgenda($seminarId, $agendaId, $agendaInfo)
     {
+        $seminar = $this->seminarService->getSeminar($seminarId);
+
         $agenda = $this->getAgenda($agendaId);
 
         $validators = array_merge([
@@ -94,11 +95,16 @@ class AgendaService
             'start_at' => [
                 'required',
                 'date',
-                'date_format' => DateTime::ATOM,
-                'after_or_equal' => $seminar->start_at,
-                'before' => $seminar->end_at
+                'date_format:' . DateTime::ATOM,
+                'after_or_equal:' . $seminar->start_at,
+                'before:' . $seminar->end_at
             ],
-            'end_at' => 'required|date|date_format:' . DateTime::ATOM . '|after:start_at',
+            'end_at' => [
+                'required',
+                'date',
+                'date_format:' . DateTime::ATOM,
+                'after:start_at'
+            ]
         ], $agenda->makeValidators(array_keys($agendaInfo)));
 
         $validator = Validator::make($agendaInfo, $validators);
@@ -116,9 +122,19 @@ class AgendaService
         return $agenda;
     }
 
-    public function deleteAgenda($agendaId)
+    public function deleteAgenda($seminarId, $agendaId)
     {
+        $seminar = $this->seminarService->getSeminar($seminarId);
+
         $agenda = $this->getAgenda($agendaId);
+
+        if (empty($agenda)) {
+            throw new Exception('agenda_not_exists');
+        }
+
+        if ($agenda->seminar_id !== $seminar->id) {
+            throw new Exception('agenda_not_belong_to_seminar');
+        }
 
         return $agenda->delete();
     }

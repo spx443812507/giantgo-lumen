@@ -32,4 +32,5 @@ return [
     'route_not_found' => '请求地址不存在',
     'model_not_found' => '请求实体不存在',
     'bad_request' => '错误的请求',
+    'agenda_not_belong_to_seminar' => '日程不属于该会议'
 ];

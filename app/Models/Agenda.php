@@ -35,6 +35,8 @@ class Agenda extends Model
      */
     protected $dates = ['start_at', 'end_at'];
 
+    protected $table = 'agendas';
+
     protected $casts = [];
 
     public function setStartAtAttribute($value)
@@ -47,14 +49,14 @@ class Agenda extends Model
         $this->attributes['end_at'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
     }
 
-    public function admin()
+    public function user()
     {
         return $this->belongsTo('App\Models\User');
     }
 
     public function speakers()
     {
-        return $this->hasMany('App\Models\Speaker');
+        return $this->belongsToMany('App\Models\Speaker');
     }
 
     public function seminar()

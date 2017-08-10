@@ -14,7 +14,7 @@ class Speaker extends Model
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = ['name', 'mobile', 'email', 'gender', 'company', 'position', 'profile'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -34,8 +34,19 @@ class Speaker extends Model
 
     protected $casts = [];
 
-    public function admin()
+    public function user()
     {
         return $this->belongsTo('App\Models\User');
     }
+
+    public function seminar()
+    {
+        return $this->belongsTo('App\Models\Seminar');
+    }
+
+    public function agendas()
+    {
+        return $this->belongsToMany('App\Models\Agenda');
+    }
+
 }

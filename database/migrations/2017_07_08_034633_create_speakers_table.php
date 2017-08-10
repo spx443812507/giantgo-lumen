@@ -17,6 +17,14 @@ class CreateSpeakersTable extends Migration
             $table->increments('id');
             $table->integer('entity_type_id')->nullable();
             $table->integer('user_id');
+            $table->integer('seminar_id');
+            $table->string('name');
+            $table->string('email')->nullable();
+            $table->string('mobile')->nullable();
+            $table->boolean('gender')->nullable();
+            $table->string('company')->nullable();
+            $table->string('position')->nullable();
+            $table->text('profile')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -35,7 +35,7 @@ class Checkin extends Model
 
     protected $casts = [];
 
-    public function admin()
+    public function user()
     {
         return $this->belongsTo('App\Models\User');
     }

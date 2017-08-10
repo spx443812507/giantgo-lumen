@@ -60,13 +60,27 @@ class AgendaController extends Controller
         return response()->json($agenda, 201);
     }
 
-    public function updateAgenda(Request $request, $seminarId)
+    public function updateAgenda(Request $request, $seminarId, $agendaId)
     {
+        $agendaInfo = $request->except('id');
 
+        try {
+            $agenda = $this->agendaService->updateAgenda($seminarId, $agendaId, $agendaInfo);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($agenda);
     }
 
     public function deleteAgenda(Request $request, $seminarId, $agendaId)
     {
+        try {
+            $this->agendaService->deleteAgenda($seminarId, $agendaId);
+        } catch (Exception $e) {
+            throw $e;
+        }
 
+        return response()->json(null, 204);
     }
 }

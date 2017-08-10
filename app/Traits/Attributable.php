@@ -463,6 +463,10 @@ trait Attributable
     {
         $validators = [];
 
+        if (!$this->entityAttributesBooted) {
+            return $validators;
+        }
+
         foreach ($attributeCodes as $attributeCode) {
             if ($this->isEntityAttribute($attributeCode)) {
                 $validators[$attributeCode] = [];
