@@ -51,7 +51,7 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->delete('/seminars/{seminar_id}', ['as' => 'seminars.delete', 'uses' => 'SeminarController@deleteSeminar', 'middleware' => ['ability:admin,seminar-delete']]);
 
         $app->post('/seminars/{seminar_id}/agendas', ['as' => 'agendas.create', 'uses' => 'AgendaController@createAgenda', 'middleware' => ['ability:admin,agenda-create']]);
-        $app->put('/seminars/{seminar_id}/agendas/{agendas}', ['as' => 'agendas.update', 'uses' => 'AgendaController@updateAgenda', 'middleware' => ['ability:admin,agenda-edit']]);
+        $app->put('/seminars/{seminar_id}/agendas/{agenda_id}', ['as' => 'agendas.update', 'uses' => 'AgendaController@updateAgenda', 'middleware' => ['ability:admin,agenda-edit']]);
         $app->delete('/seminars/agendas/{seminar_id}', ['as' => 'seminars.delete', 'uses' => 'SeminarController@deleteSeminar', 'middleware' => ['ability:admin,seminar-delete']]);
 
         $app->get('/contacts', ['as' => 'contacts.list', 'uses' => 'ContactController@getList', 'middleware' => ['ability:admin,contact-list']]);

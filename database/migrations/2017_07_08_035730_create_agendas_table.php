@@ -17,6 +17,7 @@ class CreateAgendasTable extends Migration
             $table->increments('id');
             $table->integer('entity_type_id')->nullable();
             $table->integer('user_id');
+            $table->integer('seminar_id');
             $table->string('title');
             $table->dateTime('start_at');
             $table->dateTime('end_at');

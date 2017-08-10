@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait RestExceptionHandlerTrait
 {
@@ -26,6 +27,9 @@ trait RestExceptionHandlerTrait
     protected function getJsonResponseForException(Request $request, Exception $e)
     {
         switch (true) {
+            case ($e instanceof NotFoundHttpException):
+                $response = $this->httpNotFound();
+                break;
             case ($e instanceof ModelNotFoundException):
                 $response = $this->modelNotFound();
                 break;
@@ -46,7 +50,7 @@ trait RestExceptionHandlerTrait
      * @param int $statusCode
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function badRequest($message = 'Bad request', $statusCode = 400)
+    protected function badRequest($message = 'bad_request', $statusCode = 400)
     {
         return $this->jsonResponse(['error' => $message], $statusCode);
     }
@@ -58,7 +62,12 @@ trait RestExceptionHandlerTrait
      * @param int $statusCode
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function modelNotFound($message = 'Record not found', $statusCode = 404)
+    protected function modelNotFound($message = 'model_not_found', $statusCode = 404)
+    {
+        return $this->jsonResponse(['error' => $message], $statusCode);
+    }
+
+    protected function httpNotFound($message = 'route_not_found', $statusCode = 404)
     {
         return $this->jsonResponse(['error' => $message], $statusCode);
     }

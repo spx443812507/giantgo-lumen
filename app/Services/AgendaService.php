@@ -8,10 +8,8 @@
 
 namespace App\Services;
 
-
 use App\Models\Agenda;
 use App\Models\Seminar;
-use App\Models\User;
 use DateTime;
 use Exception;
 use Illuminate\Support\Facades\Validator;
@@ -19,6 +17,13 @@ use Illuminate\Validation\ValidationException;
 
 class AgendaService
 {
+    protected $seminarService;
+
+    public function __construct(SeminarService $seminarService)
+    {
+        $this->seminarService = $seminarService;
+    }
+
     public function getAgenda($agendaId)
     {
         $agenda = Agenda::find($agendaId);
@@ -34,25 +39,34 @@ class AgendaService
         return $agenda;
     }
 
-    public function getAgendaList($perPage)
+    public function getAgendaList($seminarId, $perPage)
     {
-        $agendas = Agenda::paginate($perPage);
+        $seminar = $this->seminarService->getSeminar($seminarId);
+
+        $agendas = $seminar->agendas()->paginate($perPage);
 
         return $agendas;
     }
 
-    public function createAgenda(Seminar $seminar, $agendaInfo, User $user)
+    public function createAgenda($seminarId, $agendaInfo)
     {
+        $seminar = $this->seminarService->getSeminar($seminarId);
+
         $validators = [
             'title' => 'required|max:255',
             'start_at' => [
                 'required',
                 'date',
-                'date_format' => DateTime::ATOM,
-                'after_or_equal' => $seminar->start_at,
-                'before' => $seminar->end_at
+                'date_format:' . DateTime::ATOM,
+                'after_or_equal:' . $seminar->start_at,
+                'before:' . $seminar->end_at
             ],
-            'end_at' => 'required|date|date_format:' . DateTime::ATOM . '|after:start_at',
+            'end_at' => [
+                'required',
+                'date',
+                'date_format:' . DateTime::ATOM,
+                'after:start_at'
+            ]
         ];
 
         $validator = Validator::make($agendaInfo, $validators);
@@ -63,12 +77,12 @@ class AgendaService
 
         try {
             $agenda = new Agenda($agendaInfo);
-            $user->agendas()->save($agenda);
+            $seminar->agendas()->save($agenda);
         } catch (Exception $e) {
             throw new Exception('create_agenda_fail');
         }
 
-        return $seminar;
+        return $agenda;
     }
 
     public function updateAgenda(Seminar $seminar, $agendaId, $agendaInfo)

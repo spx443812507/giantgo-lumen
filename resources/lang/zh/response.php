@@ -28,5 +28,8 @@ return [
     'attribute_not_exists' => '字段不存在',
     'attribute_code_has_exists' => '属性代码已存在',
     'seminar_not_exists' => '会议不存在',
-    'contact_not_exists' => '联系人不存在'
+    'contact_not_exists' => '联系人不存在',
+    'route_not_found' => '请求地址不存在',
+    'model_not_found' => '请求实体不存在',
+    'bad_request' => '错误的请求',
 ];

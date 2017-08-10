@@ -9,7 +9,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Application;
-use App\Models\Contact;
 use App\Services\ContactService;
 use App\Services\SocialAccountService;
 use Exception;

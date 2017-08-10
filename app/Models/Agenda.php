@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Attributable;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Agenda extends Model
@@ -35,6 +36,16 @@ class Agenda extends Model
     protected $dates = ['start_at', 'end_at'];
 
     protected $casts = [];
+
+    public function setStartAtAttribute($value)
+    {
+        $this->attributes['start_at'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
+    }
+
+    public function setEndAtAttribute($value)
+    {
+        $this->attributes['end_at'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
+    }
 
     public function admin()
     {
