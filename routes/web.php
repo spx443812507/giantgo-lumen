@@ -27,6 +27,8 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
     $app->get('/seminars/{seminar_id}', ['as' => 'seminars.get', 'uses' => 'SeminarController@getSeminar']);
     $app->get('/seminars/{seminar_id}/agendas', ['as' => 'agendas.list', 'uses' => 'AgendaController@getAgendaList']);
     $app->get('/seminars/{seminar_id}/agendas/{agenda_id}', ['as' => 'agendas.get', 'uses' => 'AgendaController@getAgenda']);
+    $app->get('/seminars/{seminar_id}/speakers', ['as' => 'speakers.list', 'uses' => 'SpeakerController@getSpeaker']);
+    $app->get('/seminars/{seminar_id}/speakers/{speaker_id}', ['as' => 'speakers.get', 'uses' => 'SpeakerController@getSpeakerList']);
 
     $app->group(['middleware' => 'auth:web'], function () use ($app) {
         $app->get('/users/{user_id}', ['as' => 'users.get', 'middleware' => ['role:admin'], 'uses' => 'UserController@get']);
@@ -53,6 +55,9 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->post('/seminars/{seminar_id}/agendas', ['as' => 'agendas.create', 'uses' => 'AgendaController@createAgenda', 'middleware' => ['ability:admin,agenda-create']]);
         $app->put('/seminars/{seminar_id}/agendas/{agenda_id}', ['as' => 'agendas.update', 'uses' => 'AgendaController@updateAgenda', 'middleware' => ['ability:admin,agenda-edit']]);
         $app->delete('/seminars/{seminar_id}/agendas/{agenda_id}', ['as' => 'agendas.delete', 'uses' => 'AgendaController@deleteAgenda', 'middleware' => ['ability:admin,agenda-delete']]);
+        $app->post('/seminars/{seminar_id}/speakers', ['as' => 'speakers.create', 'uses' => 'SpeakerController@createSpeaker', 'middleware' => ['ability:admin,speaker-create']]);
+        $app->put('/seminars/{seminar_id}/speakers/{speaker_id}', ['as' => 'speakers.update', 'uses' => 'SpeakerController@updateSpeaker', 'middleware' => ['ability:admin,speaker-update']]);
+        $app->delete('/seminars/{seminar_id}/speakers/{speaker_id}', ['as' => 'speakers.delete', 'uses' => 'SpeakerController@deleteSpeaker', 'middleware' => ['ability:admin,speaker-delete']]);
 
         $app->get('/contacts', ['as' => 'contacts.list', 'uses' => 'ContactController@getList', 'middleware' => ['ability:admin,contact-list']]);
         $app->get('/contacts/{contact_id}', ['as' => 'contacts.get', 'uses' => 'ContactController@get', 'middleware' => ['ability:admin,contact-get']]);

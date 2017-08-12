@@ -23,12 +23,18 @@ class AgendaService
         $this->seminarService = $seminarService;
     }
 
-    public function getAgenda($agendaId)
+    public function getAgenda($seminarId, $agendaId)
     {
+        $seminar = $this->seminarService->getSeminar($seminarId);
+
         $agenda = Agenda::find($agendaId);
 
         if (empty($agenda)) {
             throw new Exception('agenda_not_exists');
+        }
+
+        if ($agenda->seminar_id !== $seminar->id) {
+            throw new Exception('agenda_not_belong_to_seminar');
         }
 
         if (!empty($agenda->entity_type_id)) {
@@ -88,7 +94,7 @@ class AgendaService
     {
         $seminar = $this->seminarService->getSeminar($seminarId);
 
-        $agenda = $this->getAgenda($agendaId);
+        $agenda = $this->getAgenda($seminarId, $agendaId);
 
         $validators = array_merge([
             'title' => 'required|max:255',
@@ -124,18 +130,22 @@ class AgendaService
 
     public function deleteAgenda($seminarId, $agendaId)
     {
-        $seminar = $this->seminarService->getSeminar($seminarId);
-
-        $agenda = $this->getAgenda($agendaId);
-
-        if (empty($agenda)) {
-            throw new Exception('agenda_not_exists');
-        }
-
-        if ($agenda->seminar_id !== $seminar->id) {
-            throw new Exception('agenda_not_belong_to_seminar');
-        }
+        $agenda = $this->getAgenda($seminarId, $agendaId);
 
         return $agenda->delete();
+    }
+
+    public function getAgendaSpeakerList($seminarId, $agendaId)
+    {
+        $agenda = $this->getAgenda($seminarId, $agendaId);
+
+        $speakers = $agenda->speakers()->all();
+
+        return $speakers;
+    }
+
+    public function deleteAgendaSpeaker($agendaId, $speakerId)
+    {
+
     }
 }

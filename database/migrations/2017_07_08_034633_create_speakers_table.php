@@ -21,7 +21,6 @@ class CreateSpeakersTable extends Migration
             $table->string('name');
             $table->string('email')->nullable();
             $table->string('mobile')->nullable();
-            $table->boolean('gender')->nullable();
             $table->string('company')->nullable();
             $table->string('position')->nullable();
             $table->text('profile')->nullable();

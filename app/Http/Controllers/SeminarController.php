@@ -50,7 +50,7 @@ class SeminarController extends Controller
 
     public function createSeminar(Request $request)
     {
-        $seminarInfo = $request->all();
+        $seminarInfo = $request->input('seminar');
 
         $user = Auth::user();
 

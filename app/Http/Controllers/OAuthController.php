@@ -58,9 +58,7 @@ class OAuthController extends Controller
 
         $urlParts['query'] = http_build_query($queries);
 
-        $url = http_build_url($urlParts);
-
-        return $url;
+        return http_build_url($urlParts);
     }
 
     protected function buildConfig($appId, $returnUrl)
@@ -87,7 +85,7 @@ class OAuthController extends Controller
         //已登录用户token
         $token = $request->input('token');
         //授权成功后的返回地址
-        $returnUrl = $request->input('return_url') ? $request->input('return_url') : $request->request;
+        $returnUrl = $request->input('return_url');
 
         if (isset($appId)) {
             $config = $this->buildConfig($appId, $returnUrl);
@@ -103,7 +101,7 @@ class OAuthController extends Controller
             $this->socialite->scopes([$scope]);
         }
 
-        return $this->socialite->stateless(false)->redirect(null, $token);
+        return $this->socialite->stateless()->redirect(null, $token);
     }
 
     public function callback(Request $request, $provider)
@@ -115,7 +113,7 @@ class OAuthController extends Controller
         $token = $request->input('state');
 
         if (isset($appId) && !empty($appId)) {
-            $config = $this->buildConfig($appId, $request->input('return_url'));
+            $config = $this->buildConfig($appId, $returnUrl);
 
             if (isset($config)) {
                 $this->socialite->config($config);
@@ -123,7 +121,7 @@ class OAuthController extends Controller
         }
 
         try {
-            $oAuthUser = $this->socialite->with($provider)->stateless(false)->user();
+            $oAuthUser = $this->socialite->with($provider)->stateless()->user();
 
             $socialAccount = $this->socialAccountService->generateSocialAccount($oAuthUser, $provider);
 
@@ -132,13 +130,17 @@ class OAuthController extends Controller
 
                 $contact = $contactInfo->user();
 
+                if (!empty($socialAccount->contact) && $socialAccount->contact->id !== $contact->id) {
+                    return redirect()->to($this->buildReturnUrl($returnUrl, ['error' => '该第三方用户已绑定其它账号']));
+                }
+
                 $this->contactService->bindSocialAccount($contact, $socialAccount);
 
                 return redirect()->to($returnUrl);
             } else {
                 $params = [];
 
-                if ($socialAccount->contact) {
+                if (!empty($socialAccount->contact)) {
                     $params['token'] = $this->jwt->fromUser($socialAccount->contact);
                 } else {
                     $params['verify'] = $this->jwt->fromUser($socialAccount);
@@ -147,9 +149,7 @@ class OAuthController extends Controller
                 return redirect()->to($this->buildReturnUrl($returnUrl, $params));
             }
         } catch (AuthorizeFailedException $e) {
-            $url = $this->buildReturnUrl($returnUrl, ['error' => '授权失败，请重试']);
-
-            return redirect()->to($url);
+            return redirect()->to($this->buildReturnUrl($returnUrl, ['error' => '授权失败，请重试']));
         } catch (Exception $e) {
             throw $e;
         }

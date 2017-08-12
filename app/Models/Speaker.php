@@ -14,7 +14,7 @@ class Speaker extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'mobile', 'email', 'gender', 'company', 'position', 'profile'];
+    protected $fillable = ['name', 'mobile', 'email', 'company', 'position', 'profile'];
 
     /**
      * The attributes excluded from the model's JSON form.

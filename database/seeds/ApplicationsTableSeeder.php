@@ -15,7 +15,7 @@ class ApplicationsTableSeeder extends Seeder
             [
                 'client_id' => '101405226',
                 'client_secret' => '22350fe680bec6a854f715fe149ec747',
-                'redirect' => 'http://dev-memberb.smarket.net.cn/oauth/qq/callback',
+                'redirect' => 'http://test-memberb.smarket.net.cn/oauth/qq/callback',
                 'provider' => 'qq'
             ],
             [

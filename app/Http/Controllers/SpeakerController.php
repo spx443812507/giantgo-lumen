@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\SpeakerService;
+use Exception;
 use Illuminate\Http\Request;
 
 class SpeakerController extends Controller
@@ -20,30 +21,66 @@ class SpeakerController extends Controller
         $this->speakerService = $speakerService;
     }
 
-    public function getSpeaker(Request $request, $seminarId, $agendaId)
+    public function getSpeaker(Request $request, $seminarId, $speakerId)
     {
+        $speaker = null;
 
+        try {
+            $speaker = $this->speakerService->getSpeaker($seminarId, $speakerId);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($speaker);
     }
 
     public function getSpeakerList(Request $request, $seminarId)
     {
         $perPage = $request->input('per_page');
 
+        try {
+            $speakers = $this->speakerService->getSpeakerList($seminarId, $perPage);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($speakers);
     }
 
     public function createSpeaker(Request $request, $seminarId)
     {
-        $agendaInfo = $request->all();
+        $speakerInfo = $request->input('speaker');
 
+        try {
+            $speaker = $this->speakerService->createSpeaker($seminarId, $speakerInfo);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($speaker, 201);
     }
 
-    public function updateSpeaker(Request $request, $seminarId, $agendaId)
+    public function updateSpeaker(Request $request, $seminarId, $speakerId)
     {
+        $speakerInfo = $request->except('id');
 
+        try {
+            $speaker = $this->speakerService->updateSpeaker($seminarId, $speakerId, $speakerInfo);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($speaker);
     }
 
-    public function deleteSpeaker(Request $request, $seminarId, $agendaId)
+    public function deleteSpeaker(Request $request, $seminarId, $speakerId)
     {
-       
+        try {
+            $this->speakerService->deleteSpeaker($seminarId, $speakerId);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json(null, 204);
     }
 }

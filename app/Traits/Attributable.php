@@ -480,7 +480,9 @@ trait Attributable
                 }
 
                 if ($entityAttribute->is_unique) {
-                    $unique = Rule::unique($entityAttribute->backend_table);
+                    $unique = Rule::unique($entityAttribute->backend_table)->where(function ($query) use ($entityAttribute) {
+                        $query->where('attribute_id', $entityAttribute->id);
+                    });
 
                     if (!empty($this->id)) {
                         $unique->ignore($this->id);
