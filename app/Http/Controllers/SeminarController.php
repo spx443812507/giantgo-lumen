@@ -27,7 +27,7 @@ class SeminarController extends Controller
         $seminar = null;
 
         try {
-            $seminar = $this->seminarService->getSeminar($seminarId);
+            $seminar = $this->seminarService->getSeminar($seminarId, true);
         } catch (Exception $e) {
             throw $e;
         }

@@ -99,9 +99,9 @@ class AttributeService
                 'frontend_class' => empty($attributeInfo['frontend_class']) ? '' : $attributeInfo['frontend_class'],
                 'is_required' => $attributeInfo['is_required'],
                 'is_user_defined' => false,
-                'is_unique' => $attributeInfo['is_unique'],
-                'default_value' => $attributeInfo['default_value'],
-                'description' => $attributeInfo['description'],
+                'is_unique' => empty($attributeInfo['is_unique']) ? false : $attributeInfo['is_unique'],
+                'default_value' => empty($attributeInfo['default_value']) ? '' : $attributeInfo['default_value'],
+                'description' => empty($attributeInfo['description']) ? '' : $attributeInfo['description']
             ]);
 
             if (array_has($attributeInfo, 'options') && count($attributeInfo['options']) > 0) {

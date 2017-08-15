@@ -26,7 +26,7 @@ class SpeakerController extends Controller
         $speaker = null;
 
         try {
-            $speaker = $this->speakerService->getSpeaker($seminarId, $speakerId);
+            $speaker = $this->speakerService->getSpeaker($seminarId, $speakerId, true);
         } catch (Exception $e) {
             throw $e;
         }

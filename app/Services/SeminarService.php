@@ -8,7 +8,6 @@
 
 namespace App\Services;
 
-
 use App\Models\Seminar;
 use App\Models\User;
 use Carbon\Carbon;
@@ -19,7 +18,14 @@ use Illuminate\Validation\ValidationException;
 
 class SeminarService
 {
-    public function getSeminar($seminarId)
+    protected $attributeService;
+
+    public function __construct(AttributeService $attributeService)
+    {
+        $this->attributeService = $attributeService;
+    }
+
+    public function getSeminar($seminarId, $includeAttributes = false)
     {
         $seminar = Seminar::find($seminarId);
 
@@ -29,6 +35,10 @@ class SeminarService
 
         if (!empty($seminar->entity_type_id)) {
             $seminar->bootEntityAttribute($seminar->entity_type_id);
+
+            if (!!$includeAttributes) {
+                $seminar->attributes = $this->attributeService->getAttributeList($seminar->entity_type_id);
+            }
         }
 
         return $seminar;

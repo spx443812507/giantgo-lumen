@@ -52,7 +52,7 @@ class AgendaController extends Controller
         $agendaInfo = $request->input('agenda');
 
         try {
-            $agenda = $this->agendaService->createAgenda($seminarId, $agendaInfo);
+            $agenda = $this->agendaService->createAgenda($seminarId, $agendaInfo, true);
         } catch (Exception $e) {
             throw $e;
         }

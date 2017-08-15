@@ -17,12 +17,16 @@ class SpeakerService
 {
     protected $seminarService;
 
-    public function __construct(SeminarService $seminarService)
+    protected $attributeService;
+
+    public function __construct(SeminarService $seminarService, AttributeService $attributeService)
     {
         $this->seminarService = $seminarService;
+
+        $this->attribtueService = $attributeService;
     }
 
-    public function getSpeaker($seminarId, $speakerId)
+    public function getSpeaker($seminarId, $speakerId, $includeAttributes = false)
     {
         $seminar = $this->seminarService->getSeminar($seminarId);
 
@@ -38,6 +42,10 @@ class SpeakerService
 
         if (!empty($speaker->entity_type_id)) {
             $speaker->bootEntityAttribute($speaker->entity_type_id);
+
+            if (!!$includeAttributes) {
+                $seminar->attributes = $this->attributeService->getAttributeList($seminar->entity_type_id);
+            }
         }
 
         return $speaker;

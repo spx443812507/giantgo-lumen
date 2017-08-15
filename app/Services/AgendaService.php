@@ -18,12 +18,16 @@ class AgendaService
 {
     protected $seminarService;
 
-    public function __construct(SeminarService $seminarService)
+    protected $attributeService;
+
+    public function __construct(SeminarService $seminarService, AttributeService $attributeService)
     {
         $this->seminarService = $seminarService;
+
+        $this->attribtueService = $attributeService;
     }
 
-    public function getAgenda($seminarId, $agendaId)
+    public function getAgenda($seminarId, $agendaId, $includeAttributes = false)
     {
         $seminar = $this->seminarService->getSeminar($seminarId);
 
@@ -39,6 +43,10 @@ class AgendaService
 
         if (!empty($agenda->entity_type_id)) {
             $agenda->bootEntityAttribute($agenda->entity_type_id);
+
+            if (!!$includeAttributes) {
+                $seminar->attributes = $this->attributeService->getAttributeList($seminar->entity_type_id);
+            }
         }
 
         return $agenda;
