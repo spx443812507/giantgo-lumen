@@ -66,7 +66,7 @@ class EntityController extends Controller
         }
 
         try {
-            $entities = Entity::where('entity_type_code', $entityTypeCode)->paginate();
+            $entities = Entity::where('entity_type_code', $entityTypeCode)->get();
 
             foreach ($entities as $entity) {
                 $entityClass = $entity->entity_model;

@@ -65,7 +65,7 @@ class SeminarController extends Controller
 
     public function updateSeminar(Request $request, $seminarId)
     {
-        $seminarInfo = $request->except('id');
+        $seminarInfo = $request->input('seminar');
 
         try {
             $seminar = $this->seminarService->updateSeminar($seminarId, $seminarInfo);

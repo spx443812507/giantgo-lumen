@@ -15,6 +15,6 @@ class Model extends BaseModel
 {
     protected function serializeDate(DateTimeInterface $date)
     {
-        return $date->toIso8601String();
+        return $date->format('c');
     }
 }
