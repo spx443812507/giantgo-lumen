@@ -25,7 +25,7 @@ class ContactController extends Controller
 
     public function signUp(Request $request)
     {
-        $contactInfo = $request->input('contact');
+        $contactInfo = $request->all();
 
         $verify = $request->input('verify');
 
@@ -84,13 +84,11 @@ class ContactController extends Controller
         try {
             $contact = Auth::guard('api')->user();
 
-            if (empty($contact)) {
+            if (!$contact) {
                 return response()->json(['error' => 'unauthorized'], 401);
             }
 
-            if (!empty($contact->entity_type_id)) {
-                $contact->bootEntityAttribute($contact->entity_type_id);
-            }
+            $contact = $this->contactService->getContact($contact->id);
         } catch (Exceptions\TokenExpiredException $e) {
             return response()->json(['error' => 'token_expired'], 500);
         } catch (Exceptions\TokenInvalidException $e) {
@@ -112,7 +110,7 @@ class ContactController extends Controller
             return response()->json(['error' => 'unauthorized'], 401);
         }
 
-        $this->contactService->updateContact($contact->id, $contactInfo);
+        $contact = $this->contactService->updateContact($contact->id, $contactInfo);
 
         return $contact;
     }

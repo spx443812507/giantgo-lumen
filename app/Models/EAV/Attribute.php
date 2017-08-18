@@ -13,7 +13,7 @@ use App\Models\EAV\Types\Text;
 use App\Models\EAV\Types\Boolean;
 use App\Models\EAV\Types\Datetime;
 use App\Models\EAV\Types\Integer;
-use App\Models\Model;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Attribute extends Model

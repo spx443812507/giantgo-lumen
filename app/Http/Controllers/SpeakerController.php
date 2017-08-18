@@ -49,7 +49,7 @@ class SpeakerController extends Controller
 
     public function createSpeaker(Request $request, $seminarId)
     {
-        $speakerInfo = $request->input('speaker');
+        $speakerInfo = $request->all();
 
         try {
             $speaker = $this->speakerService->createSpeaker($seminarId, $speakerInfo);

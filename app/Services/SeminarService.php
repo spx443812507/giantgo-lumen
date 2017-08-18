@@ -29,16 +29,14 @@ class SeminarService
     {
         $seminar = Seminar::find($seminarId);
 
+        $entityTypeId = $seminar->entity_type_id;
+
         if (empty($seminar)) {
             throw new Exception('seminar_not_exists');
         }
 
-        if (!empty($seminar->entity_type_id)) {
-            $seminar->bootEntityAttribute($seminar->entity_type_id);
-
-            if (!!$includeAttributes) {
-                $seminar->attributes = $this->attributeService->getAttributeList($seminar->entity_type_id);
-            }
+        if (!!$includeAttributes && !empty($entityTypeId)) {
+            $seminar->attributes = $this->attributeService->getAttributeList($entityTypeId);
         }
 
         return $seminar;
@@ -53,11 +51,13 @@ class SeminarService
 
     public function createSeminar($seminarInfo, User $user)
     {
-        $validators = [
+        $seminar = new Seminar($seminarInfo);
+
+        $validators = array_merge([
             'title' => 'required|max:255',
             'start_at' => 'required|date|date_format:' . DateTime::ATOM . '|after_or_equal:' . Carbon::now('UTC'),
             'end_at' => 'required|date|date_format:' . DateTime::ATOM . '|after:start_at',
-        ];
+        ], $seminar->makeValidators(array_keys($seminarInfo)));
 
         $validator = Validator::make($seminarInfo, $validators);
 
@@ -66,7 +66,6 @@ class SeminarService
         }
 
         try {
-            $seminar = new Seminar($seminarInfo);
             $user->seminars()->save($seminar);
         } catch (Exception $e) {
             throw new Exception('create_seminar_fail');
@@ -78,6 +77,10 @@ class SeminarService
     public function updateSeminar($seminarId, $seminarInfo)
     {
         $seminar = $this->getSeminar($seminarId);
+
+        if (!empty($seminarInfo['entity_type_id'])) {
+            $seminar->entity_type_id = $seminarInfo['entity_type_id'];
+        }
 
         $validators = array_merge([
             'title' => 'required|max:255',

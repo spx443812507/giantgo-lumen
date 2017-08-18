@@ -50,7 +50,7 @@ class SeminarController extends Controller
 
     public function createSeminar(Request $request)
     {
-        $seminarInfo = $request->input('seminar');
+        $seminarInfo = $request->all();
 
         $user = Auth::user();
 
@@ -65,7 +65,7 @@ class SeminarController extends Controller
 
     public function updateSeminar(Request $request, $seminarId)
     {
-        $seminarInfo = $request->input('seminar');
+        $seminarInfo = $request->except('id');
 
         try {
             $seminar = $this->seminarService->updateSeminar($seminarId, $seminarInfo);

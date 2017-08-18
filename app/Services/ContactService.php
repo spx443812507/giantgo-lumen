@@ -19,6 +19,13 @@ use Illuminate\Support\Facades\Validator;
 
 class ContactService
 {
+    protected $attributeService;
+
+    public function __construct(AttributeService $attributeService)
+    {
+        $this->attribtueService = $attributeService;
+    }
+
     public function bindSocialAccountByVerify($contact, $verify)
     {
         try {
@@ -45,6 +52,30 @@ class ContactService
         }
 
         return $contact;
+    }
+
+    public function getContact($contactId, $includeAttributes = false)
+    {
+        $contact = Contact::find($contactId);
+
+        $entityTypeId = $contact->entity_type_id;
+
+        if (empty($contact)) {
+            throw new Exception('contact_not_exists');
+        }
+
+        if (!!$includeAttributes && !empty($entityTypeId)) {
+            $contact->attributes = $this->attributeService->getAttributeList($entityTypeId);
+        }
+
+        return $contact;
+    }
+
+    public function getContactList($perPage)
+    {
+        $contacts = Contact::paginate($perPage);
+
+        return $contacts;
     }
 
     public function createContact($contactInfo, $verify)
@@ -80,8 +111,8 @@ class ContactService
     {
         $contact = $this->getContact($contactId);
 
-        if (!empty($contact->entity_type_id)) {
-            $contact->bootEntityAttribute($contact->entity_type_id);
+        if (!empty($contactInfo['entity_type_id'])) {
+            $contact->entity_type_id = $contactInfo['entity_type_id'];
         }
 
         $validator = Validator::make($contactInfo, $contact->makeValidators(array_keys($contactInfo)));
@@ -101,27 +132,5 @@ class ContactService
         }
 
         return $contact;
-    }
-
-    public function getContact($contactId)
-    {
-        $contact = Contact::find($contactId);
-
-        if (empty($contact)) {
-            throw new Exception('contact_not_exists');
-        }
-
-        if (!empty($contact->entity_type_id)) {
-            $contact->bootEntityAttribute($contact->entity_type_id);
-        }
-
-        return $contact;
-    }
-
-    public function getContactList($perPage)
-    {
-        $contacts = Contact::paginate($perPage);
-
-        return $contacts;
     }
 }

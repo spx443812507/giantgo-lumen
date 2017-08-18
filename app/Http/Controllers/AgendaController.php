@@ -49,7 +49,7 @@ class AgendaController extends Controller
 
     public function createAgenda(Request $request, $seminarId)
     {
-        $agendaInfo = $request->input('agenda');
+        $agendaInfo = $request->all();
 
         try {
             $agenda = $this->agendaService->createAgenda($seminarId, $agendaInfo, true);

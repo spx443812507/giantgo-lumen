@@ -31,6 +31,8 @@ class AgendaService
     {
         $seminar = $this->seminarService->getSeminar($seminarId);
 
+        $entityTypeId = $seminar->entity_type_id;
+
         $agenda = Agenda::find($agendaId);
 
         if (empty($agenda)) {
@@ -41,12 +43,8 @@ class AgendaService
             throw new Exception('agenda_not_belong_to_seminar');
         }
 
-        if (!empty($agenda->entity_type_id)) {
-            $agenda->bootEntityAttribute($agenda->entity_type_id);
-
-            if (!!$includeAttributes) {
-                $seminar->attributes = $this->attributeService->getAttributeList($seminar->entity_type_id);
-            }
+        if (!!$includeAttributes && !empty($entityTypeId)) {
+            $seminar->attributes = $this->attributeService->getAttributeList($entityTypeId);
         }
 
         return $agenda;
@@ -103,6 +101,10 @@ class AgendaService
         $seminar = $this->seminarService->getSeminar($seminarId);
 
         $agenda = $this->getAgenda($seminarId, $agendaId);
+
+        if (!empty($agendaInfo['entity_type_id'])) {
+            $agenda->entity_type_id = $agendaInfo['entity_type_id'];
+        }
 
         $validators = array_merge([
             'title' => 'required|max:255',

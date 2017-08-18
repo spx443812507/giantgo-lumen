@@ -32,6 +32,8 @@ class SpeakerService
 
         $speaker = Speaker::find($speakerId);
 
+        $entityTypeId = $speaker->entity_type_id;
+
         if (empty($speaker)) {
             throw new Exception('speaker_not_exists');
         }
@@ -40,12 +42,8 @@ class SpeakerService
             throw new Exception('speaker_not_belong_to_seminar');
         }
 
-        if (!empty($speaker->entity_type_id)) {
-            $speaker->bootEntityAttribute($speaker->entity_type_id);
-
-            if (!!$includeAttributes) {
-                $seminar->attributes = $this->attributeService->getAttributeList($seminar->entity_type_id);
-            }
+        if (!!$includeAttributes && !empty($entityTypeId)) {
+            $speaker->attributes = $this->attributeService->getAttributeList($entityTypeId);
         }
 
         return $speaker;
@@ -91,6 +89,10 @@ class SpeakerService
     public function updateSpeaker($seminarId, $speakerId, $speakerInfo)
     {
         $speaker = $this->getSpeaker($seminarId, $speakerId);
+
+        if (!empty($speakerInfo['entity_type_id'])) {
+            $speaker->entity_type_id = $speakerInfo['entity_type_id'];
+        }
 
         $validators = array_merge([
             'name' => 'required|max:255',

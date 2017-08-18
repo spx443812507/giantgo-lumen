@@ -50,9 +50,7 @@ class AttributeService
             throw new Exception('entity_type_not_exists');
         }
 
-        $entityClass = new $entityType->entity_model();
-
-        $attributes = $entityClass->attributes();
+        $attributes = Attribute::where('entity_type_id', $entityTypeId)->get();
 
         $result = [];
 

@@ -10,12 +10,10 @@ namespace App\Traits;
 
 use App\Events\EntityDeleted;
 use App\Events\EntitySaved;
-use App\Events\EntitySaving;
 use App\Models\EAV\Attribute;
 use App\Models\EAV\Types\Datetime;
 use App\Models\EAV\Types\Integer;
 use App\Models\EAV\Value;
-use App\Scopes\EagerLoadScope;
 use App\Models\Model;
 use App\Supports\RelationBuilder;
 use App\Supports\ValueCollection;
@@ -67,46 +65,35 @@ trait Attributable
 
     public static function bootAttributable()
     {
-        static::saving(EntitySaving::class . '@handle');
         static::saved(EntitySaved::class . '@handle');
         static::deleted(EntityDeleted::class . '@handle');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function bootIfNotBooted()
-    {
-        parent::bootIfNotBooted();
-
-        if (!empty(static::$entityTypeId)) {
-            if (!$this->entityAttributesBooted) {
-                $attributeIds = DB::table('entity_attribute')->where('entity_type_id', static::$entityTypeId)->get()->pluck('attribute_id');
-
-                static::$entityAttributes = Attribute::whereIn('id', $attributeIds)->get()->keyBy('attribute_code');
-
-                $this->entityAttributesBooted = true;
-            }
-
-            if (!$this->entityAttributeRelationsBooted) {
-                app(RelationBuilder::class)->build($this);
-
-                $relations = $this->getEntityAttributeRelations();
-
-                $this->load(array_keys($relations));
-
-                $this->entityAttributeRelationsBooted = true;
-            }
-        }
-    }
-
     public function bootEntityAttribute($entityTypeId)
     {
-        if (!empty($entityTypeId)) {
+        if (!empty($entityTypeId) && $entityTypeId !== static::$entityTypeId) {
             static::$entityTypeId = $entityTypeId;
-        }
 
-        $this->bootIfNotBooted();
+            $entity = DB::table('entity_type')->where('id', static::$entityTypeId)->first();
+
+            if (!empty($entity) && $entity->entity_model !== get_class($this)) {
+                throw new \Exception('entity_not_match');
+            }
+
+            $attributeIds = DB::table('entity_attribute')->where('entity_type_id', static::$entityTypeId)->get()->pluck('attribute_id');
+
+            static::$entityAttributes = Attribute::whereIn('id', $attributeIds)->get()->keyBy('attribute_code');
+
+            app(RelationBuilder::class)->build($this);
+
+            $relations = $this->getEntityAttributeRelations();
+
+            $this->load(array_keys($relations));
+
+            $this->entityAttributesBooted = true;
+
+            $this->entityAttributeRelationsBooted = true;
+        }
     }
 
     public function getEntityTypeId()
@@ -117,6 +104,24 @@ trait Attributable
     public function setEntityTypeId($entityTypeId)
     {
         return static::$entityTypeId = $entityTypeId;
+    }
+
+    public function getEntityTypeIdAttribute($entityTypeId)
+    {
+        if (!empty($entityTypeId)) {
+            $this->bootEntityAttribute($entityTypeId);
+        }
+
+        return $entityTypeId;
+    }
+
+    public function setEntityTypeIdAttribute($entityTypeId)
+    {
+        if (!empty($entityTypeId)) {
+            $this->bootEntityAttribute($entityTypeId);
+        }
+
+        $this->attributes['entity_type_id'] = $entityTypeId;
     }
 
     /**
@@ -475,6 +480,10 @@ trait Attributable
 
                 $entityAttribute = $entityAttributes[$attributeCode];
 
+                if ($entityAttribute->is_collection) {
+                    $validators[$attributeCode . '.*'] = [];
+                }
+
                 if ($entityAttribute->is_required) {
                     $validators[$attributeCode][] = 'required';
                 }
@@ -498,7 +507,7 @@ trait Attributable
 
                 if (Integer::class === $entityAttribute->backend_model) {
                     if ($entityAttribute->is_collection) {
-                        $validators[$attributeCode][$attributeCode . '.*'] = 'integer';
+                        $validators[$attributeCode . '.*'][] = 'integer';
                     } else {
                         $validators[$attributeCode][] = 'integer';
                     }
