@@ -156,12 +156,16 @@ class AttributeService
         return $results;
     }
 
-    public function updateAttribute($attributeId, $attributeInfo)
+    public function updateAttribute($entityTypeId, $attributeId, $attributeInfo)
     {
         $attribute = Attribute::find($attributeId);
 
         if (empty($attribute)) {
             throw new Exception('attribute_not_exists');
+        }
+
+        if ($attribute->entity_type_id != $entityTypeId) {
+            throw new Exception('attribute_not_belong_entity');
         }
 
         $validators = $this->makeValidators($attribute->entity_type_id, $attributeId);

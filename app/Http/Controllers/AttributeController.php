@@ -21,14 +21,10 @@ class AttributeController extends Controller
         $this->attributeService = $attributeService;
     }
 
-    public function createAttribute(Request $request)
+    public function createAttribute(Request $request, $entityTypeId)
     {
-        $entityTypeId = $request->input('entity_type_id');
-
-        $attributeInfo = $request->input('attribute');
-
         try {
-            $attribute = $this->attributeService->createAttribute($entityTypeId, $attributeInfo);
+            $attribute = $this->attributeService->createAttribute($entityTypeId, $request->all());
         } catch (Exception $e) {
             throw $e;
         }
@@ -36,12 +32,10 @@ class AttributeController extends Controller
         return response()->json($attribute, 200);
     }
 
-    public function batchCreateAttribute(Request $request)
+    public function batchCreateAttribute(Request $request, $entityTypeId)
     {
-        $entityTypeId = $request->input('entity_type_id');
-
         try {
-            $result = $this->attributeService->createAttributes($entityTypeId, $request->input('attributes'));
+            $result = $this->attributeService->createAttributes($entityTypeId, $request->all());
         } catch (Exception $e) {
             throw $e;
         }
@@ -49,12 +43,10 @@ class AttributeController extends Controller
         return response()->json($result, 200);
     }
 
-    public function updateAttribute(Request $request, $attributeId)
+    public function updateAttribute(Request $request, $entityTypeId, $attributeId)
     {
-        $attributeInfo = $request->input('attribute');
-
         try {
-            $attribute = $this->attributeService->updateAttribute($attributeId, $attributeInfo);
+            $attribute = $this->attributeService->updateAttribute($entityTypeId, $attributeId, $request->all());
         } catch (Exception $e) {
             throw $e;
         }
@@ -62,14 +54,8 @@ class AttributeController extends Controller
         return response()->json($attribute, 200);
     }
 
-    public function getAttributeList(Request $request)
+    public function getAttributeList(Request $request, $entityTypeId)
     {
-        $this->validate($request, [
-            'entity_type_id' => 'required|integer'
-        ]);
-
-        $entityTypeId = $request->input('entity_type_id');
-
         $result = $this->attributeService->getAttributeList($entityTypeId);
 
         return response()->json($result);
