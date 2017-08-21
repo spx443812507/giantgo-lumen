@@ -8,14 +8,21 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\EAV\Entity;
+use App\Services\AttributeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Mockery\Exception;
 
 class EntityController extends Controller
 {
+    protected $attributeService;
+
+    public function __construct(AttributeService $attributeService)
+    {
+        $this->attributeService = $attributeService;
+    }
+
     private $entityMappings = [
         'contact' => [
             'entity_model' => 'App\Models\Contact',
@@ -70,6 +77,8 @@ class EntityController extends Controller
 
             foreach ($entities as $entity) {
                 $entityClass = $entity->entity_model;
+
+                $entity->attributes = $this->attributeService->getAttributeList($entity->id);
 
                 $entity->entity_instance_count = count($entityClass::where('entity_type_id', $entity->id)->get());
             }

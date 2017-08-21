@@ -35,7 +35,7 @@ class AttributeController extends Controller
     public function batchCreateAttribute(Request $request, $entityTypeId)
     {
         try {
-            $result = $this->attributeService->createAttributes($entityTypeId, $request->all());
+            $result = $this->attributeService->createAttributes($entityTypeId, $request->input('attributes'));
         } catch (Exception $e) {
             throw $e;
         }
