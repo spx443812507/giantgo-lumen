@@ -20,7 +20,6 @@ class Datetime extends Value
 
     protected $table = 'value_datetime';
 
-
     protected function getValueAttribute()
     {
         $value = $this->attributes['value'];
@@ -34,7 +33,11 @@ class Datetime extends Value
 
     public function setValueAttribute($value)
     {
-        $this->attributes['value'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
+        if (strlen($value)) {
+            $this->attributes['value'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
+        } else {
+            $this->attributes['value'] = null;
+        }
     }
 
     /**

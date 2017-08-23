@@ -16,7 +16,7 @@ class Seminar extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'start_at', 'end_at', 'closed_at'
+        'title', 'start_at', 'end_at', 'closed_at', 'need_audit'
     ];
 
     /**
@@ -41,17 +41,29 @@ class Seminar extends Model
 
     public function setStartAtAttribute($value)
     {
-        $this->attributes['start_at'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
+        if (strlen($value)) {
+            $this->attributes['start_at'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
+        } else {
+            $this->attributes['start_at'] = null;
+        }
     }
 
     public function setEndAtAttribute($value)
     {
-        $this->attributes['end_at'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
+        if (strlen($value)) {
+            $this->attributes['end_at'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
+        } else {
+            $this->attributes['end_at'] = null;
+        }
     }
 
     public function setClosedAtAttribute($value)
     {
-        $this->attributes['closed_at'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
+        if (strlen($value)) {
+            $this->attributes['closed_at'] = Carbon::createFromFormat(\DateTime::ATOM, $value);
+        } else {
+            $this->attributes['closed_at'] = null;
+        }
     }
 
     public function user()

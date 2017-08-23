@@ -15,6 +15,16 @@ class Integer extends Value
 {
     protected $table = 'value_integer';
 
+
+    public function setValueAttribute($value)
+    {
+        if (empty($value)) {
+            $this->attributes['value'] = null;
+        } else {
+            $this->attributes['value'] = $value;
+        }
+    }
+
     /**
      * Create a new Eloquent model instance.
      *
