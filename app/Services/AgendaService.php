@@ -50,11 +50,11 @@ class AgendaService
         return $agenda;
     }
 
-    public function getAgendaList($seminarId, $perPage)
+    public function getAgendaList($seminarId)
     {
         $seminar = $this->seminarService->getSeminar($seminarId);
 
-        $agendas = $seminar->agendas()->paginate($perPage);
+        $agendas = $seminar->agendas()->get();
 
         return $agendas;
     }

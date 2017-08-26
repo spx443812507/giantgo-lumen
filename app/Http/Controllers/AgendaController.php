@@ -36,10 +36,8 @@ class AgendaController extends Controller
 
     public function getAgendaList(Request $request, $seminarId)
     {
-        $perPage = $request->input('per_page');
-
         try {
-            $agendas = $this->agendaService->getAgendaList($seminarId, $perPage);
+            $agendas = $this->agendaService->getAgendaList($seminarId);
         } catch (Exception $e) {
             throw $e;
         }

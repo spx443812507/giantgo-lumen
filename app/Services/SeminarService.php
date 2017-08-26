@@ -55,7 +55,7 @@ class SeminarService
 
         $validators = array_merge([
             'title' => 'required|max:255',
-            'start_at' => 'required|date|date_format:' . DateTime::ATOM . '|after_or_equal:' . Carbon::now('UTC'),
+            'start_at' => 'required|date|date_format:' . DateTime::ATOM,
             'end_at' => 'required|date|date_format:' . DateTime::ATOM . '|after:start_at',
         ], $seminar->makeValidators(array_keys($seminarInfo)));
 

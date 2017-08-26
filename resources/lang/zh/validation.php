@@ -3,7 +3,7 @@ return [
     'unique' => ':attribute 已存在',
     'accepted' => ':attribute 是被接受的',
     'active_url' => ':attribute 必须是一个合法的 URL',
-    'after' => ':attribute 必须是 :date 之后的一个日期',
+    'after' => ':attribute 必须晚于 :date',
     'alpha' => ':attribute 必须全部由字母字符构成。',
     'alpha_dash' => ':attribute 必须全部由字母、数字、中划线或下划线字符构成',
     'alpha_num' => ':attribute 必须全部由字母和数字构成',
