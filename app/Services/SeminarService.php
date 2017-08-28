@@ -10,7 +10,6 @@ namespace App\Services;
 
 use App\Models\Seminar;
 use App\Models\User;
-use Carbon\Carbon;
 use DateTime;
 use Exception;
 use Illuminate\Support\Facades\Validator;
@@ -42,9 +41,29 @@ class SeminarService
         return $seminar;
     }
 
-    public function getSeminarList($perPage)
+    public function getSeminarList($perPage, $title = null, $startAt = null, $endAt = null, $sortBy = null, $order = 'desc')
     {
-        $seminars = Seminar::paginate($perPage);
+        $query = Seminar::query();
+
+        if (!is_null($title)) {
+            $query->where('title', 'like', '%' . $title . '%');
+        }
+
+        if (!is_null($startAt)) {
+            $query->where('start_at', '>=', $startAt);
+        }
+
+        if (!is_null($endAt)) {
+            $query->where('end_at', '<=', $endAt);
+        }
+
+        $query->when($sortBy, function ($query) use ($sortBy, $order) {
+            return $query->orderBy($sortBy, $order);
+        });
+
+        $seminars = $query->paginate($perPage);
+
+        $seminars->load('entity');
 
         return $seminars;
     }

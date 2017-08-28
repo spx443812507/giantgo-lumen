@@ -9,6 +9,7 @@
 namespace App\Services;
 
 use App\Models\Agenda;
+use Carbon\Carbon;
 use DateTime;
 use Exception;
 use Illuminate\Support\Facades\Validator;
@@ -143,6 +144,37 @@ class AgendaService
         $agenda = $this->getAgenda($seminarId, $agendaId);
 
         return $agenda->delete();
+    }
+
+    public function getAgendaDaysList($seminarId)
+    {
+        $days = [];
+
+        $agendas = $this->getAgendaList($seminarId);
+
+        $seminar = $this->seminarService->getSeminar($seminarId);
+
+        $startDay = $seminar->start_at->startOfDay();
+
+        $diff = $seminar->start_at->diffInDays($seminar->end_at);
+
+        for ($i = -1; $i < $diff; $i++) {
+            $date = $startDay->addDay()->format(DateTime::ATOM);
+            $days[$date] = [
+                'date' => $date,
+                'agendas' => []
+            ];
+        }
+
+        foreach ($agendas as $agenda) {
+            $agendaStartDay = $agenda->start_at->startOfDay()->format(DateTime::ATOM);
+
+            if (array_has($days, $agendaStartDay)) {
+                $days[$agendaStartDay]['agendas'][] = $agenda;
+            }
+        }
+
+        return array_pluck($days, null);
     }
 
     public function getAgendaSpeakerList($seminarId, $agendaId)

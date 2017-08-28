@@ -66,6 +66,11 @@ class Seminar extends Model
         }
     }
 
+    public function entity()
+    {
+        return $this->belongsTo('App\Models\EAV\Entity', 'entity_type_id', 'id');
+    }
+
     public function user()
     {
         return $this->belongsTo('App\Models\User');

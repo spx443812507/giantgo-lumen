@@ -38,9 +38,14 @@ class SeminarController extends Controller
     public function getSeminarList(Request $request)
     {
         $perPage = $request->input('per_page');
+        $title = $request->input('title');
+        $startAt = $request->input('start_at');
+        $endAt = $request->input('end_at');
+        $sortBy = $request->input('sort_by');
+        $order = $request->input('order');
 
         try {
-            $seminars = $this->seminarService->getSeminarList($perPage);
+            $seminars = $this->seminarService->getSeminarList($perPage, $title, $startAt, $endAt, $sortBy, $order);
         } catch (Exception $e) {
             throw $e;
         }
