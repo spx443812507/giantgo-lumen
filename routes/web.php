@@ -28,8 +28,8 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
     $app->get('/seminars/{seminar_id}/agendas', ['as' => 'agendas.list', 'uses' => 'AgendaController@getAgendaList']);
     $app->get('/seminars/{seminar_id}/agendas/days', ['as' => 'agendas.day.list', 'uses' => 'AgendaController@getAgendaDaysList']);
     $app->get('/seminars/{seminar_id}/agendas/{agenda_id}', ['as' => 'agendas.get', 'uses' => 'AgendaController@getAgenda']);
-    $app->get('/seminars/{seminar_id}/speakers', ['as' => 'speakers.list', 'uses' => 'SpeakerController@getSpeaker']);
-    $app->get('/seminars/{seminar_id}/speakers/{speaker_id}', ['as' => 'speakers.get', 'uses' => 'SpeakerController@getSpeakerList']);
+    $app->get('/seminars/{seminar_id}/speakers', ['as' => 'speakers.list', 'uses' => 'SpeakerController@getSpeakerList']);
+    $app->get('/seminars/{seminar_id}/speakers/{speaker_id}', ['as' => 'speakers.get', 'uses' => 'SpeakerController@getSpeaker']);
 
     $app->group(['middleware' => 'auth:web'], function () use ($app) {
         $app->get('/users/{user_id}', ['as' => 'users.get', 'middleware' => ['role:admin'], 'uses' => 'UserController@get']);
