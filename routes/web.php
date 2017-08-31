@@ -31,6 +31,8 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
     $app->get('/seminars/{seminar_id}/speakers', ['as' => 'speakers.list', 'uses' => 'SpeakerController@getSpeakerList']);
     $app->get('/seminars/{seminar_id}/speakers/{speaker_id}', ['as' => 'speakers.get', 'uses' => 'SpeakerController@getSpeaker']);
 
+    $app->post('/files/avatar', ['as' => 'avatar.create', 'uses' => 'FileController@uploadAvatar']);
+
     $app->group(['middleware' => 'auth:web'], function () use ($app) {
         $app->get('/users/{user_id}', ['as' => 'users.get', 'middleware' => ['role:admin'], 'uses' => 'UserController@get']);
         $app->get('/users', ['as' => 'users.getList', 'middleware' => ['role:admin'], 'uses' => 'UserController@getList']);

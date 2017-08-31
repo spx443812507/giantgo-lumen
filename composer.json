@@ -24,7 +24,9 @@
     "overtrue/laravel-wechat": "~3.0",
     "overtrue/wechat": "~3.1",
     "overtrue/socialite": "master",
-    "zizaco/entrust": "master"
+    "zizaco/entrust": "master",
+    "league/flysystem": " ~1.0",
+    "johnlui/aliyun-oss": "~2.0"
   },
   "repositories": [
     {
