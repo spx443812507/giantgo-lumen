@@ -9,7 +9,6 @@
 namespace App\Services;
 
 use App\Models\Agenda;
-use Carbon\Carbon;
 use DateTime;
 use Exception;
 use Illuminate\Support\Facades\Validator;
@@ -32,9 +31,9 @@ class AgendaService
     {
         $seminar = $this->seminarService->getSeminar($seminarId);
 
-        $entityTypeId = $seminar->entity_type_id;
-
         $agenda = Agenda::find($agendaId);
+
+        $entityTypeId = $agenda->entity_type_id;
 
         if (empty($agenda)) {
             throw new Exception('agenda_not_exists');
@@ -45,7 +44,7 @@ class AgendaService
         }
 
         if (!!$includeAttributes && !empty($entityTypeId)) {
-            $seminar->attributes = $this->attributeService->getAttributeList($entityTypeId);
+            $agenda->attributes = $this->attributeService->getAttributeList($entityTypeId);
         }
 
         return $agenda;

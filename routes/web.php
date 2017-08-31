@@ -58,9 +58,16 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->post('/seminars/{seminar_id}/agendas', ['as' => 'agendas.create', 'uses' => 'AgendaController@createAgenda', 'middleware' => ['ability:admin,agenda-create']]);
         $app->put('/seminars/{seminar_id}/agendas/{agenda_id}', ['as' => 'agendas.update', 'uses' => 'AgendaController@updateAgenda', 'middleware' => ['ability:admin,agenda-edit']]);
         $app->delete('/seminars/{seminar_id}/agendas/{agenda_id}', ['as' => 'agendas.delete', 'uses' => 'AgendaController@deleteAgenda', 'middleware' => ['ability:admin,agenda-delete']]);
+
         $app->post('/seminars/{seminar_id}/speakers', ['as' => 'speakers.create', 'uses' => 'SpeakerController@createSpeaker', 'middleware' => ['ability:admin,speaker-create']]);
         $app->put('/seminars/{seminar_id}/speakers/{speaker_id}', ['as' => 'speakers.update', 'uses' => 'SpeakerController@updateSpeaker', 'middleware' => ['ability:admin,speaker-update']]);
         $app->delete('/seminars/{seminar_id}/speakers/{speaker_id}', ['as' => 'speakers.delete', 'uses' => 'SpeakerController@deleteSpeaker', 'middleware' => ['ability:admin,speaker-delete']]);
+
+        $app->get('/seminars/{seminar_id}/checkins/{checkin_id}', ['as' => 'checkins.get', 'uses' => 'CheckinController@getCheckin', 'middleware' => ['ability:admin,checkin-get']]);
+        $app->get('/seminars/{seminar_id}/checkins', ['as' => 'checkins.list', 'uses' => 'CheckinController@getCheckinList', 'middleware' => ['ability:admin,checkin-list']]);
+        $app->post('/seminars/{seminar_id}/checkins', ['as' => 'checkins.create', 'uses' => 'CheckinController@createCheckin', 'middleware' => ['ability:admin,checkin-create']]);
+        $app->put('/seminars/{seminar_id}/checkins/{checkin_id}', ['as' => 'checkins.update', 'uses' => 'CheckinController@updateCheckin', 'middleware' => ['ability:admin,checkin-update']]);
+        $app->delete('/seminars/{seminar_id}/checkins/{checkin_id}', ['as' => 'checkins.delete', 'uses' => 'CheckinController@deleteCheckin', 'middleware' => ['ability:admin,checkin-delete']]);
 
         $app->get('/contacts', ['as' => 'contacts.list', 'uses' => 'ContactController@getList', 'middleware' => ['ability:admin,contact-list']]);
         $app->get('/contacts/{contact_id}', ['as' => 'contacts.get', 'uses' => 'ContactController@get', 'middleware' => ['ability:admin,contact-get']]);

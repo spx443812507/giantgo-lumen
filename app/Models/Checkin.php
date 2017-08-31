@@ -44,4 +44,9 @@ class Checkin extends Model
     {
         return $this->belongsTo('App\Models\Seminar');
     }
+
+    public function contacts()
+    {
+        return $this->hasMany('App\Models\Contact');
+    }
 }

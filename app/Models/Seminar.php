@@ -86,6 +86,11 @@ class Seminar extends Model
         return $this->hasMany('App\Models\Agenda');
     }
 
+    public function checkins()
+    {
+        return $this->hasMany('App\Models\Checkin');
+    }
+
     public function speakers()
     {
         return $this->hasMany('App\Models\Speaker');
