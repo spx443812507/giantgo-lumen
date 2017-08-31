@@ -10,7 +10,7 @@ namespace App\Http\Controllers;
 
 use App\Services\OssService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class FileController extends Controller
 {
@@ -23,9 +23,15 @@ class FileController extends Controller
 
     public function uploadAvatar(Request $request)
     {
-        $fullPath = Storage::disk('public')->putFile('avatar', $request->file('file'), 'public');
+        $file = $request->file('file');
 
-        OssService::publicUpload($this->bucketName, $fullPath, storage_path('app/public/') . $fullPath);
+        $avatarName = Str::random(32) . time();
+
+        $fullName = $avatarName . "." . $file->getClientOriginalExtension();
+
+        $fullPath = 'avatar/' . $fullName;
+
+        OssService::publicUpload($this->bucketName, $fullPath, $file->getPathname());
 
         $ossPath = OssService::getPublicObjectURL($this->bucketName, $fullPath);
 
