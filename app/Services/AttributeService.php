@@ -88,19 +88,13 @@ class AttributeService
         DB::beginTransaction();
 
         try {
-            $attribute = $entity->attributes()->create([
-                'entity_type_id' => $entity->id,
-                'attribute_code' => $attributeInfo['attribute_code'],
-                'frontend_input' => $attributeInfo['frontend_input'],
-                'frontend_model' => empty($attributeInfo['frontend_model']) ? '' : $attributeInfo['frontend_model'],
-                'frontend_label' => $attributeInfo['frontend_label'],
-                'frontend_class' => empty($attributeInfo['frontend_class']) ? '' : $attributeInfo['frontend_class'],
-                'is_required' => $attributeInfo['is_required'],
-                'is_user_defined' => false,
-                'is_unique' => empty($attributeInfo['is_unique']) ? false : $attributeInfo['is_unique'],
-                'default_value' => empty($attributeInfo['default_value']) ? '' : $attributeInfo['default_value'],
-                'description' => empty($attributeInfo['description']) ? '' : $attributeInfo['description']
-            ]);
+            $attribute = new Attribute();
+
+            $attribute->fill($attributeInfo);
+
+            $attribute->entity_type_id = $entityTypeId;
+
+            $attribute = $entity->attributes()->save($attribute);
 
             if (array_has($attributeInfo, 'options') && count($attributeInfo['options']) > 0) {
                 $options = $attributeInfo['options'];
@@ -176,11 +170,7 @@ class AttributeService
             throw new ValidationException($validator);
         }
 
-        $attribute->attribute_code = $attributeInfo['attribute_code'];
-        $attribute->frontend_label = $attributeInfo['frontend_label'];
-        $attribute->frontend_input = $attributeInfo['frontend_input'];
-        $attribute->is_required = $attributeInfo['is_required'];
-        $attribute->is_unique = $attributeInfo['is_unique'];
+        $attribute->fill($attributeInfo);
 
         $options = $attributeInfo['options'];
 

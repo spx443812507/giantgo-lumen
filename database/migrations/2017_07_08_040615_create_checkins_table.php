@@ -18,8 +18,8 @@ class CreateCheckinsTable extends Migration
             $table->integer('user_id');
             $table->integer('seminar_id');
             $table->string('title');
-            $table->dateTime('staff_name');
-            $table->dateTime('staff_mobile');
+            $table->string('staff_name');
+            $table->string('staff_mobile');
             $table->timestamps();
             $table->softDeletes();
         });
