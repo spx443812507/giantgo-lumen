@@ -49,11 +49,44 @@ class SpeakerService
         return $speaker;
     }
 
-    public function getSpeakerList($seminarId, $perPage)
+    public function getSpeakerList($seminarId, $perPage = null, $name = null)
     {
         $seminar = $this->seminarService->getSeminar($seminarId);
 
-        $speakers = $seminar->speakers()->paginate($perPage);
+        $speakers = $seminar->speakers();
+
+        if (!is_null($name)) {
+            $speakers->where('name', 'like', '%' . $name . '%');
+        }
+
+        $speakers = $speakers->paginate($perPage);
+
+        return $speakers;
+    }
+
+    public function searchSpeakerList($perPage = null, $seminarId = null, $agendaId = null, $name = null)
+    {
+        $query = Speaker::query();
+
+        if ($seminarId) {
+            $query->where('seminarId', $seminarId);
+        }
+
+        if ($agendaId) {
+            $query->where('agendaId', $agendaId);
+        }
+
+        if ($name) {
+            $query->where('name', 'like', '%' . $name . '%');
+        }
+
+        if (empty($perPage)) {
+            $perPage = 100;
+        } else if ($perPage > 1000) {
+            $perPage = 1000;
+        }
+
+        $speakers = $query->paginate($perPage);
 
         return $speakers;
     }

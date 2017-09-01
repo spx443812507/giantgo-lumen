@@ -47,9 +47,9 @@ class CheckinService
     {
         $seminar = $this->seminarService->getSeminar($seminarId);
 
-        $agendas = $seminar->checkins()->get();
+        $checkins = $seminar->checkins()->get();
 
-        return $agendas;
+        return $checkins;
     }
 
     public function createCheckin($seminarId, $checkinInfo)

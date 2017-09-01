@@ -71,7 +71,7 @@ class ContactService
         return $contact;
     }
 
-    public function getContactList($perPage)
+    public function getContactList($perPage = null)
     {
         $contacts = Contact::paginate($perPage);
 

@@ -41,7 +41,7 @@ class SeminarService
         return $seminar;
     }
 
-    public function getSeminarList($perPage, $title = null, $startAt = null, $endAt = null, $sortBy = null, $order = 'desc')
+    public function getSeminarList($perPage = null, $title = null, $startAt = null, $endAt = null, $sortBy = null, $order = 'desc')
     {
         $query = Seminar::query();
 

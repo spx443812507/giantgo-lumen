@@ -11,6 +11,7 @@ namespace App\Services;
 use App\Models\Agenda;
 use DateTime;
 use Exception;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -50,11 +51,11 @@ class AgendaService
         return $agenda;
     }
 
-    public function getAgendaList($seminarId)
+    public function getAgendaList($seminarId, $perPage = null)
     {
         $seminar = $this->seminarService->getSeminar($seminarId);
 
-        $agendas = $seminar->agendas()->get();
+        $agendas = $seminar->agendas()->get($perPage);
 
         return $agendas;
     }
