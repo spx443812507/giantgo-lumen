@@ -81,15 +81,4 @@ class AgendaController extends Controller
 
         return response()->json(null, 204);
     }
-
-    public function getAgendaDaysList(Request $request, $seminarId)
-    {
-        try {
-            $days = $this->agendaService->getAgendaDaysList($seminarId);
-        } catch (Exception $e) {
-            throw $e;
-        }
-
-        return response()->json($days);
-    }
 }

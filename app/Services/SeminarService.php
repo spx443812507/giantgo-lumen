@@ -28,11 +28,11 @@ class SeminarService
     {
         $seminar = Seminar::find($seminarId);
 
-        $entityTypeId = $seminar->entity_type_id;
-
         if (empty($seminar)) {
             throw new Exception('seminar_not_exists');
         }
+
+        $entityTypeId = $seminar->entity_type_id;
 
         if (!!$includeAttributes && !empty($entityTypeId)) {
             $seminar->attributes = $this->attributeService->getAttributeList($entityTypeId);

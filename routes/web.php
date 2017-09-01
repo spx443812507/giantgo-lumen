@@ -25,9 +25,10 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
 
     $app->get('/seminars', ['as' => 'seminars.list', 'uses' => 'SeminarController@getSeminarList']);
     $app->get('/seminars/{seminar_id}', ['as' => 'seminars.get', 'uses' => 'SeminarController@getSeminar']);
+
     $app->get('/seminars/{seminar_id}/agendas', ['as' => 'agendas.list', 'uses' => 'AgendaController@getAgendaList']);
-    $app->get('/seminars/{seminar_id}/agendas/days', ['as' => 'agendas.day.list', 'uses' => 'AgendaController@getAgendaDaysList']);
     $app->get('/seminars/{seminar_id}/agendas/{agenda_id}', ['as' => 'agendas.get', 'uses' => 'AgendaController@getAgenda']);
+
     $app->get('/seminars/{seminar_id}/speakers', ['as' => 'speakers.list', 'uses' => 'SpeakerController@getSpeakerList']);
     $app->get('/seminars/{seminar_id}/speakers/{speaker_id}', ['as' => 'speakers.get', 'uses' => 'SpeakerController@getSpeaker']);
 

@@ -32,5 +32,13 @@ return [
     'route_not_found' => '请求地址不存在',
     'model_not_found' => '请求实体不存在',
     'bad_request' => '错误的请求',
-    'agenda_not_belong_to_seminar' => '日程不属于该会议'
+    'create_agenda_fail' => '创建日程失败',
+    'agenda_not_exists' => '日程不存在',
+    'agenda_not_belong_to_seminar' => '日程不属于该会议',
+    'create_speaker_fail' => '创建演讲嘉宾失败',
+    'speaker_not_exists' => '演讲嘉宾不存在',
+    'speaker_not_belong_to_seminar' => '演讲嘉宾不属于该会议',
+    'create_checkin_fail' => '创建签到点失败',
+    'checkin_not_exists' => '签到点不存在',
+    'checkin_not_belong_to_seminar' => '签到点不属于该会议'
 ];

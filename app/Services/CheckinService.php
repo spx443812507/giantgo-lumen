@@ -9,7 +9,6 @@
 namespace App\Services;
 
 use App\Models\Checkin;
-use DateTime;
 use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -51,5 +50,63 @@ class CheckinService
         $agendas = $seminar->checkins()->get();
 
         return $agendas;
+    }
+
+    public function createCheckin($seminarId, $checkinInfo)
+    {
+        $seminar = $this->seminarService->getSeminar($seminarId);
+
+        $validators = [
+            'title' => 'required|max:255',
+            'staff_name' => 'max:255',
+            'staff_mobile' => 'max:255'
+        ];
+
+        $validator = Validator::make($checkinInfo, $validators);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        try {
+            $checkin = new Checkin($checkinInfo);
+            $seminar->checkins()->save($checkin);
+        } catch (Exception $e) {
+            throw new Exception('create_checkin_fail');
+        }
+
+        return $checkin;
+    }
+
+    public function updateCheckin($seminarId, $checkinId, $checkinInfo)
+    {
+        $checkin = $this->getCheckin($seminarId, $checkinId);
+
+        $validators = [
+            'title' => 'required|max:255',
+            'staff_name' => 'max:255',
+            'staff_mobile' => 'max:255'
+        ];
+
+        $validator = Validator::make($checkinInfo, $validators);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        try {
+            $checkin->fill($checkinInfo)->save();
+        } catch (Exception $exception) {
+            throw new Exception('update_checkin_fail');
+        }
+
+        return $checkin;
+    }
+
+    public function deleteCheckin($seminarId, $checkinId)
+    {
+        $checkin = $this->getCheckin($seminarId, $checkinId);
+
+        return $checkin->delete();
     }
 }

@@ -18,11 +18,6 @@ class EntityController extends Controller
 {
     protected $attributeService;
 
-    public function __construct(AttributeService $attributeService)
-    {
-        $this->attributeService = $attributeService;
-    }
-
     private $entityMappings = [
         'contact' => [
             'entity_model' => 'App\Models\Contact',
@@ -35,8 +30,17 @@ class EntityController extends Controller
         'speaker' => [
             'entity_model' => 'App\Models\Speaker',
             'entity_table' => 'speakers'
+        ],
+        'agenda' => [
+            'entity_model' => 'App\Models\Agenda',
+            'entity_table' => 'agendas'
         ]
     ];
+
+    public function __construct(AttributeService $attributeService)
+    {
+        $this->attributeService = $attributeService;
+    }
 
     public function createEntity(Request $request)
     {

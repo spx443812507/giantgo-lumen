@@ -23,7 +23,7 @@ class SpeakerService
     {
         $this->seminarService = $seminarService;
 
-        $this->attribtueService = $attributeService;
+        $this->attributeService = $attributeService;
     }
 
     public function getSpeaker($seminarId, $speakerId, $includeAttributes = false)
@@ -32,8 +32,6 @@ class SpeakerService
 
         $speaker = Speaker::find($speakerId);
 
-        $entityTypeId = $speaker->entity_type_id;
-
         if (empty($speaker)) {
             throw new Exception('speaker_not_exists');
         }
@@ -41,6 +39,8 @@ class SpeakerService
         if ($speaker->seminar_id !== $seminar->id) {
             throw new Exception('speaker_not_belong_to_seminar');
         }
+
+        $entityTypeId = $speaker->entity_type_id;
 
         if (!!$includeAttributes && !empty($entityTypeId)) {
             $speaker->attributes = $this->attributeService->getAttributeList($entityTypeId);
@@ -80,7 +80,7 @@ class SpeakerService
             $speaker = new Speaker($speakerInfo);
             $seminar->speakers()->save($speaker);
         } catch (Exception $e) {
-            throw new Exception('create_agenda_fail');
+            throw new Exception('create_speaker_fail');
         }
 
         return $speaker;
