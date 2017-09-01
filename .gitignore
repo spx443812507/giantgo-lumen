@@ -3,5 +3,4 @@ Homestead.json
 Homestead.yaml
 .DS_Store
 /vendor/
-/.env
 /localhost.env
