@@ -32,6 +32,8 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
     $app->get('/seminars/{seminar_id}/speakers', ['as' => 'speakers.list', 'uses' => 'SpeakerController@getSpeakerList']);
     $app->get('/seminars/{seminar_id}/speakers/{speaker_id}', ['as' => 'speakers.get', 'uses' => 'SpeakerController@getSpeaker']);
 
+    $app->get('/seminars/{seminar_id}/agendas/{agenda_id}/speakers', ['as' => 'agenda.speakers.get', 'uses' => 'SpeakerController@getAgendaSpeakers']);
+
     $app->get('/search/speakers', ['as' => 'search.speakers', 'uses' => 'SpeakerController@searchSpeakerList']);
 
     $app->post('/files/avatar', ['as' => 'avatar.create', 'uses' => 'FileController@uploadAvatar']);
@@ -65,6 +67,8 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->post('/seminars/{seminar_id}/speakers', ['as' => 'speakers.create', 'uses' => 'SpeakerController@createSpeaker', 'middleware' => ['ability:admin,speaker-create']]);
         $app->put('/seminars/{seminar_id}/speakers/{speaker_id}', ['as' => 'speakers.update', 'uses' => 'SpeakerController@updateSpeaker', 'middleware' => ['ability:admin,speaker-update']]);
         $app->delete('/seminars/{seminar_id}/speakers/{speaker_id}', ['as' => 'speakers.delete', 'uses' => 'SpeakerController@deleteSpeaker', 'middleware' => ['ability:admin,speaker-delete']]);
+
+        $app->put('/seminars/{seminar_id}/agendas/{agenda_id}/speakers', ['as' => 'agenda.speakers.update', 'uses' => 'SpeakerController@attachAgendaSpeakers', 'middleware' => ['ability:admin,speaker-create']]);
 
         $app->get('/seminars/{seminar_id}/checkins/{checkin_id}', ['as' => 'checkins.get', 'uses' => 'CheckinController@getCheckin', 'middleware' => ['ability:admin,checkin-get']]);
         $app->get('/seminars/{seminar_id}/checkins', ['as' => 'checkins.list', 'uses' => 'CheckinController@getCheckinList', 'middleware' => ['ability:admin,checkin-list']]);

@@ -100,4 +100,28 @@ class SpeakerController extends Controller
 
         return response()->json(null, 204);
     }
+
+    public function getAgendaSpeakers(Request $request, $seminarId, $agendaId)
+    {
+        try {
+            $speakers = $this->speakerService->getAgendaSpeakers($seminarId, $agendaId);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($speakers);
+    }
+
+    public function attachAgendaSpeakers(Request $request, $seminarId, $agendaId)
+    {
+        $speakerIds = $request->input('speakers');
+
+        try {
+            $speakers = $this->speakerService->attachAgendaSpeakers($seminarId, $agendaId, $speakerIds);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($speakers);
+    }
 }

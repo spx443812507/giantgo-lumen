@@ -11,17 +11,22 @@ namespace App\Services;
 use App\Models\Speaker;
 use Exception;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class SpeakerService
 {
     protected $seminarService;
 
+    protected $agendaService;
+
     protected $attributeService;
 
-    public function __construct(SeminarService $seminarService, AttributeService $attributeService)
+    public function __construct(SeminarService $seminarService, AgendaService $agendaService, AttributeService $attributeService)
     {
         $this->seminarService = $seminarService;
+
+        $this->agendaService = $agendaService;
 
         $this->attributeService = $attributeService;
     }
@@ -155,5 +160,37 @@ class SpeakerService
         $speaker = $this->getSpeaker($seminarId, $speakerId);
 
         return $speaker->delete();
+    }
+
+    public function getAgendaSpeakers($seminarId, $agendaId)
+    {
+        $agenda = $this->agendaService->getAgenda($seminarId, $agendaId);
+
+        return $agenda->speakers()->get();
+    }
+
+    public function attachAgendaSpeakers($seminarId, $agendaId, $speakerIds)
+    {
+        $agenda = $this->agendaService->getAgenda($seminarId, $agendaId);
+
+        $seminar = $this->seminarService->getSeminar($seminarId);
+
+        $seminarSpeakers = $seminar->speakers()->get()->pluck('id')->toArray();
+
+        $validator = Validator::make($speakerIds, [
+            '*' => Rule::in($seminarSpeakers)
+        ]);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        try {
+            $agenda->speakers()->sync($speakerIds);
+        } catch (Exception $e) {
+            throw new Exception('attach_agenda_speaker_fail');
+        }
+
+        return $this->getAgendaSpeakers($seminarId, $agendaId);
     }
 }

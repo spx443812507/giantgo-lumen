@@ -11,7 +11,6 @@ namespace App\Services;
 use App\Models\Agenda;
 use DateTime;
 use Exception;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -34,8 +33,6 @@ class AgendaService
 
         $agenda = Agenda::find($agendaId);
 
-        $entityTypeId = $agenda->entity_type_id;
-
         if (empty($agenda)) {
             throw new Exception('agenda_not_exists');
         }
@@ -43,6 +40,8 @@ class AgendaService
         if ($agenda->seminar_id !== $seminar->id) {
             throw new Exception('agenda_not_belong_to_seminar');
         }
+
+        $entityTypeId = $agenda->entity_type_id;
 
         if (!!$includeAttributes && !empty($entityTypeId)) {
             $agenda->attributes = $this->attributeService->getAttributeList($entityTypeId);
@@ -144,19 +143,5 @@ class AgendaService
         $agenda = $this->getAgenda($seminarId, $agendaId);
 
         return $agenda->delete();
-    }
-
-    public function getAgendaSpeakerList($seminarId, $agendaId)
-    {
-        $agenda = $this->getAgenda($seminarId, $agendaId);
-
-        $speakers = $agenda->speakers()->all();
-
-        return $speakers;
-    }
-
-    public function deleteAgendaSpeaker($agendaId, $speakerId)
-    {
-
     }
 }
