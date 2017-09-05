@@ -74,11 +74,13 @@ class SpeakerService
         $query = Speaker::query();
 
         if ($seminarId) {
-            $query->where('seminarId', $seminarId);
+            $query->where('seminar_id', $seminarId);
         }
 
         if ($agendaId) {
-            $query->where('agendaId', $agendaId);
+            $query->whereHas('agendas', function ($query) use ($agendaId) {
+                $query->where('id', '=', $agendaId);
+            });
         }
 
         if ($name) {

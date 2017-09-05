@@ -47,6 +47,8 @@ class AgendaService
             $agenda->attributes = $this->attributeService->getAttributeList($entityTypeId);
         }
 
+        $agenda->load('speakers');
+
         return $agenda;
     }
 
@@ -55,6 +57,8 @@ class AgendaService
         $seminar = $this->seminarService->getSeminar($seminarId);
 
         $agendas = $seminar->agendas()->get($perPage);
+
+        $agendas->load('speakers');
 
         return $agendas;
     }
