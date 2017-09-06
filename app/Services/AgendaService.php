@@ -60,6 +60,10 @@ class AgendaService
 
         $agendas->load('speakers');
 
+        foreach ($agendas as $agenda) {
+            $agenda->speakerIds = $agenda->speakers->pluck('id');
+        }
+
         return $agendas;
     }
 
@@ -145,6 +149,8 @@ class AgendaService
     public function deleteAgenda($seminarId, $agendaId)
     {
         $agenda = $this->getAgenda($seminarId, $agendaId);
+
+        $agenda->speakers()->sync([]);
 
         return $agenda->delete();
     }

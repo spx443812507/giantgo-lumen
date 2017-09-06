@@ -36,11 +36,10 @@ class SpeakerController extends Controller
 
     public function getSpeakerList(Request $request, $seminarId)
     {
-        $perPage = $request->input('per_page');
         $name = $request->input('name');
 
         try {
-            $speakers = $this->speakerService->getSpeakerList($seminarId, $perPage, $name);
+            $speakers = $this->speakerService->getSpeakerList($seminarId, $name);
         } catch (Exception $e) {
             throw $e;
         }

@@ -54,7 +54,7 @@ class SpeakerService
         return $speaker;
     }
 
-    public function getSpeakerList($seminarId, $perPage = null, $name = null)
+    public function getSpeakerList($seminarId, $name = null)
     {
         $seminar = $this->seminarService->getSeminar($seminarId);
 
@@ -64,7 +64,7 @@ class SpeakerService
             $speakers->where('name', 'like', '%' . $name . '%');
         }
 
-        $speakers = $speakers->paginate($perPage);
+        $speakers = $speakers->get();
 
         return $speakers;
     }

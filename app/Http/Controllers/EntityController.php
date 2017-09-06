@@ -8,88 +8,75 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EAV\Entity;
-use App\Services\AttributeService;
+use App\Services\EntityService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Mockery\Exception;
 
 class EntityController extends Controller
 {
-    protected $attributeService;
+    protected $entityService;
 
-    private $entityMappings = [
-        'contact' => [
-            'entity_model' => 'App\Models\Contact',
-            'entity_table' => 'contacts'
-        ],
-        'seminar' => [
-            'entity_model' => 'App\Models\Seminar',
-            'entity_table' => 'seminars'
-        ],
-        'speaker' => [
-            'entity_model' => 'App\Models\Speaker',
-            'entity_table' => 'speakers'
-        ],
-        'agenda' => [
-            'entity_model' => 'App\Models\Agenda',
-            'entity_table' => 'agendas'
-        ]
-    ];
-
-    public function __construct(AttributeService $attributeService)
+    public function __construct(EntityService $entityService)
     {
-        $this->attributeService = $attributeService;
+        $this->entityService = $entityService;
     }
 
-    public function createEntity(Request $request)
+    public function getEntity(Request $request, $entityTypeId)
     {
-        $this->validate($request, [
-            'entity_type_name' => 'required|max:255',
-            'entity_type_code' => 'required'
-        ]);
-
-        $entityTypeCode = $request->input('entity_type_code');
-
-        if (!array_has($this->entityMappings, $entityTypeCode)) {
-            return response()->json(['error' => 'entity_type_not_support'], 500);
-        }
-
-        $entityInfo = array_merge($request->only('entity_type_name', 'entity_type_code', 'description'), [
-            'entity_model' => $this->entityMappings[$entityTypeCode]['entity_model'],
-            'entity_table' => $this->entityMappings[$entityTypeCode]['entity_table'],
-            'user_id' => Auth::user()->id
-        ]);
-
         try {
-            $entity = Entity::create($entityInfo);
+            $entity = $this->entityService->getEntity($entityTypeId);
         } catch (Exception $e) {
-            return response()->json('create_error', 500);
+            throw $e;
         }
 
-        return response()->json($entity, 200);
+        return response()->json($entity);
     }
 
     public function getEntityList(Request $request, $entityTypeCode)
     {
-        if (!array_has($this->entityMappings, $entityTypeCode)) {
-            return response()->json(['error' => 'entity_type_not_support'], 500);
+        try {
+            $entities = $this->entityService->getEntityList($entityTypeCode);
+        } catch (Exception $e) {
+            throw $e;
         }
+
+        return response()->json($entities);
+    }
+
+    public function createEntity(Request $request)
+    {
+        $entityInfo = $request->only('entity_type_name', 'entity_type_code', 'description');
 
         try {
-            $entities = Entity::where('entity_type_code', $entityTypeCode)->get();
-
-            foreach ($entities as $entity) {
-                $entityClass = $entity->entity_model;
-
-                $entity->attributes = $this->attributeService->getAttributeList($entity->id);
-
-                $entity->entity_instance_count = count($entityClass::where('entity_type_id', $entity->id)->get());
-            }
+            $entity = $this->entityService->createEntity($entityInfo);
         } catch (Exception $e) {
-            return response()->json('entity_not_exists', 500);
+            throw $e;
         }
 
-        return response()->json($entities, 200);
+        return response()->json($entity, 201);
+    }
+
+    public function updateEntity(Request $request, $entityTypeId)
+    {
+        $entityInfo = $request->only('entity_type_name', 'description');
+
+        try {
+            $entity = $this->entityService->updateEntity($entityTypeId, $entityInfo);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($entity);
+    }
+
+    public function deleteEntity(Request $request, $entityTypeId)
+    {
+        try {
+            $this->entityService->deleteEntity($entityTypeId);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json(null, 204);
     }
 }

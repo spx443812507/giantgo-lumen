@@ -33,6 +33,7 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
     $app->get('/seminars/{seminar_id}/speakers/{speaker_id}', ['as' => 'speakers.get', 'uses' => 'SpeakerController@getSpeaker']);
 
     $app->get('/seminars/{seminar_id}/agendas/{agenda_id}/speakers', ['as' => 'agenda.speakers.get', 'uses' => 'SpeakerController@getAgendaSpeakers']);
+    $app->get('/seminars/{seminar_id}/entities/{entity_type_id}/speakers', ['as' => 'entity.speakers.get', 'uses' => 'SpeakerController@getEntitySpeakers']);
 
     $app->get('/search/speakers', ['as' => 'search.speakers', 'uses' => 'SpeakerController@searchSpeakerList']);
 
