@@ -49,8 +49,6 @@ class EntityService
             throw new Exception('entity_not_exists');
         }
 
-        $entity->load($entity->entity_table);
-
         return $entity;
     }
 
@@ -89,7 +87,7 @@ class EntityService
             throw new ValidationException($validator);
         }
 
-        $entityTypeCode = $entityInfo->entity_type_code;
+        $entityTypeCode = $entityInfo['entity_type_code'];
 
         if (!array_has($this->entityMappings, $entityTypeCode)) {
             throw new Exception('entity_type_not_support');
@@ -135,6 +133,8 @@ class EntityService
     public function deleteEntity($entityTypeId)
     {
         $entity = $this->getEntity($entityTypeId);
+
+        $entity->attributes()->sync([]);
 
         return $entity->delete();
     }

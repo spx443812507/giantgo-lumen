@@ -48,8 +48,11 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->post('/roles', ['as' => 'roles.create', 'uses' => 'RoleController@createRole', 'middleware' => ['ability:admin,role-create']]);
         $app->get('/roles/{role_id}', ['as' => 'roles.get', 'uses' => 'RoleController@getRole', 'middleware' => ['ability:admin,role-get']]);
 
+        $app->get('/entities/{entity_type_code:contact|seminar|agenda|speaker}', ['as' => 'entities.list', 'uses' => 'EntityController@getEntityList', 'middleware' => ['ability:admin,entity-list']]);
+        $app->get('/entities/{entity_type_id}', ['as' => 'entities.get', 'uses' => 'EntityController@getEntity', 'middleware' => ['ability:admin,entity-get']]);
         $app->post('/entities', ['as' => 'entities.create', 'uses' => 'EntityController@createEntity', 'middleware' => ['ability:admin,entity-create']]);
-        $app->get('/entities/{entity_type_code}', ['as' => 'entities.list', 'uses' => 'EntityController@getEntityList', 'middleware' => ['ability:admin,entity-list']]);
+        $app->put('/entities/{entity_type_id}', ['as' => 'entities.update', 'uses' => 'EntityController@updateEntity', 'middleware' => ['ability:admin,entity-update']]);
+        $app->delete('/entities/{entity_type_id}', ['as' => 'entities.delete', 'uses' => 'EntityController@deleteEntity', 'middleware' => ['ability:admin,entity-delete']]);
 
         $app->post('/entities/{entity_type_id}/attributes/batch', ['as' => 'attributes.batchCreate', 'uses' => 'AttributeController@batchCreateAttribute']);
         $app->post('/entities/{entity_type_id}/attributes', ['as' => 'attributes.create', 'uses' => 'AttributeController@createAttribute']);
