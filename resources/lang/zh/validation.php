@@ -104,6 +104,7 @@ return [
         'end_at' => '结束时间',
         'closed_at' => '关闭时间',
         'entity_type_id' => '实体类型',
+        'attribute_code' => '属性代码',
         '*.attribute_code' => '属性代码',
         '*.frontend_label' => '属性标题',
         '*.frontend_input' => '属性类型'

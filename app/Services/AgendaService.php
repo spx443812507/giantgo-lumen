@@ -43,7 +43,7 @@ class AgendaService
 
         $entityTypeId = $agenda->entity_type_id;
 
-        if (!!$includeAttributes && !empty($entityTypeId)) {
+        if ($includeAttributes && !empty($entityTypeId)) {
             $agenda->attributes = $this->attributeService->getAttributeList($entityTypeId);
         }
 
@@ -71,7 +71,15 @@ class AgendaService
     {
         $seminar = $this->seminarService->getSeminar($seminarId);
 
-        $validators = [
+        $agenda = new Agenda($agendaInfo);
+
+        if (!empty($agendaInfo['entity_type_id'])) {
+            $agenda->entity_type_id = $agendaInfo['entity_type_id'];
+        }
+
+        $messages = [];
+
+        $validators = array_merge([
             'title' => 'required|max:255',
             'start_at' => [
                 'required',
@@ -86,16 +94,15 @@ class AgendaService
                 'date_format:' . DateTime::ATOM,
                 'after:start_at'
             ]
-        ];
+        ], $agenda->makeValidators(array_keys($agendaInfo), $messages));
 
-        $validator = Validator::make($agendaInfo, $validators);
+        $validator = Validator::make($agendaInfo, $validators, $messages);
 
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
 
         try {
-            $agenda = new Agenda($agendaInfo);
             $seminar->agendas()->save($agenda);
         } catch (Exception $e) {
             throw new Exception('create_agenda_fail');
@@ -114,6 +121,8 @@ class AgendaService
             $agenda->entity_type_id = $agendaInfo['entity_type_id'];
         }
 
+        $messages = [];
+
         $validators = array_merge([
             'title' => 'required|max:255',
             'start_at' => [
@@ -129,9 +138,9 @@ class AgendaService
                 'date_format:' . DateTime::ATOM,
                 'after:start_at'
             ]
-        ], $agenda->makeValidators(array_keys($agendaInfo)));
+        ], $agenda->makeValidators(array_keys($agendaInfo), $messages));
 
-        $validator = Validator::make($agendaInfo, $validators);
+        $validator = Validator::make($agendaInfo, $validators, $messages);
 
         if ($validator->fails()) {
             throw new ValidationException($validator);

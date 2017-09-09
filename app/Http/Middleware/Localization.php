@@ -26,17 +26,26 @@ class Localization
 
         $response = $next($request);
 
-        //escape parameters error
-        if (!$response->isSuccessful() && $response->getStatusCode() !== 422) {
-
-            $content = $response->getContent();
-
-            $content = json_decode($content);
+        if (!$response->isSuccessful()) {
+            $content = json_decode($response->getContent());
 
             if (isset($content) && property_exists($content, 'error')) {
+                if ($response->getStatusCode() === 422) {
+
+                    $message = [];
+
+                    foreach ($content->error as $error) {
+                        $message = array_merge($message, array_pluck($error, 'message'));
+                    }
+
+                    $message = implode($message, ', ');
+                } else {
+                    $message = trans('response.' . $content->error);
+                }
+
                 $response->setContent(json_encode([
                     'error' => $content->error,
-                    'message' => trans('response.' . $content->error)
+                    'message' => $message
                 ]));
             }
         }

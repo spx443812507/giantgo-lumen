@@ -50,12 +50,13 @@ class SpeakerController extends Controller
     public function searchSpeakerList(Request $request)
     {
         $perPage = $request->input('per_page');
+        $entityTypeId = $request->input('entity_type_id');
         $seminarId = $request->input('seminar_id');
         $agendaId = $request->input('agenda_id');
         $name = $request->input('name');
 
         try {
-            $speakers = $this->speakerService->searchSpeakerList($perPage, $seminarId, $agendaId, $name);
+            $speakers = $this->speakerService->searchSpeakerList($perPage, $seminarId, $agendaId, $entityTypeId, $name);
         } catch (Exception $e) {
             throw $e;
         }

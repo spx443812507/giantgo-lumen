@@ -47,7 +47,7 @@ class SpeakerService
 
         $entityTypeId = $speaker->entity_type_id;
 
-        if (!!$includeAttributes && !empty($entityTypeId)) {
+        if ($includeAttributes && !empty($entityTypeId)) {
             $speaker->attributes = $this->attributeService->getAttributeList($entityTypeId);
         }
 
@@ -69,9 +69,19 @@ class SpeakerService
         return $speakers;
     }
 
-    public function searchSpeakerList($perPage = null, $seminarId = null, $agendaId = null, $name = null)
+    public function searchSpeakerList(
+        $perPage = null,
+        $seminarId = null,
+        $agendaId = null,
+        $entityTypeId = null,
+        $name = null
+    )
     {
         $query = Speaker::query();
+
+        if ($entityTypeId) {
+            $query->where('entity_type_id', $entityTypeId);
+        }
 
         if ($seminarId) {
             $query->where('seminar_id', $seminarId);
@@ -102,22 +112,27 @@ class SpeakerService
     {
         $seminar = $this->seminarService->getSeminar($seminarId);
 
-        $validators = [
+        $speaker = new Speaker($speakerInfo);
+
+        if (!empty($speakerInfo['entity_type_id'])) {
+            $speaker->entity_type_id = $speakerInfo['entity_type_id'];
+        }
+
+        $messages = [];
+
+        $validators = array_merge([
             'name' => 'required|max:255',
-            'email' => 'email|max:255',
-            'mobile' => 'max:255',
             'company' => 'max:255',
             'position' => 'max:255'
-        ];
+        ], $speaker->makeValidators(array_keys($speakerInfo), $messages));
 
-        $validator = Validator::make($speakerInfo, $validators);
+        $validator = Validator::make($speakerInfo, $validators, $messages);
 
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
 
         try {
-            $speaker = new Speaker($speakerInfo);
             $seminar->speakers()->save($speaker);
         } catch (Exception $e) {
             throw new Exception('create_speaker_fail');

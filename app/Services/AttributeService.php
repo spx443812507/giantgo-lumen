@@ -22,7 +22,7 @@ class AttributeService
     protected function makeValidators($entityTypeId, $attributeId = null)
     {
         $validators = [
-            'attribute_code' => 'required',
+            'attribute_code' => ['required'],
             'frontend_label' => 'required',
             'frontend_input' => 'required',
             'options' => 'array',
@@ -37,9 +37,24 @@ class AttributeService
             $unique = $unique->ignore($attributeId);
         }
 
-        $validators['attribute_code'] = $unique;
+        $validators['attribute_code'][] = $unique;
 
         return $validators;
+    }
+
+    public function getAttribute($entityTypeId, $attributeId)
+    {
+        $attribute = Attribute::find($attributeId);
+
+        if (empty($attribute)) {
+            throw new Exception('attribute_not_exists');
+        }
+
+        if ($attribute->entity_type_id != $entityTypeId) {
+            throw new Exception('attribute_not_belong_to_entity');
+        }
+
+        return $attribute;
     }
 
     public function getAttributeList($entityTypeId)
@@ -207,5 +222,20 @@ class AttributeService
         $attribute->save();
 
         return $attribute;
+    }
+
+    public function deleteAttribute($entityTypeId, $attributeId)
+    {
+        $attribute = $this->getAttribute($entityTypeId, $attributeId);
+
+        if ($attribute->hasOptions()) {
+            $attribute->options()->delete();
+        }
+
+        $valueClass = $attribute->backend_model;
+
+        $valueClass::where('attribute_id', $attribute->id)->delete();
+
+        $attribute->delete();
     }
 }

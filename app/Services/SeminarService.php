@@ -34,7 +34,7 @@ class SeminarService
 
         $entityTypeId = $seminar->entity_type_id;
 
-        if (!!$includeAttributes && !empty($entityTypeId)) {
+        if ($includeAttributes && !empty($entityTypeId)) {
             $seminar->attributes = $this->attributeService->getAttributeList($entityTypeId);
         }
 
@@ -72,13 +72,19 @@ class SeminarService
     {
         $seminar = new Seminar($seminarInfo);
 
+        if (!empty($seminarInfo['entity_type_id'])) {
+            $seminar->entity_type_id = $seminarInfo['entity_type_id'];
+        }
+
+        $messages = [];
+
         $validators = array_merge([
             'title' => 'required|max:255',
             'start_at' => 'required|date|date_format:' . DateTime::ATOM,
             'end_at' => 'required|date|date_format:' . DateTime::ATOM . '|after:start_at',
-        ], $seminar->makeValidators(array_keys($seminarInfo)));
+        ], $seminar->makeValidators(array_keys($seminarInfo), $messages));
 
-        $validator = Validator::make($seminarInfo, $validators);
+        $validator = Validator::make($seminarInfo, $validators, $messages);
 
         if ($validator->fails()) {
             throw new ValidationException($validator);
@@ -101,13 +107,15 @@ class SeminarService
             $seminar->entity_type_id = $seminarInfo['entity_type_id'];
         }
 
+        $messages = [];
+
         $validators = array_merge([
             'title' => 'required|max:255',
             'start_at' => 'required|date|date_format:' . DateTime::ATOM,
             'end_at' => 'required|date|date_format:' . DateTime::ATOM . '|after:start_at',
-        ], $seminar->makeValidators(array_keys($seminarInfo)));
+        ], $seminar->makeValidators(array_keys($seminarInfo), $messages));
 
-        $validator = Validator::make($seminarInfo, $validators);
+        $validator = Validator::make($seminarInfo, $validators, $messages);
 
         if ($validator->fails()) {
             throw new ValidationException($validator);

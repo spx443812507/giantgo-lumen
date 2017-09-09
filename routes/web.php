@@ -57,6 +57,7 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->post('/entities/{entity_type_id}/attributes/batch', ['as' => 'attributes.batchCreate', 'uses' => 'AttributeController@batchCreateAttribute']);
         $app->post('/entities/{entity_type_id}/attributes', ['as' => 'attributes.create', 'uses' => 'AttributeController@createAttribute']);
         $app->put('/entities/{entity_type_id}/attributes/{attribute_id}', ['as' => 'attributes.update', 'uses' => 'AttributeController@updateAttribute']);
+        $app->get('/entities/{entity_type_id}/attributes/{attribute_id}', ['as' => 'attributes.get', 'uses' => 'AttributeController@getAttribute']);
         $app->get('/entities/{entity_type_id}/attributes', ['as' => 'attributes.list', 'uses' => 'AttributeController@getAttributeList']);
         $app->delete('/entities/{entity_type_id}/attributes/{attribute_id}', ['as' => 'attributes.delete', 'uses' => 'AttributeController@deleteAttribute']);
 

@@ -64,7 +64,7 @@ class ContactService
             throw new Exception('contact_not_exists');
         }
 
-        if (!!$includeAttributes && !empty($entityTypeId)) {
+        if ($includeAttributes && !empty($entityTypeId)) {
             $contact->attributes = $this->attributeService->getAttributeList($entityTypeId);
         }
 
@@ -82,13 +82,19 @@ class ContactService
     {
         $contact = new Contact;
 
+        if (!empty($contactInfo['entity_type_id'])) {
+            $contact->entity_type_id = $contactInfo['entity_type_id'];
+        }
+
+        $messages = [];
+
         $validators = array_merge([
             'email' => 'required_without:mobile|email|max:255|unique:contacts,email',
             'mobile' => 'max:255|unique:contacts,mobile',
             'password' => 'required'
-        ], $contact->makeValidators(array_keys($contactInfo)));
+        ], $contact->makeValidators(array_keys($contactInfo), $messages));
 
-        $validator = Validator::make($contactInfo, $validators);
+        $validator = Validator::make($contactInfo, $validators, $messages);
 
         if ($validator->fails()) {
             throw new ValidationException($validator);

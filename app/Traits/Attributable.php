@@ -464,7 +464,7 @@ trait Attributable
         });
     }
 
-    public function makeValidators($attributeCodes = ['*'])
+    public function makeValidators($attributeCodes = ['*'], &$messages = [])
     {
         $validators = [];
 
@@ -486,18 +486,23 @@ trait Attributable
 
                 if ($entityAttribute->is_required) {
                     $validators[$attributeCode][] = 'required';
+                    $messages[$attributeCode . '.required'] = '请填写' . $entityAttribute->frontend_label;
                 }
 
                 if ($entityAttribute->is_unique) {
-                    $unique = Rule::unique($entityAttribute->backend_table)->where(function ($query) use ($entityAttribute) {
+                    $unique = Rule::unique($entityAttribute->backend_table, 'value')->where(function ($query) use ($entityAttribute) {
                         $query->where('attribute_id', $entityAttribute->id);
                     });
 
-                    if (!empty($this->id)) {
-                        $unique->ignore($this->id);
+                    $value = $this->getEntityAttributeRelation($attributeCode);
+
+                    if (!empty($value)) {
+                        $unique->ignore($value->id);
                     }
 
                     $validators[$attributeCode][] = $unique;
+
+                    $messages[$attributeCode . '.unique'] = $entityAttribute->frontend_label . '已存在';
                 }
 
                 if (Datetime::class === $entityAttribute->backend_model) {

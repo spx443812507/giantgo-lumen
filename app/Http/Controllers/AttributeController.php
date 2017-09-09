@@ -21,6 +21,28 @@ class AttributeController extends Controller
         $this->attributeService = $attributeService;
     }
 
+    public function getAttribute(Request $request, $entityTypeId, $attributeId)
+    {
+        try {
+            $attribute = $this->attributeService->getAttribute($entityTypeId, $attributeId);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($attribute);
+    }
+
+    public function getAttributeList(Request $request, $entityTypeId)
+    {
+        try {
+            $attributes = $this->attributeService->getAttributeList($entityTypeId);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($attributes);
+    }
+
     public function createAttribute(Request $request, $entityTypeId)
     {
         try {
@@ -54,10 +76,14 @@ class AttributeController extends Controller
         return response()->json($attribute, 200);
     }
 
-    public function getAttributeList(Request $request, $entityTypeId)
+    public function deleteAttribute(Request $request, $entityTypeId, $attributeId)
     {
-        $result = $this->attributeService->getAttributeList($entityTypeId);
+        try {
+            $this->attributeService->deleteAttribute($entityTypeId, $attributeId);
+        } catch (Exception $e) {
+            throw $e;
+        }
 
-        return response()->json($result);
+        return response()->json(null, 204);
     }
 }
