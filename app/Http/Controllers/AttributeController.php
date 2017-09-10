@@ -43,6 +43,34 @@ class AttributeController extends Controller
         return response()->json($attributes);
     }
 
+    public function searchAttributeList(Request $request)
+    {
+        $perPage = $request->input('per_page');
+        $entityTypeId = $request->input('entity_type_id');
+        $attributeCode = $request->input('attribute_code');
+
+        try {
+            $attributes = $this->attributeService->searchAttributeList($perPage, $entityTypeId, $attributeCode);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($attributes);
+    }
+
+    public function checkAttributeCode(Request $request, $entityTypeId, $attributeCode)
+    {
+        $attributeId = $request->input('attribute_id');
+
+        try {
+            $result = $this->attributeService->checkAttributeCode($entityTypeId, $attributeCode, $attributeId);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($result);
+    }
+
     public function createAttribute(Request $request, $entityTypeId)
     {
         try {

@@ -82,6 +82,54 @@ class AttributeService
         return $result;
     }
 
+    public function searchAttributeList(
+        $perPage = null,
+        $entityTypeId = null,
+        $attributeCode = null
+    )
+    {
+        $query = Attribute::query();
+
+        if (!empty($entityTypeId)) {
+            $query->where('entity_type_id', $entityTypeId);
+        }
+
+        if (!empty($attributeCode)) {
+            $query->where('attribute_code', 'like', '%' . $attributeCode . '%');
+        }
+
+        if (empty($perPage)) {
+            $perPage = 100;
+        } else if ($perPage > 1000) {
+            $perPage = 1000;
+        }
+
+        $attributes = $query->paginate($perPage);
+
+        return $attributes;
+    }
+
+    public function checkAttributeCode($entityTypeId, $attributeCode, $attributeId = null)
+    {
+        $query = Attribute::query();
+
+        if (!empty($entityTypeId)) {
+            $query->where('entity_type_id', $entityTypeId);
+        }
+
+        if (!empty($attributeCode)) {
+            $query->where('attribute_code', $attributeCode);
+        }
+
+        if (!empty($attributeId)) {
+            $query->whereDoesntHave('entities', function ($query) use ($attributeId) {
+                $query->where('attribute_id', '=', $attributeId);
+            });
+        }
+
+        return $query->get()->isEmpty();
+    }
+
     public function createAttribute($entityTypeId, $attributeInfo)
     {
         $attribute = null;

@@ -60,6 +60,7 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->get('/entities/{entity_type_id}/attributes/{attribute_id}', ['as' => 'attributes.get', 'uses' => 'AttributeController@getAttribute']);
         $app->get('/entities/{entity_type_id}/attributes', ['as' => 'attributes.list', 'uses' => 'AttributeController@getAttributeList']);
         $app->delete('/entities/{entity_type_id}/attributes/{attribute_id}', ['as' => 'attributes.delete', 'uses' => 'AttributeController@deleteAttribute']);
+        $app->get('/entities/{entity_type_id}/attribute_codes/{attribute_code}', ['as' => 'attribute_code.check', 'uses' => 'AttributeController@checkAttributeCode']);
 
         $app->post('/seminars', ['as' => 'seminars.create', 'uses' => 'SeminarController@createSeminar', 'middleware' => ['ability:admin,seminar-create']]);
         $app->put('/seminars/{seminar_id}', ['as' => 'seminars.update', 'uses' => 'SeminarController@updateSeminar', 'middleware' => ['ability:admin,seminar-edit']]);

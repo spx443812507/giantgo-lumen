@@ -79,21 +79,21 @@ class SpeakerService
     {
         $query = Speaker::query();
 
-        if ($entityTypeId) {
+        if (!empty($entityTypeId)) {
             $query->where('entity_type_id', $entityTypeId);
         }
 
-        if ($seminarId) {
+        if (!empty($seminarId)) {
             $query->where('seminar_id', $seminarId);
         }
 
-        if ($agendaId) {
+        if (!empty($agendaId)) {
             $query->whereHas('agendas', function ($query) use ($agendaId) {
                 $query->where('id', '=', $agendaId);
             });
         }
 
-        if ($name) {
+        if (!empty($name)) {
             $query->where('name', 'like', '%' . $name . '%');
         }
 
