@@ -78,7 +78,7 @@ class Seminar extends Model
 
     public function contacts()
     {
-        return $this->belongsToMany('App\Models\Contact');
+        return $this->belongsToMany('App\Models\Contact', 'seminar_contact');
     }
 
     public function agendas()

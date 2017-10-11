@@ -28,6 +28,7 @@ return [
     'attribute_not_exists' => '字段不存在',
     'attribute_code_has_exists' => '属性代码已存在',
     'seminar_not_exists' => '会议不存在',
+    'get_seminar_list_fail' => '获取会议列表失败',
     'contact_not_exists' => '联系人不存在',
     'route_not_found' => '请求地址不存在',
     'model_not_found' => '请求实体不存在',

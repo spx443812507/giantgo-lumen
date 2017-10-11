@@ -43,27 +43,33 @@ class SeminarService
 
     public function getSeminarList($perPage = null, $title = null, $startAt = null, $endAt = null, $sortBy = null, $order = 'desc')
     {
-        $query = Seminar::query();
+        try {
+            $query = Seminar::query();
 
-        if (!is_null($title)) {
-            $query->where('title', 'like', '%' . $title . '%');
+            if (!is_null($title)) {
+                $query->where('title', 'like', '%' . $title . '%');
+            }
+
+            if (!is_null($startAt)) {
+                $query->where('start_at', '>=', $startAt);
+            }
+
+            if (!is_null($endAt)) {
+                $query->where('end_at', '<=', $endAt);
+            }
+
+            $query->when($sortBy, function ($query) use ($sortBy, $order) {
+                return $query->orderBy($sortBy, $order);
+            });
+
+            $query->withCount('contacts');
+
+            $seminars = $query->paginate($perPage);
+
+            $seminars->load('entity');
+        } catch (Exception $e) {
+            throw new Exception('get_seminar_list_fail');
         }
-
-        if (!is_null($startAt)) {
-            $query->where('start_at', '>=', $startAt);
-        }
-
-        if (!is_null($endAt)) {
-            $query->where('end_at', '<=', $endAt);
-        }
-
-        $query->when($sortBy, function ($query) use ($sortBy, $order) {
-            return $query->orderBy($sortBy, $order);
-        });
-
-        $seminars = $query->paginate($perPage);
-
-        $seminars->load('entity');
 
         return $seminars;
     }
