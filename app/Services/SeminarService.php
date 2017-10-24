@@ -74,7 +74,7 @@ class SeminarService
         return $seminars;
     }
 
-    public function createSeminar($seminarInfo, User $user)
+    public function createSeminar($seminarInfo)
     {
         $seminar = new Seminar($seminarInfo);
 
@@ -97,7 +97,7 @@ class SeminarService
         }
 
         try {
-            $user->seminars()->save($seminar);
+            $seminar->save();
         } catch (Exception $e) {
             throw new Exception('create_seminar_fail');
         }

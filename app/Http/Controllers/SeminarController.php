@@ -10,7 +10,6 @@ namespace App\Http\Controllers;
 
 use App\Services\SeminarService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Exception;
 
 class SeminarController extends Controller
@@ -57,10 +56,8 @@ class SeminarController extends Controller
     {
         $seminarInfo = $request->all();
 
-        $user = Auth::user();
-
         try {
-            $seminar = $this->seminarService->createSeminar($seminarInfo, $user);
+            $seminar = $this->seminarService->createSeminar($seminarInfo);
         } catch (Exception $e) {
             throw $e;
         }
