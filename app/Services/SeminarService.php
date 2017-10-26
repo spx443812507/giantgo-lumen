@@ -86,6 +86,8 @@ class SeminarService
     {
         $seminar = new Seminar($seminarInfo);
 
+        $seminar->setEntityTypeIdAttribute($seminarInfo['entity_type_id']);
+
         $messages = [];
 
         $validators = array_merge([
@@ -119,6 +121,8 @@ class SeminarService
     {
         $seminar = $this->getSeminar($seminarId);
 
+        $seminar->setEntityTypeIdAttribute($seminarInfo['entity_type_id']);
+
         $messages = [];
 
         $validators = array_merge([
@@ -134,7 +138,8 @@ class SeminarService
         }
 
         try {
-            $seminar->fill($seminarInfo)->save();
+            $seminar->fill($seminarInfo);
+            $seminar->save();
         } catch (Exception $exception) {
             throw new Exception('update_seminar_fail');
         }

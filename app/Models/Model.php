@@ -13,17 +13,6 @@ use Illuminate\Database\Eloquent\Model as BaseModel;
 
 class Model extends BaseModel
 {
-    public function __construct(array $attributes = [])
-    {
-        $this->fillable[] = 'entity_type_id';
-
-        if (!empty($attributes['entity_type_id'])) {
-            $this->bootEntityAttribute($attributes['entity_type_id']);
-        }
-
-        parent::__construct($attributes);
-    }
-
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('c');
