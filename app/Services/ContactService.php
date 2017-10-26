@@ -64,8 +64,12 @@ class ContactService
             throw new Exception('contact_not_exists');
         }
 
-        if ($includeAttributes && !empty($entityTypeId)) {
-            $contact->attributes = $this->attributeService->getAttributeList($entityTypeId);
+        if (!empty($entityTypeId)) {
+            $contact->setEntityTypeIdAttribute($entityTypeId);
+
+            if ($includeAttributes) {
+                $contact->attributes = $this->attributeService->getAttributeList($entityTypeId);
+            }
         }
 
         return $contact;

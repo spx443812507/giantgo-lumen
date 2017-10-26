@@ -23,8 +23,6 @@ class CheckinController extends Controller
 
     public function getCheckin(Request $request, $seminarId, $checkinId)
     {
-        $checkin = null;
-
         try {
             $checkin = $this->checkinService->getCheckin($seminarId, $checkinId);
         } catch (Exception $e) {

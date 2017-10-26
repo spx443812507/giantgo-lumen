@@ -37,6 +37,8 @@ class SpeakerService
 
         $speaker = Speaker::find($speakerId);
 
+        $entityTypeId = $speaker->entity_type_id;
+
         if (empty($speaker)) {
             throw new Exception('speaker_not_exists');
         }
@@ -45,10 +47,12 @@ class SpeakerService
             throw new Exception('speaker_not_belong_to_seminar');
         }
 
-        $entityTypeId = $speaker->entity_type_id;
+        if (!empty($entityTypeId)) {
+            $speaker->setEntityTypeIdAttribute($entityTypeId);
 
-        if ($includeAttributes && !empty($entityTypeId)) {
-            $speaker->attributes = $this->attributeService->getAttributeList($entityTypeId);
+            if ($includeAttributes) {
+                $speaker->attributes = $this->attributeService->getAttributeList($entityTypeId);
+            }
         }
 
         return $speaker;

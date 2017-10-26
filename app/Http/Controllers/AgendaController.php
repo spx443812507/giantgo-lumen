@@ -23,8 +23,6 @@ class AgendaController extends Controller
 
     public function getAgenda(Request $request, $seminarId, $agendaId)
     {
-        $agenda = null;
-
         try {
             $agenda = $this->agendaService->getAgenda($seminarId, $agendaId);
         } catch (Exception $e) {

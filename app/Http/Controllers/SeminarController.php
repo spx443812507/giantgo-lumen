@@ -23,8 +23,6 @@ class SeminarController extends Controller
 
     public function getSeminar(Request $request, $seminarId)
     {
-        $seminar = null;
-
         try {
             $seminar = $this->seminarService->getSeminar($seminarId, true);
         } catch (Exception $e) {

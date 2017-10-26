@@ -23,8 +23,6 @@ class SpeakerController extends Controller
 
     public function getSpeaker(Request $request, $seminarId, $speakerId)
     {
-        $speaker = null;
-
         try {
             $speaker = $this->speakerService->getSpeaker($seminarId, $speakerId, true);
         } catch (Exception $e) {

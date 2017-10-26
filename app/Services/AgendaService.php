@@ -33,6 +33,8 @@ class AgendaService
 
         $agenda = Agenda::find($agendaId);
 
+        $entityTypeId = $agenda->entity_type_id;
+
         if (empty($agenda)) {
             throw new Exception('agenda_not_exists');
         }
@@ -41,10 +43,12 @@ class AgendaService
             throw new Exception('agenda_not_belong_to_seminar');
         }
 
-        $entityTypeId = $agenda->entity_type_id;
+        if (!empty($entityTypeId)) {
+            $agenda->setEntityTypeIdAttribute($entityTypeId);
 
-        if ($includeAttributes && !empty($entityTypeId)) {
-            $agenda->attributes = $this->attributeService->getAttributeList($entityTypeId);
+            if ($includeAttributes) {
+                $agenda->attributes = $this->attributeService->getAttributeList($entityTypeId);
+            }
         }
 
         $agenda->load('speakers');

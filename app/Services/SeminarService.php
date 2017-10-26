@@ -26,16 +26,24 @@ class SeminarService
 
     public function getSeminar($seminarId, $includeAttributes = false)
     {
-        $seminar = Seminar::find($seminarId);
+        try {
+            $seminar = Seminar::find($seminarId);
 
-        if (empty($seminar)) {
-            throw new Exception('seminar_not_exists');
-        }
+            $entityTypeId = $seminar->entity_type_id;
 
-        $entityTypeId = $seminar->entity_type_id;
+            if (empty($seminar)) {
+                throw new Exception('seminar_not_exists');
+            }
 
-        if ($includeAttributes && !empty($entityTypeId)) {
-            $seminar->attributes = $this->attributeService->getAttributeList($entityTypeId);
+            if (!empty($entityTypeId)) {
+                $seminar->setEntityTypeIdAttribute($entityTypeId);
+
+                if ($includeAttributes) {
+                    $seminar->attributes = $this->attributeService->getAttributeList($entityTypeId);
+                }
+            }
+        } catch (Exception $e) {
+            throw new Exception('get_seminar_fail');
         }
 
         return $seminar;
@@ -78,10 +86,6 @@ class SeminarService
     {
         $seminar = new Seminar($seminarInfo);
 
-        if (!empty($seminarInfo['entity_type_id'])) {
-            $seminar->entity_type_id = $seminarInfo['entity_type_id'];
-        }
-
         $messages = [];
 
         $validators = array_merge([
@@ -102,16 +106,18 @@ class SeminarService
             throw new Exception('create_seminar_fail');
         }
 
+        $entityTypeId = $seminar->entity_type_id;
+
+        if (!empty($entityTypeId)) {
+            $seminar->attributes = $this->attributeService->getAttributeList($entityTypeId);
+        }
+
         return $seminar;
     }
 
     public function updateSeminar($seminarId, $seminarInfo)
     {
         $seminar = $this->getSeminar($seminarId);
-
-        if (!empty($seminarInfo['entity_type_id'])) {
-            $seminar->entity_type_id = $seminarInfo['entity_type_id'];
-        }
 
         $messages = [];
 
@@ -131,6 +137,12 @@ class SeminarService
             $seminar->fill($seminarInfo)->save();
         } catch (Exception $exception) {
             throw new Exception('update_seminar_fail');
+        }
+
+        $entityTypeId = $seminar->entity_type_id;
+
+        if (!empty($entityTypeId)) {
+            $seminar->attributes = $this->attributeService->getAttributeList($entityTypeId);
         }
 
         return $seminar;
