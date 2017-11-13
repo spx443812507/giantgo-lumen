@@ -25,7 +25,7 @@ class ContactService
 
     public function __construct(AttributeService $attributeService, SeminarService $seminarService)
     {
-        $this->attribtueService = $attributeService;
+        $this->attributeService = $attributeService;
 
         $this->seminarService = $seminarService;
     }
@@ -125,8 +125,10 @@ class ContactService
     {
         $contact = $this->getContact($contactId);
 
-        if (!empty($contactInfo['entity_type_id'])) {
-            $contact->setEntityTypeIdAttribute($contactInfo['entity_type_id']);
+        $entityTypeId = empty($contactInfo['entity_type_id']) ? $contact->entity_type_id : $contactInfo['entity_type_id'];
+
+        if (!empty($entityTypeId)) {
+            $contact->setEntityTypeIdAttribute($entityTypeId);
         }
 
         $validator = Validator::make($contactInfo, $contact->makeValidators(array_keys($contactInfo)));
@@ -141,6 +143,12 @@ class ContactService
             if (!empty($verify)) {
                 $contact = $this->bindSocialAccount($contact, $verify);
             }
+
+            $entityTypeId = $contact->entity_type_id;
+
+            if (!empty($entityTypeId)) {
+                $contact->attributes = $this->attributeService->getAttributeList($entityTypeId);
+            }
         } catch (Exception $exception) {
             throw new Exception('update_contact_fail');
         }
@@ -150,11 +158,11 @@ class ContactService
 
     public function createSeminarContact($contactInfo, $seminarId, $verify)
     {
+        $seminar = $this->seminarService->getSeminar($seminarId);
+
+        $contact = $this->createContact($contactInfo, $verify);
+
         try {
-            $seminar = $this->seminarService->getSeminar($seminarId);
-
-            $contact = $this->createContact($contactInfo, $verify);
-
             $seminar->contacts()->attach($contact->id);
         } catch (Exception $exception) {
             throw new Exception('create_seminar_contact_fail');
@@ -165,13 +173,20 @@ class ContactService
 
     public function registerSeminarContact($seminarId, $contactId)
     {
-        try {
-            $seminar = $this->seminarService->getSeminar($seminarId);
+        $seminar = $this->seminarService->getSeminar($seminarId);
 
+        $contact = $this->getContact($contactId);
+
+        $contactIds = $seminar->contacts()->get()->pluck('id')->toArray();
+
+        if (in_array($contact->id, $contactIds)) {
+            throw new Exception('contact_has_registered_seminar');
+        }
+
+        try {
             $seminar->contacts()->attach($contactId);
         } catch (Exception $exception) {
             throw new Exception('register_seminar_contact_fail');
         }
-
     }
 }

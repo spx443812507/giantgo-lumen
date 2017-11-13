@@ -61,13 +61,13 @@ class AttributeService
     {
         $entityType = Entity::find($entityTypeId);
 
+        $result = [];
+
         if (empty($entityType)) {
-            throw new Exception('entity_type_not_exists');
+            return $result;
         }
 
-        $attributes = Attribute::where('entity_type_id', $entityTypeId)->get();
-
-        $result = [];
+        $attributes = $entityType->attributes()->get();
 
         if (!empty($attributes)) {
             foreach ($attributes as $key => $attribute) {

@@ -92,7 +92,7 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->get('/contact', ['as' => 'contacts.get', 'uses' => 'ContactController@me']);
         $app->put('/contact', ['as' => 'contacts.update', 'uses' => 'ContactController@updateMyInfo']);
         $app->get('/contact/social_account', ['as' => 'social_account.get', 'uses' => 'SocialAccountController@get']);
-        $app->post('/seminars/{seminar_id}/contacts/me', ['as' => 'seminars.contacts.register', 'uses' => 'ContactController@registerSeminarContact']);
+        $app->post('/seminars/{seminar_id}/contact', ['as' => 'seminars.contacts.register', 'uses' => 'ContactController@registerSeminarContact']);
     });
 });
 

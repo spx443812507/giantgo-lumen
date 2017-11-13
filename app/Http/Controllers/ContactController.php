@@ -88,7 +88,7 @@ class ContactController extends Controller
                 return response()->json(['error' => 'unauthorized'], 401);
             }
 
-            $contact = $this->contactService->getContact($contact->id);
+            $contact = $this->contactService->getContact($contact->id, true);
         } catch (Exceptions\TokenExpiredException $e) {
             return response()->json(['error' => 'token_expired'], 500);
         } catch (Exceptions\TokenInvalidException $e) {
@@ -165,7 +165,7 @@ class ContactController extends Controller
 
             $this->contactService->registerSeminarContact($seminarId, $contact->id);
 
-            return response()->json($contact);
+            return response()->json(null, 204);
         } catch (Exception $e) {
             throw $e;
         }

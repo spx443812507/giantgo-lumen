@@ -30,6 +30,7 @@ return [
     'seminar_not_exists' => '会议不存在',
     'get_seminar_list_fail' => '获取会议列表失败',
     'contact_not_exists' => '联系人不存在',
+    'contact_has_registered_seminar' => '联系人已报名会议',
     'route_not_found' => '请求地址不存在',
     'model_not_found' => '请求实体不存在',
     'bad_request' => '错误的请求',
