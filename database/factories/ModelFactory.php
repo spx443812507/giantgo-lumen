@@ -11,7 +11,7 @@
 |
 */
 
-$factory->define(App\Models\EAV\Factories\Entity::class, function (Faker\Generator $faker) {
+$factory->define(App\Models\EAV\Entity::class, function (Faker\Generator $faker) {
     return [
         'id' => $faker->unique(),
         'entity_type_name' => $faker->name,

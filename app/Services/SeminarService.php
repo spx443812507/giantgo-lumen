@@ -86,7 +86,9 @@ class SeminarService
     {
         $seminar = new Seminar($seminarInfo);
 
-        $seminar->setEntityTypeIdAttribute($seminarInfo['entity_type_id']);
+        if (!empty($seminarInfo['entity_type_id'])) {
+            $seminar->setEntityTypeIdAttribute($seminarInfo['entity_type_id']);
+        }
 
         $messages = [];
 
@@ -121,8 +123,10 @@ class SeminarService
     {
         $seminar = $this->getSeminar($seminarId);
 
-        $seminar->setEntityTypeIdAttribute($seminarInfo['entity_type_id']);
-
+        if (!empty($seminarInfo['entity_type_id'])) {
+            $seminar->setEntityTypeIdAttribute($seminarInfo['entity_type_id']);
+        }
+        
         $messages = [];
 
         $validators = array_merge([

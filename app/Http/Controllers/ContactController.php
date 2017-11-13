@@ -136,4 +136,38 @@ class ContactController extends Controller
 
         return response()->json($contacts);
     }
+
+    public function createSeminarContact(Request $request, $seminarId)
+    {
+        $contactInfo = $request->all();
+
+        $verify = $request->input('verify');
+
+        try {
+            $contact = $this->contactService->createSeminarContact($contactInfo, $seminarId, $verify);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return $contact;
+    }
+
+    public function registerSeminarContact(Request $request, $seminarId)
+    {
+        try {
+            $contact = Auth::guard('api')->user();
+
+            if (!$contact) {
+                return response()->json(['error' => 'unauthorized'], 401);
+            }
+
+            $contact = $this->contactService->getContact($contact->id);
+
+            $this->contactService->registerSeminarContact($seminarId, $contact->id);
+
+            return response()->json($contact);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
 }

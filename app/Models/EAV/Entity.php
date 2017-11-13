@@ -22,7 +22,7 @@ class Entity extends Model
      */
     protected $fillable = [
         'user_id', 'entity_type_name', 'entity_type_code',
-        'entity_model', 'attribute_model', 'entity_table', 'description'
+        'entity_model', 'entity_table', 'description'
     ];
 
     /**

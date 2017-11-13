@@ -35,6 +35,8 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
     $app->get('/seminars/{seminar_id}/agendas/{agenda_id}/speakers', ['as' => 'agenda.speakers.get', 'uses' => 'SpeakerController@getAgendaSpeakers']);
     $app->get('/seminars/{seminar_id}/entities/{entity_type_id}/speakers', ['as' => 'entity.speakers.get', 'uses' => 'SpeakerController@getEntitySpeakers']);
 
+    $app->post('/seminars/{seminar_id}/contacts', ['as' => 'seminars.contacts.create', 'uses' => 'ContactController@createSeminarContact']);
+
     $app->get('/search/speakers', ['as' => 'search.speakers', 'uses' => 'SpeakerController@searchSpeakerList']);
 
     $app->post('/files/avatar', ['as' => 'avatar.create', 'uses' => 'FileController@uploadAvatar']);
@@ -90,6 +92,7 @@ $app->group(['prefix' => $prefix, 'middleware' => 'cors'], function () use ($app
         $app->get('/contact', ['as' => 'contacts.get', 'uses' => 'ContactController@me']);
         $app->put('/contact', ['as' => 'contacts.update', 'uses' => 'ContactController@updateMyInfo']);
         $app->get('/contact/social_account', ['as' => 'social_account.get', 'uses' => 'SocialAccountController@get']);
+        $app->post('/seminars/{seminar_id}/contacts/me', ['as' => 'seminars.contacts.register', 'uses' => 'ContactController@registerSeminarContact']);
     });
 });
 

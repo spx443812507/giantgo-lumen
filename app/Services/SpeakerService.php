@@ -119,7 +119,7 @@ class SpeakerService
         $speaker = new Speaker($speakerInfo);
 
         if (!empty($speakerInfo['entity_type_id'])) {
-            $speaker->entity_type_id = $speakerInfo['entity_type_id'];
+            $speaker->setEntityTypeIdAttribute($speakerInfo['entity_type_id']);
         }
 
         $messages = [];
@@ -150,7 +150,7 @@ class SpeakerService
         $speaker = $this->getSpeaker($seminarId, $speakerId);
 
         if (!empty($speakerInfo['entity_type_id'])) {
-            $speaker->entity_type_id = $speakerInfo['entity_type_id'];
+            $speaker->setEntityTypeIdAttribute($speakerInfo['entity_type_id']);
         }
 
         $validators = array_merge([

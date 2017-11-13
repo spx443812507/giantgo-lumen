@@ -21,9 +21,13 @@ class ContactService
 {
     protected $attributeService;
 
-    public function __construct(AttributeService $attributeService)
+    protected $seminarService;
+
+    public function __construct(AttributeService $attributeService, SeminarService $seminarService)
     {
         $this->attribtueService = $attributeService;
+
+        $this->seminarService = $seminarService;
     }
 
     public function bindSocialAccountByVerify($contact, $verify)
@@ -87,7 +91,7 @@ class ContactService
         $contact = new Contact;
 
         if (!empty($contactInfo['entity_type_id'])) {
-            $contact->entity_type_id = $contactInfo['entity_type_id'];
+            $contact->setEntityTypeIdAttribute($contactInfo['entity_type_id']);
         }
 
         $messages = [];
@@ -122,7 +126,7 @@ class ContactService
         $contact = $this->getContact($contactId);
 
         if (!empty($contactInfo['entity_type_id'])) {
-            $contact->entity_type_id = $contactInfo['entity_type_id'];
+            $contact->setEntityTypeIdAttribute($contactInfo['entity_type_id']);
         }
 
         $validator = Validator::make($contactInfo, $contact->makeValidators(array_keys($contactInfo)));
@@ -142,5 +146,32 @@ class ContactService
         }
 
         return $contact;
+    }
+
+    public function createSeminarContact($contactInfo, $seminarId, $verify)
+    {
+        try {
+            $seminar = $this->seminarService->getSeminar($seminarId);
+
+            $contact = $this->createContact($contactInfo, $verify);
+
+            $seminar->contacts()->attach($contact->id);
+        } catch (Exception $exception) {
+            throw new Exception('create_seminar_contact_fail');
+        }
+
+        return $contact;
+    }
+
+    public function registerSeminarContact($seminarId, $contactId)
+    {
+        try {
+            $seminar = $this->seminarService->getSeminar($seminarId);
+
+            $seminar->contacts()->attach($contactId);
+        } catch (Exception $exception) {
+            throw new Exception('register_seminar_contact_fail');
+        }
+
     }
 }

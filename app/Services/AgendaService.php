@@ -78,7 +78,7 @@ class AgendaService
         $agenda = new Agenda($agendaInfo);
 
         if (!empty($agendaInfo['entity_type_id'])) {
-            $agenda->entity_type_id = $agendaInfo['entity_type_id'];
+            $agenda->setEntityTypeIdAttribute($agendaInfo['entity_type_id']);
         }
 
         $messages = [];
@@ -122,7 +122,7 @@ class AgendaService
         $agenda = $this->getAgenda($seminarId, $agendaId);
 
         if (!empty($agendaInfo['entity_type_id'])) {
-            $agenda->entity_type_id = $agendaInfo['entity_type_id'];
+            $agenda->setEntityTypeIdAttribute($agendaInfo['entity_type_id']);
         }
 
         $messages = [];
