@@ -9,7 +9,6 @@
 namespace App\Services;
 
 use App\Models\Seminar;
-use App\Models\User;
 use DateTime;
 use Exception;
 use Illuminate\Support\Facades\Validator;
