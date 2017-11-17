@@ -49,7 +49,8 @@ class Swoole
             echo "receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}\n";
 
             $sql = <<<MySQL
-INSERT INTO listeners (fd, command, params) VALUES(:fd, :command, :params);
+INSERT INTO listeners(fd, command, params, created_at) SELECT :fd, :command, :params, :created_at
+FROM dual WHERE not exists (select * from listeners where fd = :fd AND command = :command);
 MySQL;
 
             $data = json_decode($frame->data);
@@ -59,7 +60,9 @@ MySQL;
             $executor->execute([
                 ':fd' => $frame->fd,
                 ':command' => $data->command,
-                ':params' => json_encode($data->params)
+                ':params' => json_encode($data->params),
+                ':created_at' => date('Y-m-d H:m:s'),
+                ':updated_at' => date('Y-m-d H:m:s')
             ]);
 
             $executor->closeCursor();
@@ -67,6 +70,7 @@ MySQL;
 
         $this->server->on('request', function ($request, $response) {
             $command = $request->post['command'];
+            $data = $request->post['data'];
 
             $sql = 'select * from listeners where command = :command';
             $executor = $this->conn->prepare($sql);
@@ -79,7 +83,8 @@ MySQL;
                 if ($this->isWebSocketClient($row['fd'])) {
                     $this->server->push($row['fd'], json_encode([
                         'command' => $command,
-                        'params' => $row['params']
+                        'params' => $row['params'],
+                        'data' => $data
                     ]));
                 }
             }
