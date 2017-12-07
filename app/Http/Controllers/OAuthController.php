@@ -71,6 +71,8 @@ class OAuthController extends Controller
                 'client_secret' => $application['client_secret'],
                 'redirect' => $this->buildReturnUrl($application['redirect'], ['app_id' => $appId, 'return_url' => $returnUrl])
             ]]);
+        } else {
+            throw new Exception('application_not_exists');
         }
 
         return $this->config;
