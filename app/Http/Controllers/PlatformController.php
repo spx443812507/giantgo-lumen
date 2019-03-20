@@ -73,7 +73,7 @@ class PlatformController extends OAuthController
 
         $http = new Client();
 
-        $result = $http->request('post', 'http://devswcb.wechat.smarket.net.cn/index.php', ['json' =>
+        $result = $http->request('post', 'http://wechat/index.php', ['json' =>
             ["command" =>
                 ["size" => 0,
                     "orn" => "02-0001-00000001",
@@ -125,7 +125,7 @@ class PlatformController extends OAuthController
     {
         $openPlatform = $this->weChat->open_platform;
         // 直接跳转
-        $response = $openPlatform->pre_auth->redirect('http://password.smarket.net.cn/oauth/wechat/open/response');
+        $response = $openPlatform->pre_auth->redirect('http://password/oauth/wechat/open/response');
         // 获取跳转的 URL
         return $response->getTargetUrl();
     }
